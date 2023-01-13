@@ -15,6 +15,6 @@ public class ExitCommand extends Command {
 
     @Override
     public void execute(CommandArguments commandArguments) {
-        Rifle.getInstance().running = false;
+        Rifle.getInstance().stop();
     }
 }

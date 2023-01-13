@@ -4,6 +4,7 @@ import rifle.Rifle;
 import rifle.command.Command;
 import rifle.command.others.CommandArguments;
 import rifle.command.others.KeyArguments;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Set;
@@ -20,7 +21,7 @@ public class HelpCommand extends Command {
     @Override
     public void execute(CommandArguments commandArguments) {
         if (commandArguments.getOrigin().length() == 0)
-            Rifle.getInstance().getLogger().print(getAllCommands());
+            Rifle.getInstance().getLogger().println(getAllCommands());
         else {
             if (commandArguments.getOrigin().startsWith("-")) {
                 KeyArguments arguments = commandArguments.toKeyMode();
@@ -28,18 +29,18 @@ public class HelpCommand extends Command {
                     LinkedList<String> cmdNames = arguments.existsKey("n") ? arguments.getArgument("n") : arguments.getArgument("name");
 
                     if (cmdNames.size() > 0)
-                        Rifle.getInstance().getLogger().print(formatHelps(cmdNames.toArray(new String[0])));
+                        Rifle.getInstance().getLogger().println(formatHelps(cmdNames.toArray(new String[0])));
                     else
-                        Rifle.getInstance().getLogger().print("Missing parameter value.");
+                        Rifle.getInstance().getLogger().println("Missing parameter value.");
                 } else
-                    Rifle.getInstance().getLogger().print(getAllCommands());
+                    Rifle.getInstance().getLogger().println(getAllCommands());
             } else {
                 String[] cmds = commandArguments.toOrderMode().getArguments();
 
                 if (cmds.length > 0)
-                    Rifle.getInstance().getLogger().print(formatHelps(cmds));
+                    Rifle.getInstance().getLogger().println(formatHelps(cmds));
                 else
-                    Rifle.getInstance().getLogger().print(getAllCommands());
+                    Rifle.getInstance().getLogger().println(getAllCommands());
             }
         }
     }

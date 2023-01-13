@@ -8,7 +8,6 @@ import rifle.command.others.OrderArguments;
 
 import java.util.Arrays;
 import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * @author Huyemt
@@ -23,12 +22,12 @@ public class TestCommand extends Command {
     public void execute(CommandArguments commandArguments) {
         if (commandArguments.getOrigin().length() == 0)
             // no arguments
-            Rifle.getInstance().getLogger().print("Full arguments -> null" + "\nArguments order mode data" + orderToString(commandArguments.toOrderMode()) + "\nArguments key mode data" + keyValueToString(commandArguments.toKeyMode()));
+            Rifle.getInstance().getLogger().println("Full arguments -> null" + "\nArguments order mode data" + orderToString(commandArguments.toOrderMode()) + "\nArguments key mode data" + keyValueToString(commandArguments.toKeyMode()));
         else {
             if (commandArguments.getOrigin().startsWith("-"))
-                Rifle.getInstance().getLogger().print("Full arguments -> " + commandArguments.getOrigin() + "\nArguments key mode data" + keyValueToString(commandArguments.toKeyMode()));
+                Rifle.getInstance().getLogger().println("Full arguments -> " + commandArguments.getOrigin() + "\nArguments key mode data" + keyValueToString(commandArguments.toKeyMode()));
             else
-                Rifle.getInstance().getLogger().print("Full arguments -> " + commandArguments.getOrigin() + "\nArguments order mode data" + orderToString(commandArguments.toOrderMode()));
+                Rifle.getInstance().getLogger().println("Full arguments -> " + commandArguments.getOrigin() + "\nArguments order mode data" + orderToString(commandArguments.toOrderMode()));
         }
     }
 
