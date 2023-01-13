@@ -1,9 +1,7 @@
 package rifle;
 
 import rifle.command.CommandMap;
-import rifle.command.main.ExitCommand;
-import rifle.command.main.HelpCommand;
-import rifle.command.main.TestCommand;
+import rifle.command.main.*;
 import rifle.module.ModuleManager;
 import rifle.utils.Logger;
 import rifle.utils.MainLogger;
@@ -101,6 +99,8 @@ public class Rifle {
         getCommandMap().register(new ExitCommand());
         getCommandMap().register(new HelpCommand());
         getCommandMap().register(new TestCommand());
+        getCommandMap().register(new ModuleListCommand());
+        getCommandMap().register(new ModuleHelpCommand());
     }
 
     private void initDataFiles() {

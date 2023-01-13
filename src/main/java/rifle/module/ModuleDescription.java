@@ -27,7 +27,7 @@ public class ModuleDescription implements DescriptionKeys {
     }
 
     private void parse(LinkedHashMap<String, Object> map) {
-        name = String.valueOf(map.get(NAME));
+        name = String.valueOf(map.get(NAME)).replace(" ", "");
         main = String.valueOf(map.get(MAIN));
         description = String.valueOf(map.getOrDefault(DESCRIPTION, "no description in here"));
         version = String.valueOf(map.get(VERSION));

@@ -27,6 +27,10 @@ public class ModuleManager {
         return modules;
     }
 
+    public boolean existsModule(String name) {
+        return modules.containsKey(name);
+    }
+
     public void loadModule(File file) {
         for (Pattern pattern : loader.getPluginFilters()) {
             if (!pattern.matcher(file.getName()).matches())
