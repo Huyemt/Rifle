@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Keying of command arguments
  * @author Huyemt
  */
 

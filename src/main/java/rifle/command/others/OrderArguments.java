@@ -1,8 +1,7 @@
 package rifle.command.others;
 
-import java.util.Arrays;
-
 /**
+ * Ordering of command arguments
  * @author Huyemt
  */
 
