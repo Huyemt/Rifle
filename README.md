@@ -1,9 +1,9 @@
 ## What is Rifle?
 > <kbd>[Rifle](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/Rifle.java)</kbd> is a class console program written based on <kbd>Java</kbd>.<br>
 > <br>
-> It realizes the corresponding functions in the way of <kbd>[Command](https://github.com/huyemet/rifle/blob/main/src/main/Java/rifle/command/command.java)</kbd >. The supported command arguments types are: <kbd>[OrderArguments](https://github.com/huyemet/rifle/blob/main/src/main/Java/rifle/command/others/orderarguments.java)</kbd>(sequence parameter), <kbd>[KeyArguments](https://github.com/huyemet/rifle/blob/main/src/main/Java/rifle/command/others/keyarguments.java)</kbd >(keyword parameter).<br>
+> It realizes the corresponding functions in the way of <kbd>[Command](https://github.com/Huyemt/rifle/blob/main/src/main/Java/rifle/command/command.java)</kbd >. The supported command arguments types are: <kbd>[OrderArguments](https://github.com/huyemet/rifle/blob/main/src/main/Java/rifle/command/others/orderarguments.java)</kbd>(sequence parameter), <kbd>[KeyArguments](https://github.com/huyemet/rifle/blob/main/src/main/Java/rifle/command/others/keyarguments.java)</kbd >(keyword parameter).<br>
 > <br>
-> At the same time, it has the function of <kbd>[Module](https://github.com/huyemet/rifle/blob/main/src/main/Java/rifle/module/module.java)</kbd> loading, and it can load modules written by users or other developers, which is highly extensible.<br>
+> At the same time, it has the function of <kbd>[Module](https://github.com/Huyemt/rifle/blob/main/src/main/Java/rifle/module/module.java)</kbd> loading, and it can load modules written by users or other developers, which is highly extensible.<br>
 > <br>
 > At the same time, many useful functions in the field of network penetration are built in (not yet realized).
 >
