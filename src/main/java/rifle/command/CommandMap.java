@@ -1,11 +1,8 @@
 package rifle.command;
 
 import rifle.command.others.CommandArguments;
-import rifle.utils.Utils;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Huyemt
@@ -30,7 +27,7 @@ public class CommandMap {
     }
 
     public final Set<String> getAllCommandNames() {
-        return this.maps.keySet();
+        return new LinkedHashSet<>(this.maps.keySet());
     }
 
     public final boolean register(Command command) {
