@@ -1,5 +1,6 @@
 package rifle.module;
 
+import rifle.command.CommandMap;
 import rifle.utils.ModuleLogger;
 
 /**
@@ -47,6 +48,18 @@ public interface ModuleBase {
     boolean isSuspended();
 
     /**
+     * Set the select state
+     * @param state
+     */
+    void setSelected(boolean state);
+
+    /**
+     * Set the suspend state
+     * @param state
+     */
+    void setSuspended(boolean state);
+
+    /**
      * Get the logger of this module
      * @return ModuleLogger
      */
@@ -57,4 +70,10 @@ public interface ModuleBase {
      * @return ModuleDescription
      */
     ModuleDescription getModuleDescription();
+
+    /**
+     * Get the command map of the module
+     * @return CommandMap
+     */
+    CommandMap getCommandMap();
 }

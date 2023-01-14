@@ -75,6 +75,8 @@ public class Rifle {
         getCommandMap().register(new TestCommand());
         getCommandMap().register(new ModuleListCommand());
         getCommandMap().register(new ModuleHelpCommand());
+        getCommandMap().register(new UseCommand());
+        getCommandMap().register(new QuitCommand());
     }
 
     private void initDataFiles() {

@@ -63,7 +63,7 @@ public class ModuleHelpCommand extends Command {
                 stringBuilder.append("this module does not exists");
             else {
                 ModuleBase moduleBase = Rifle.getInstance().getModuleManager().getModule(name);
-                stringBuilder.append("\n    Version: ").append(moduleBase.getModuleDescription().getVersion()).append("\n    Authors: ").append(Arrays.toString(moduleBase.getModuleDescription().getAuthors().toArray(new String[0]))).append("\n    Description: ").append(moduleBase.getModuleDescription().getDescription());
+                stringBuilder.append("\n    Version: ").append(moduleBase.getModuleDescription().getVersion()).append("\n    Authors: ").append(Arrays.toString(moduleBase.getModuleDescription().getAuthors().toArray(new String[0]))).append("\n    Description: ").append(moduleBase.getModuleDescription().getDescription()).append("\n    Commands: ").append(String.valueOf(moduleBase.getCommandMap().getAllCommandNames()));
             }
             if ((i + 1) < moduleNames.length)
                 stringBuilder.append("\n");

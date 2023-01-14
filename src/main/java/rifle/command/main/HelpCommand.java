@@ -5,9 +5,7 @@ import rifle.command.Command;
 import rifle.command.others.CommandArguments;
 import rifle.command.others.KeyArguments;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Huyemt
@@ -57,11 +55,20 @@ public class HelpCommand extends Command {
 
             stringBuilder.append(name).append(": ");
 
-            if (!Rifle.getInstance().getCommandMap().exists(name))
-                stringBuilder.append("this command does not exists");
-            else {
-                Command command = Rifle.getInstance().getCommandMap().get(name);
-                stringBuilder.append("\n    Description: ").append(command.getDescription()).append("\n    Usage: ").append(formatUsages(command.getUsages()));
+            if (Rifle.getInstance().getConsoleThread().isMain()) {
+                if (!Rifle.getInstance().getCommandMap().exists(name))
+                    stringBuilder.append("this command does not exists in Rifle.");
+                else {
+                    Command command = Rifle.getInstance().getCommandMap().get(name);
+                    stringBuilder.append("\n    Description: ").append(command.getDescription()).append("\n    Usage: ").append(formatUsages(command.getUsages()));
+                }
+            } else {
+                if (!Rifle.getInstance().getConsoleThread().getModule().getCommandMap().exists(name))
+                    stringBuilder.append("this command does not exists in Rifle and Module \"{}\"".replace("{}", Rifle.getInstance().getConsoleThread().getModule().getModuleDescription().getName()));
+                else {
+                    Command command = Rifle.getInstance().getConsoleThread().getModule().getCommandMap().get(name);
+                    stringBuilder.append("\n    Description: ").append(command.getDescription()).append("\n    Usage: ").append(formatUsages(command.getUsages()));
+                }
             }
             if ((i + 1) < strings.length)
                 stringBuilder.append("\n");
@@ -89,7 +96,10 @@ public class HelpCommand extends Command {
         StringBuilder stringBuilder = new StringBuilder();
 
         stringBuilder.append("You can use \"help -name <cmdName>...\" or \"help <cmdName>...\" to get command help.\n\n");
-        Set<String> names = Rifle.getInstance().getCommandMap().getAllCommandNames();
+        Set<String> names = new LinkedHashSet<>(Rifle.getInstance().getCommandMap().getAllCommandNames());
+
+        if (!Rifle.getInstance().getConsoleThread().isMain())
+            names.addAll(Rifle.getInstance().getConsoleThread().getModule().getCommandMap().getAllCommandNames());
 
         stringBuilder.append("Commands ({}):\n".replace("{}", String.valueOf(names.size())));
         int i = 0;
