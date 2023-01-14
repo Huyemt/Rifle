@@ -22,7 +22,7 @@ public class ModuleHelpCommand extends Command {
     @Override
     public void execute(CommandArguments commandArguments) {
         if (commandArguments.getOrigin().length() == 0) {
-            Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage -> " + getUsage());
+            Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage -> \"" + getUsage() + "\"");
             return;
         }
         if (commandArguments.getOrigin().startsWith("-")) {
