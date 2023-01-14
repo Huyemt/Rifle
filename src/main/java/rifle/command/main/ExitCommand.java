@@ -10,11 +10,11 @@ import rifle.command.others.CommandArguments;
 
 public class ExitCommand extends Command {
     public ExitCommand() {
-        super("exit", "Exit the Rifle process", "exit");
+        super("exit", "Exit the Rifle process", new String[]{"exit"});
     }
 
     @Override
     public void execute(CommandArguments commandArguments) {
-        Rifle.getInstance().stop();
+        Rifle.getInstance().getConsoleThread().stopIt();
     }
 }

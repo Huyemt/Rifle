@@ -16,13 +16,13 @@ import java.util.LinkedList;
 
 public class ModuleHelpCommand extends Command {
     public ModuleHelpCommand() {
-        super("mhelp", "List the information of the module", "mhelp <moduleName>... || mhelp -name <moduleName>...");
+        super("mhelp", "List the information of the module", new String[]{"mhelp <moduleName>...", "mhelp -name <moduleName>..."});
     }
 
     @Override
     public void execute(CommandArguments commandArguments) {
         if (commandArguments.getOrigin().length() == 0) {
-            Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage -> \"" + getUsage() + "\"");
+            Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage:" + formatUsages());
             return;
         }
         if (commandArguments.getOrigin().startsWith("-")) {
@@ -35,14 +35,14 @@ public class ModuleHelpCommand extends Command {
                 else
                     Rifle.getInstance().getLogger().println("Missing parameter value.");
             } else
-                Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage -> \"" + getUsage() + "\"");
+                Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage:" + formatUsages());
         } else {
             String[] moduleNames = commandArguments.toOrderMode().getArguments();
 
             if (moduleNames.length > 0)
                 Rifle.getInstance().getLogger().println(formatHelps(moduleNames));
             else
-                Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage -> \"" + getUsage() + "\"");
+                Rifle.getInstance().getLogger().println("The format of `mhelp` you used is incorrect. Please refer to its usage:" + formatUsages());
         }
     }
 
@@ -66,6 +66,21 @@ public class ModuleHelpCommand extends Command {
                 stringBuilder.append("\n    Version: ").append(moduleBase.getModuleDescription().getVersion()).append("\n    Authors: ").append(Arrays.toString(moduleBase.getModuleDescription().getAuthors().toArray(new String[0]))).append("\n    Description: ").append(moduleBase.getModuleDescription().getDescription());
             }
             if ((i + 1) < moduleNames.length)
+                stringBuilder.append("\n");
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private String formatUsages() {
+        if (getUsages() == null || getUsages().length == 0)
+            return "";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n");
+        for (int i = 0; i < getUsages().length; i++) {
+            stringBuilder.append(" ".repeat(8)).append("- ").append(getUsages()[i]);
+            if ((i + 1) < getUsages().length)
                 stringBuilder.append("\n");
         }
 

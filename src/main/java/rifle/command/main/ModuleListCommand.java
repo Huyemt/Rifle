@@ -13,7 +13,7 @@ import java.util.Collection;
 
 public class ModuleListCommand extends Command {
     public ModuleListCommand() {
-        super("ml", "Lists the modules that have been loaded by Rifle", "ml");
+        super("ml", "Lists the modules that have been loaded by Rifle", new String[]{"ml"});
     }
 
     @Override

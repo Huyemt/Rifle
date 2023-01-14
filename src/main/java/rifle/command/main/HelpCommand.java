@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class HelpCommand extends Command {
     public HelpCommand() {
-        super("help", "Get command help", "help");
+        super("help", "Get command help", new String[]{"help"});
     }
 
     @Override
@@ -61,9 +61,24 @@ public class HelpCommand extends Command {
                 stringBuilder.append("this command does not exists");
             else {
                 Command command = Rifle.getInstance().getCommandMap().get(name);
-                stringBuilder.append("\n    Description: ").append(command.getDescription()).append("\n    Usage: ").append(command.getUsage());
+                stringBuilder.append("\n    Description: ").append(command.getDescription()).append("\n    Usage: ").append(formatUsages(command.getUsages()));
             }
             if ((i + 1) < strings.length)
+                stringBuilder.append("\n");
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private String formatUsages(String[] usages) {
+        if (usages == null || usages.length == 0)
+            return "";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n");
+        for (int i = 0; i < usages.length; i++) {
+            stringBuilder.append(" ".repeat(8)).append("- ").append(usages[i]);
+            if ((i + 1) < usages.length)
                 stringBuilder.append("\n");
         }
 

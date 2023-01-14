@@ -15,7 +15,7 @@ import java.util.LinkedList;
 
 public class TestCommand extends Command {
     public TestCommand() {
-        super("test", "Testing the Rifle command-system", "test <key> <value> || test <value>...");
+        super("test", "Testing the Rifle command-system", new String[]{"test <key> <value>...", "test <value>..."});
     }
 
     @Override

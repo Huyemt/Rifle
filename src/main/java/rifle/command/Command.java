@@ -12,12 +12,12 @@ public abstract class Command {
     // command description
     protected final String description;
     // command usage
-    protected final String usage;
+    protected final String[] usages;
 
-    public Command(String name, String description, String usage) {
+    public Command(String name, String description, String[] usages) {
         this.name = name;
         this.description = description;
-        this.usage = usage;
+        this.usages = usages;
     }
 
     /**
@@ -34,7 +34,7 @@ public abstract class Command {
         return description;
     }
 
-    public final String getUsage() {
-        return usage;
+    public final String[] getUsages() {
+        return usages;
     }
 }
