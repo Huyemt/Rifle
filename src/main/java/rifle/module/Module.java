@@ -2,11 +2,14 @@ package rifle.module;
 
 import rifle.utils.ModuleLogger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Huyemt
  */
 
-public class Module implements ModuleBase {
+public abstract class Module implements ModuleBase {
     private ModuleDescription description;
     private ModuleLogger logger;
 
@@ -25,7 +28,7 @@ public class Module implements ModuleBase {
     }
 
     @Override
-    public void onSuspend() {
+    public void onSuspended() {
 
     }
 
@@ -39,30 +42,58 @@ public class Module implements ModuleBase {
 
     }
 
+    /**
+     * Get the name of this module
+     * @return String
+     */
+    protected abstract String getModuleName();
+
+    /**
+     * Get the version of this module
+     * @return String
+     */
+    protected abstract String getModuleVersion();
+
+    /**
+     * Get the description of this module
+     * @return String
+     */
+    protected String getDescription() {
+        return "";
+    }
+
+    /**
+     * Get the authors of this module
+     * @return String[]
+     */
+    protected String[] getAuthors() {
+        return new String[0];
+    }
+
     @Override
-    public boolean isSelected() {
+    public final boolean isSelected() {
         return isSelected;
     }
 
     @Override
-    public boolean isSuspended() {
+    public final boolean isSuspended() {
         return isSuspened;
     }
 
     @Override
-    public ModuleLogger getLogger() {
+    public final ModuleLogger getLogger() {
         return logger;
     }
 
     @Override
-    public ModuleDescription getModuleDescription() {
+    public final ModuleDescription getModuleDescription() {
         return description;
     }
 
-    public final void init(ModuleDescription description) {
+    public final void init(String main) {
         if (!isInitalized) {
             isInitalized = true;
-            this.description = description;
+            this.description = new ModuleDescription(getModuleName(), main, getDescription(), getModuleVersion(), new ArrayList<>(List.of(getAuthors())));
             this.logger = new ModuleLogger(description.getName());
         }
     }

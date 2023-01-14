@@ -1,13 +1,10 @@
 package rifle.module;
 
 import rifle.Rifle;
-import rifle.utils.Utils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
-import java.util.jar.JarEntry;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
@@ -16,56 +13,52 @@ import java.util.regex.Pattern;
  */
 
 public class JarLoader implements ModuleLoader {
-    private final HashMap<String, Class> classHashMap = new HashMap<>();
+    private final HashMap<String, Class<?>> classHashMap = new HashMap<>();
     private final HashMap<String, ModuleClassLoader> loaderHashMap = new HashMap<>();
 
     public JarLoader() {
 
     }
 
-
     @Override
-    public ModuleBase loadModule(File file) throws Exception {
-        ModuleDescription description = getMouduleDescription(file);
-        if (description == null)
-            return null;
-
-        // get main classpath
-        String mainClassPath = description.getMain();
-        ModuleClassLoader classLoader = new ModuleClassLoader(this, getClass().getClassLoader(), file);
-        loaderHashMap.put(description.getName(), classLoader);
-        Module module;
-        try {
-            Class<?> javaClass = classLoader.findClass(mainClassPath);
-
-            if (!ModuleBase.class.isAssignableFrom(javaClass))
-                throw new Exception("The Module main class `" + description.getMain() + "` must extends `rifle.module.Module`!");
-
-            Class<Module> moduleClass = (Class<Module>) javaClass.asSubclass(Module.class);
-            module = moduleClass.newInstance();
-            module.init(description);
-            module.onLoad();
-            return module;
-        } catch (ClassNotFoundException e) {
-            throw new Exception("The Module main class `" + description.getMain() + "` is not found!");
-        }
-    }
-
-
-    @Override
-    public ModuleDescription getMouduleDescription(File file) {
-        try (JarFile jarFile = new JarFile(file)) {
-            // finding module.yml
-            JarEntry entry = jarFile.getJarEntry("module.yml");
-            if (entry == null)
+    public ModuleBase loadModule(File file) {
+        // Does Rifle support the module of this file
+        for (Pattern pattern : getPluginFilters())
+            if (!pattern.matcher(file.getName()).matches())
                 return null;
 
-            try (InputStream stream = jarFile.getInputStream(entry)) {
-                return new ModuleDescription(Utils.readFile(stream));
+        // Get the main classpath of the module
+        try (JarFile jarFile = new JarFile(file)) {
+            Attributes attributes = jarFile.getManifest().getMainAttributes();
+            String mainClassPath = attributes.getValue("Main-Class");
+
+            // Does MANIFEST.MF contain the value of Main-Class
+            if (mainClassPath == null)
+                throw new ClassNotFoundException("Unable to load \"{}\" because \"Main-Class\" could not be found.".replace("{}", file.getName()));
+
+            // loading it
+            ModuleClassLoader classLoader = new ModuleClassLoader(this, getClass().getClassLoader(), file);
+            Module module;
+            try {
+                Class<?> javaClass = classLoader.findClass(mainClassPath);
+
+                if (!ModuleBase.class.isAssignableFrom(javaClass))
+                    throw new Exception("The Module main class `" + mainClassPath + "` must extends `rifle.module.Module`!");
+
+                Class<Module> moduleClass = (Class<Module>) javaClass.asSubclass(Module.class);
+                module = moduleClass.newInstance();
+                module.init(mainClassPath);
+                loaderHashMap.put(module.getModuleName(), classLoader);
+                module.onLoad();
+                return module;
+            } catch (ClassNotFoundException e) {
+                Rifle.getInstance().getLogger().error("The Module main class `" + mainClassPath + "` must extends `rifle.module.Module`!");
             }
-        } catch (IOException e) {
-            return null;
+        } catch (Exception e) {
+            Rifle.getInstance().getLogger().error(e.getMessage());
         }
+
+        return null;
     }
 
     @Override

@@ -19,6 +19,11 @@ public class ModuleManager {
         loader = new JarLoader();
     }
 
+    /**
+     * Using name to get a module that was loaded by Rifle
+     * @param name
+     * @return ModuleBase
+     */
     public ModuleBase getModule(String name) {
         return modules.getOrDefault(name, null);
     }
@@ -31,27 +36,28 @@ public class ModuleManager {
         return modules.containsKey(name);
     }
 
+    /**
+     * Loading a module jar
+     * @param file
+     */
     public void loadModule(File file) {
         for (Pattern pattern : loader.getPluginFilters()) {
             if (!pattern.matcher(file.getName()).matches())
-                continue;
+                return;
+        }
 
-            ModuleDescription description = loader.getMouduleDescription(file);
-            if (description == null) {
-                Rifle.getInstance().getLogger().error("Unable to load Module `{}`".replace("{}", file.getName()));
-                continue;
-            }
-
-            try {
-                ModuleBase moduleBase = loader.loadModule(file);
-                if (moduleBase != null)
-                    modules.put(description.getName(), moduleBase);
-            } catch (Exception e) {
-                Rifle.getInstance().getLogger().error(e.getMessage());
-            }
+        try {
+            ModuleBase moduleBase = loader.loadModule(file);
+            if (moduleBase != null)
+                modules.put(moduleBase.getModuleDescription().getName(), moduleBase);
+        } catch (Exception e) {
+            Rifle.getInstance().getLogger().error(e.getMessage());
         }
     }
 
+    /**
+     * Loading modules from the dir path "modules"
+     */
     public void loadModules() {
         File f = new File(Rifle.RIFLE_PATH + "modules");
         if (!f.exists() || f.isFile())
@@ -65,6 +71,9 @@ public class ModuleManager {
         }
     }
 
+    /**
+     * Unloading modules that was loaded by Rifle
+     */
     public void closeModules() {
         for (ModuleBase moduleBase : modules.values())
             moduleBase.onClose();

@@ -22,7 +22,7 @@ public interface ModuleBase {
     /**
      * This method is executed when the user suspends the module (not quits the module)
      */
-    void onSuspend();
+    void onSuspended();
 
     /**
      * This method is executed when the user exits the module

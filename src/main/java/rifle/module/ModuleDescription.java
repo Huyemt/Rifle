@@ -1,11 +1,6 @@
 package rifle.module;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -19,27 +14,12 @@ public class ModuleDescription implements DescriptionKeys {
     private List<String> authors = new ArrayList<>();
     private String description;
 
-    public ModuleDescription(String yaml) {
-        DumperOptions dumperOptions = new DumperOptions();
-        dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-        Yaml yaml1 = new Yaml(dumperOptions);
-        parse(yaml1.loadAs(yaml, LinkedHashMap.class));
-    }
-
-    private void parse(LinkedHashMap<String, Object> map) {
-        name = String.valueOf(map.get(NAME)).replace(" ", "");
-        main = String.valueOf(map.get(MAIN));
-        description = String.valueOf(map.getOrDefault(DESCRIPTION, "no description in here"));
-        version = String.valueOf(map.get(VERSION));
-
-        if (map.containsKey(AUTHOR)) {
-            String a = String.valueOf(map.get(AUTHOR));
-
-            if (a.contains(","))
-                Collections.addAll(authors, a.split(","));
-            else
-                authors.add(a);
-        }
+    public ModuleDescription(String moduleName, String main, String description, String version, ArrayList<String> authors) {
+        this.name = moduleName;
+        this.main = main;
+        this.description = description;
+        this.version = version;
+        this.authors = authors;
     }
 
     public final String getName() {
