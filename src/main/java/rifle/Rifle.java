@@ -3,6 +3,7 @@ package rifle;
 import rifle.command.CommandMap;
 import rifle.command.main.*;
 import rifle.module.ModuleManager;
+import rifle.threads.ConsoleThread;
 import rifle.utils.Logger;
 import rifle.utils.MainLogger;
 import rifle.utils.Utils;
@@ -21,30 +22,23 @@ public class Rifle {
 
     // Rifle instance
     private static Rifle instance;
-    // running state (listen command)
-    public volatile boolean running = false;
 
     private Logger logger;
 
     private CommandMap commandMap;
 
     private ModuleManager manager;
+    private ConsoleThread consoleThread;
 
     public Rifle() {
         instance = this;
         RIFLE_PATH = System.getProperty("user.dir").concat(File.separator);
-
-        // set running state to true
-        this.running = true;
 
         // loading process
         this.load();
 
         // running process
         this.run();
-
-        // closing process
-        this.close();
     }
 
     private void load() {
@@ -65,34 +59,14 @@ public class Rifle {
     }
 
     private void run() {
-        Scanner scanner;
-        String[] cmd;
-        while (running) {
-            Thread.onSpinWait();
-            getLogger().print("Rifle> ");
-            scanner = new Scanner(System.in);
-
-            if (scanner.hasNext()) {
-                cmd = Utils.spiltCommand(scanner.nextLine());
-                if (cmd.length == 0)
-                    continue;
-
-                if (!getCommandMap().execute(cmd[0], cmd[1])) {
-                    getLogger().println("command `{name}` does not exists.".replace("{name}", cmd[0]));
-                }
-            }
+        consoleThread = new ConsoleThread(System.in);
+        consoleThread.start();
+        try {
+            consoleThread.join();
+        } catch (InterruptedException e) {
+            getLogger().error(e.getMessage());
+            consoleThread.stopIt();
         }
-    }
-
-    private void close() {
-
-        // unregister commands
-        String[] commands = getCommandMap().getAllCommandNames().toArray(new String[0]);
-        for (String commmand : commands) {
-            getCommandMap().unregister(commmand);
-        }
-
-
     }
 
     private void initMainCommands() {
@@ -126,8 +100,8 @@ public class Rifle {
         return logger;
     }
 
-    public final void stop() {
-        running = false;
+    public final ConsoleThread getConsoleThread() {
+        return consoleThread;
     }
 
     public static void main(String[] args) {
