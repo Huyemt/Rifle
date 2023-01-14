@@ -3,6 +3,8 @@ package rifle.command.main;
 import rifle.Rifle;
 import rifle.command.Command;
 import rifle.command.others.CommandArguments;
+import rifle.module.ModuleBase;
+import java.util.Collection;
 
 
 /**
@@ -16,17 +18,16 @@ public class ModuleListCommand extends Command {
 
     @Override
     public void execute(CommandArguments commandArguments) {
-        String[] moduleNames = Rifle.getInstance().getModuleManager().getModules().keySet().toArray(new String[0]);
+        Collection<ModuleBase> modules = Rifle.getInstance().getModuleManager().getModules().values();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Modules ({})".replace("{}", String.valueOf(moduleNames.length))).append(": ");
+        stringBuilder.append("Modules ({})".replace("{}", String.valueOf(modules.size()))).append(": ");
 
-        if (moduleNames.length > 0) {
-            stringBuilder.append("\n");
-            for (int i = 0; i < moduleNames.length; i++) {
-                stringBuilder.append("    - ").append(moduleNames[i]);
-
-                if ((i + 1) < moduleNames.length)
-                    stringBuilder.append("\n");
+        if (modules.size() > 0) {
+            int i = 0;
+            for (ModuleBase moduleBase : modules) {
+                stringBuilder.append(moduleBase.getModuleDescription().getFullname());
+                if ((i + 1) < modules.size())
+                    stringBuilder.append(",");
             }
         }
         Rifle.getInstance().getLogger().println(stringBuilder.toString());
