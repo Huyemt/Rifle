@@ -12,9 +12,9 @@
 <br><br>
 ## 如何使用命令？
 > * 顺序参数的例子:
-> > test a b c 
+>   > test a b c 
 > * 关键字参数的例子:
-> > test -a a -b b b
+>   > test -a a -b b b
 >
 <br><br>
 ## 它能干什么？
@@ -26,4 +26,4 @@
 > 但我现在已经是高二的学生了，所以接下来一年的时间里，Rifle不会频繁更新。
 ***
 
-#### <p align="right">感谢您对 Rifle 支持<br>By [Huyemt](https://github.com/Huyemt)<br>Edited on January 14th, 2023</p>
+<p align="right">感谢您对 Rifle 支持<br>By <a href="https://github.com/Huyemt">Huyemt</a><br>Edited on January 14th, 2023</p>
