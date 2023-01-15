@@ -67,6 +67,7 @@ public class Rifle {
 
     private void run() {
         consoleThread = new ConsoleThread(System.in);
+        getTaskMap().startCheck();
         consoleThread.start();
         try {
             consoleThread.join();
