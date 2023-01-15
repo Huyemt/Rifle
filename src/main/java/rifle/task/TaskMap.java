@@ -59,7 +59,6 @@ public class TaskMap {
         if (task.isAlive())
             return;
         taskHashMap.remove(task.getTaskID());
-        Rifle.getInstance().getLogger().info(TextFormat.FONT_GREEN + "Task \"" + TextFormat.STYLE_BOLD + TextFormat.FONT_RED + task.getTaskID() + TextFormat.STYLE_RESET + TextFormat.FONT_GREEN + "\" was stopped.");
     }
 
     public final boolean existsTask(String tid) {
