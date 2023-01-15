@@ -33,6 +33,7 @@ public class Rifle {
 
     public Rifle() {
         AnsiConsole.systemInstall();
+        clearScreen();
         instance = this;
         RIFLE_PATH = System.getProperty("user.dir").concat(File.separator);
         USER_SYSTEM = System.getProperty("os.name").toLowerCase();
@@ -80,6 +81,7 @@ public class Rifle {
         getCommandMap().register(new ModuleHelpCommand());
         getCommandMap().register(new UseCommand());
         getCommandMap().register(new QuitCommand());
+        getCommandMap().register(new ClearCommand());
     }
 
     private void initDataFiles() {
@@ -105,12 +107,16 @@ public class Rifle {
         return USER_SYSTEM;
     }
 
-    public String getRiflePath() {
+    public final String getRiflePath() {
         return RIFLE_PATH;
     }
 
     public final Logger getLogger() {
         return logger;
+    }
+
+    public final void clearScreen() {
+        System.out.println("\u001B[2J");
     }
 
     public final ConsoleThread getConsoleThread() {
