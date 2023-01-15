@@ -1,15 +1,15 @@
 package rifle;
 
+import org.fusesource.jansi.AnsiConsole;
 import rifle.command.CommandMap;
 import rifle.command.main.*;
 import rifle.module.ModuleManager;
 import rifle.threads.ConsoleThread;
 import rifle.utils.Logger;
 import rifle.utils.MainLogger;
-import rifle.utils.Utils;
+import rifle.utils.TextFormat;
 
 import java.io.File;
-import java.util.Scanner;
 
 /**
  * @author Huyemt
@@ -17,8 +17,9 @@ import java.util.Scanner;
 
 public class Rifle {
     public static final String VERSION = "1.0.0";
+    private final String USER_SYSTEM;
     public static final String RIFLE_NAME = "    ____     _    ____   __      \n   / __ \\   (_)  / __/  / /  ___ \n  / /_/ /  / /  / /_   / /  / _ \\\n / _, _/  / /  / __/  / /  /  __/\n/_/ |_|  /_/  /_/    /_/   \\___/ \n                                 \n";
-    public static String RIFLE_PATH = null;
+    private final String RIFLE_PATH;
 
     // Rifle instance
     private static Rifle instance;
@@ -31,8 +32,10 @@ public class Rifle {
     private ConsoleThread consoleThread;
 
     public Rifle() {
+        AnsiConsole.systemInstall();
         instance = this;
         RIFLE_PATH = System.getProperty("user.dir").concat(File.separator);
+        USER_SYSTEM = System.getProperty("os.name").toLowerCase();
 
         // loading process
         this.load();
@@ -49,9 +52,9 @@ public class Rifle {
         initDataFiles();
         initMainCommands();
 
-        getLogger().println(RIFLE_NAME);
-        getLogger().println("Author: Huyemt (楠生)");
-        getLogger().println("Welcome to Rifle v".concat(VERSION).concat("!"));
+        getLogger().println(TextFormat.FONT_RED + TextFormat.STYLE_BOLD.toString() + RIFLE_NAME);
+        getLogger().println(TextFormat.FONT_GREEN + "Author: " + TextFormat.STYLE_RESET + TextFormat.STYLE_BOLD + "Huyemt (楠生)");
+        getLogger().println("Welcome to " + TextFormat.FONT_RED + TextFormat.STYLE_BOLD + "Rifle" + TextFormat.STYLE_THIN + TextFormat.FONT_WHITE + " v" + VERSION + "!");
         getLogger().println("");
         manager.loadModules();
         getLogger().println("");
@@ -96,6 +99,14 @@ public class Rifle {
 
     public final ModuleManager getModuleManager() {
         return manager;
+    }
+
+    public final String getUserSystem() {
+        return USER_SYSTEM;
+    }
+
+    public String getRiflePath() {
+        return RIFLE_PATH;
     }
 
     public final Logger getLogger() {

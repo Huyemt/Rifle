@@ -11,10 +11,10 @@ public abstract class Logger {
     public abstract void error(String message);
 
     public final void print(String message) {
-        System.out.print(message);
+        System.out.print(message + TextFormat.STYLE_RESET);
     }
 
     public final void println(String message) {
-        System.out.println(message);
+        System.out.println(message + TextFormat.STYLE_RESET);
     }
 }

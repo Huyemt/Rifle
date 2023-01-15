@@ -25,7 +25,6 @@ public class QuitCommand extends Command {
                 }
                 moduleBase.onQuit();
                 moduleBase.setSelected(false);
-                moduleBase.setSuspended(false);
                 Rifle.getInstance().getConsoleThread().setMain();
             }
         }

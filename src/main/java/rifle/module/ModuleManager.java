@@ -59,7 +59,7 @@ public class ModuleManager {
      * Loading modules from the dir path "modules"
      */
     public void loadModules() {
-        File f = new File(Rifle.RIFLE_PATH + "modules");
+        File f = new File(Rifle.getInstance().getRiflePath() + "modules");
         if (!f.exists() || f.isFile())
             return;
 

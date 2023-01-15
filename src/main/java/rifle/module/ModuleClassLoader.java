@@ -1,7 +1,5 @@
 package rifle.module;
 
-import rifle.Rifle;
-
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;

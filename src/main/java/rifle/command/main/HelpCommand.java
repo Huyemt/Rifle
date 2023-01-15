@@ -4,6 +4,7 @@ import rifle.Rifle;
 import rifle.command.Command;
 import rifle.command.others.CommandArguments;
 import rifle.command.others.KeyArguments;
+import rifle.utils.TextFormat;
 
 import java.util.*;
 
@@ -29,7 +30,7 @@ public class HelpCommand extends Command {
                     if (cmdNames.size() > 0)
                         Rifle.getInstance().getLogger().println(formatHelps(cmdNames.toArray(new String[0])));
                     else
-                        Rifle.getInstance().getLogger().println("Missing parameter value.");
+                        Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "Missing parameter value.");
                 } else
                     Rifle.getInstance().getLogger().println(getAllCommands());
             } else {
@@ -57,14 +58,14 @@ public class HelpCommand extends Command {
 
             if (Rifle.getInstance().getConsoleThread().isMain()) {
                 if (!Rifle.getInstance().getCommandMap().exists(name))
-                    stringBuilder.append("this command does not exists in Rifle.");
+                    stringBuilder.append(TextFormat.FONT_RED).append("this command does not exists in Rifle.").append(TextFormat.STYLE_RESET);
                 else {
                     Command command = Rifle.getInstance().getCommandMap().get(name);
                     stringBuilder.append("\n    Description: ").append(command.getDescription()).append("\n    Usage: ").append(formatUsages(command.getUsages()));
                 }
             } else {
                 if (!Rifle.getInstance().getConsoleThread().getModule().getCommandMap().exists(name))
-                    stringBuilder.append("this command does not exists in Rifle and Module \"{}\"".replace("{}", Rifle.getInstance().getConsoleThread().getModule().getModuleDescription().getName()));
+                    stringBuilder.append(TextFormat.FONT_RED).append("this command does not exists in Rifle and Module \"{}\"".replace("{}", Rifle.getInstance().getConsoleThread().getModule().getModuleDescription().getName())).append(TextFormat.STYLE_RESET);
                 else {
                     Command command = Rifle.getInstance().getConsoleThread().getModule().getCommandMap().get(name);
                     stringBuilder.append("\n    Description: ").append(command.getDescription()).append("\n    Usage: ").append(formatUsages(command.getUsages()));
@@ -84,7 +85,7 @@ public class HelpCommand extends Command {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\n");
         for (int i = 0; i < usages.length; i++) {
-            stringBuilder.append(" ".repeat(8)).append("- ").append(usages[i]);
+            stringBuilder.append(" ".repeat(8)).append(TextFormat.FONT_WHITE).append("- ").append(TextFormat.STYLE_RESET).append(usages[i]);
             if ((i + 1) < usages.length)
                 stringBuilder.append("\n");
         }
@@ -95,17 +96,17 @@ public class HelpCommand extends Command {
     private String getAllCommands() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("You can use \"help -name <cmdName>...\" or \"help <cmdName>...\" to get command help.\n\n");
+        stringBuilder.append(TextFormat.FONT_GREEN).append("You can use \"help -name <cmdName>...\" or \"help <cmdName>...\" to get command help.\n\n").append(TextFormat.STYLE_RESET);
         Set<String> names = new LinkedHashSet<>(Rifle.getInstance().getCommandMap().getAllCommandNames());
 
         if (!Rifle.getInstance().getConsoleThread().isMain())
             names.addAll(Rifle.getInstance().getConsoleThread().getModule().getCommandMap().getAllCommandNames());
 
-        stringBuilder.append("Commands ({}):\n".replace("{}", String.valueOf(names.size())));
+        stringBuilder.append("Commands ({}):\n".replace("{}", TextFormat.FONT_RED + String.valueOf(names.size()) + TextFormat.STYLE_RESET));
         int i = 0;
         for (String cmd : names) {
             i++;
-            stringBuilder.append("  - ").append(cmd);
+            stringBuilder.append(TextFormat.FONT_WHITE).append("  - ").append(TextFormat.STYLE_RESET).append(cmd);
             if (i < names.size())
                 stringBuilder.append("\n");
         }

@@ -21,11 +21,6 @@ public interface ModuleBase {
     void onSelected();
 
     /**
-     * This method is executed when the user suspends the module (not quits the module)
-     */
-    void onSuspended();
-
-    /**
      * This method is executed when the user exits the module
      */
     void onQuit();
@@ -42,22 +37,10 @@ public interface ModuleBase {
     boolean isSelected();
 
     /**
-     * Gets whether the module is suspended
-     * @return boolean
-     */
-    boolean isSuspended();
-
-    /**
      * Set the select state
      * @param state
      */
     void setSelected(boolean state);
-
-    /**
-     * Set the suspend state
-     * @param state
-     */
-    void setSuspended(boolean state);
 
     /**
      * Get the logger of this module

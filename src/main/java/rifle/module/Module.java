@@ -15,7 +15,6 @@ public abstract class Module implements ModuleBase {
     private ModuleLogger logger;
     private CommandMap commandMap;
     public boolean isSelected = false;
-    public boolean isSuspened = false;
     private boolean isInitalized = false;
 
     @Override
@@ -25,11 +24,6 @@ public abstract class Module implements ModuleBase {
 
     @Override
     public void onSelected() {
-
-    }
-
-    @Override
-    public void onSuspended() {
 
     }
 
@@ -77,18 +71,8 @@ public abstract class Module implements ModuleBase {
     }
 
     @Override
-    public final boolean isSuspended() {
-        return isSuspened;
-    }
-
-    @Override
     public final void setSelected(boolean selected) {
         isSelected = selected;
-    }
-
-    @Override
-    public final void setSuspended(boolean suspended) {
-        isSuspened = suspended;
     }
 
     @Override

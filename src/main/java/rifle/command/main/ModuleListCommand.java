@@ -4,6 +4,8 @@ import rifle.Rifle;
 import rifle.command.Command;
 import rifle.command.others.CommandArguments;
 import rifle.module.ModuleBase;
+import rifle.utils.TextFormat;
+
 import java.util.Collection;
 
 
@@ -20,12 +22,12 @@ public class ModuleListCommand extends Command {
     public void execute(CommandArguments commandArguments) {
         Collection<ModuleBase> modules = Rifle.getInstance().getModuleManager().getModules().values();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Modules ({})".replace("{}", String.valueOf(modules.size()))).append(": ");
+        stringBuilder.append("Modules ({})".replace("{}", TextFormat.FONT_RED + String.valueOf(modules.size()) + TextFormat.STYLE_RESET)).append(": ");
 
         if (modules.size() > 0) {
             int i = 0;
             for (ModuleBase moduleBase : modules) {
-                stringBuilder.append(moduleBase.getModuleDescription().getFullname());
+                stringBuilder.append(TextFormat.FONT_GREEN).append(moduleBase.getModuleDescription().getFullname()).append(TextFormat.STYLE_RESET);
                 if ((i + 1) < modules.size())
                     stringBuilder.append(",");
             }
