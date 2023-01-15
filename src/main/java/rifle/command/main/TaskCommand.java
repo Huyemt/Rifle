@@ -56,7 +56,7 @@ public class TaskCommand extends Command {
                             }
                         };
                         Rifle.getInstance().getTaskMap().addTask(task);
-                        Rifle.getInstance().getLogger().println(TextFormat.FONT_GREEN + "Successfully added task" + TextFormat.FONT_BLUE + " -> " + TextFormat.FONT_WHITE + commandArguments.getOrigin());
+                        Rifle.getInstance().getLogger().println(TextFormat.FONT_GREEN + "Successfully added task \"{}\"".replace("{}", TextFormat.FONT_RED + task.getTaskID() + TextFormat.FONT_GREEN) + TextFormat.FONT_BLUE + " -> " + TextFormat.FONT_WHITE + commandArguments.getOrigin());
                         return;
                     }
                     Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "command `{name}` does not exists in Rifle and Module \"{module}\".".replace("{name}", TextFormat.FONT_BLUE.toString() + TextFormat.STYLE_BOLD + cmd[0] + TextFormat.STYLE_RESET + TextFormat.FONT_RED).replace("{module}", module.getModuleDescription().getName()));
