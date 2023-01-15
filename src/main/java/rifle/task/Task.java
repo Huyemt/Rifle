@@ -26,10 +26,4 @@ public class Task extends Thread {
     public synchronized final void start() {
         super.start();
     }
-
-    @Override
-    public void interrupt() {
-        super.interrupt();
-        Rifle.getInstance().getTaskMap().removeTask(tid);
-    }
 }
