@@ -11,10 +11,11 @@ import java.util.*;
 
 public class TaskMap {
     private final HashMap<String, Task> taskHashMap = new HashMap<>();
+    private final Thread check;
 
     public TaskMap() {
-        Thread thread = new Thread(() -> {
-            while (true) {
+        check = new Thread(() -> {
+            while (Rifle.getInstance().getConsoleThread().isAlive()) {
                 if (taskHashMap.size() > 0) {
                     synchronized (taskHashMap) {
                         Collection<Task> collection = taskHashMap.values();
@@ -26,7 +27,12 @@ public class TaskMap {
                 }
             }
         });
-        thread.start();
+    }
+
+    public final void startCheck() {
+        if (check.isAlive())
+            return;
+        check.start();
     }
 
     public final synchronized void addTask(Task task) {
