@@ -16,17 +16,15 @@ public class QuitCommand extends Command {
 
     @Override
     public void execute(CommandArguments commandArguments) {
-        if (commandArguments.getOrigin().length() == 0) {
-            if (!Rifle.getInstance().getConsoleThread().isMain()) {
-                ModuleBase moduleBase = Rifle.getInstance().getConsoleThread().getModule();
-                if (moduleBase == null) {
-                    Rifle.getInstance().getConsoleThread().setMain();
-                    return;
-                }
-                moduleBase.onQuit();
-                moduleBase.setSelected(false);
+        if (!Rifle.getInstance().getConsoleThread().isMain()) {
+            ModuleBase moduleBase = Rifle.getInstance().getConsoleThread().getModule();
+            if (moduleBase == null) {
                 Rifle.getInstance().getConsoleThread().setMain();
+                return;
             }
+            moduleBase.onQuit();
+            moduleBase.setSelected(false);
+            Rifle.getInstance().getConsoleThread().setMain();
         }
     }
 }

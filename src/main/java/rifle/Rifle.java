@@ -4,6 +4,7 @@ import org.fusesource.jansi.AnsiConsole;
 import rifle.command.CommandMap;
 import rifle.command.main.*;
 import rifle.module.ModuleManager;
+import rifle.task.TaskMap;
 import rifle.threads.ConsoleThread;
 import rifle.utils.Logger;
 import rifle.utils.MainLogger;
@@ -30,6 +31,7 @@ public class Rifle {
 
     private ModuleManager manager;
     private ConsoleThread consoleThread;
+    private TaskMap taskMap;
 
     public Rifle() {
         AnsiConsole.systemInstall();
@@ -46,6 +48,7 @@ public class Rifle {
     }
 
     private void load() {
+        taskMap = new TaskMap();
         logger = new MainLogger();
         commandMap = new CommandMap();
         manager = new ModuleManager();
@@ -82,6 +85,9 @@ public class Rifle {
         getCommandMap().register(new UseCommand());
         getCommandMap().register(new QuitCommand());
         getCommandMap().register(new ClearCommand());
+        getCommandMap().register(new TaskCommand());
+        getCommandMap().register(new TaskListCommand());
+        getCommandMap().register(new TasKillCommand());
     }
 
     private void initDataFiles() {
@@ -113,6 +119,10 @@ public class Rifle {
 
     public final Logger getLogger() {
         return logger;
+    }
+
+    public final TaskMap getTaskMap() {
+        return taskMap;
     }
 
     public final void clearScreen() {

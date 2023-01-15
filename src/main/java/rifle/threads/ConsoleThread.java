@@ -1,6 +1,5 @@
 package rifle.threads;
 
-import org.fusesource.jansi.AnsiConsole;
 import rifle.Rifle;
 import rifle.module.ModuleBase;
 import rifle.utils.TextFormat;
