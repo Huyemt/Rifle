@@ -32,9 +32,9 @@ public class ConsoleThread extends Thread {
             Rifle.getInstance().getLogger().print(isMain() ? "Rifle> " : "Rifle[{}]> ".replace("{}", module.getModuleDescription().getName()));
             scanner = new Scanner(inputStream);
 
-            if (scanner.hasNext()) {
+            if (scanner.hasNextLine()) {
                 String[] cmd = Utils.spiltCommand(scanner.nextLine());
-                if (cmd.length == 0)
+                if (cmd[0].length() == 0 || cmd[0].startsWith("\n"))
                     continue;
 
                 if (!Rifle.getInstance().getCommandMap().execute(cmd[0], cmd[1])) {
