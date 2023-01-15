@@ -28,7 +28,7 @@ public class ConsoleThread extends Thread {
     public void run() {
         Scanner scanner;
         while (running) {
-            Rifle.getInstance().getLogger().print(isMain() ? "Rifle> " : "Rifle[{}]> ".replace("{}", module.getModuleDescription().getName()));
+            Rifle.getInstance().getLogger().print(isMain() ? TextFormat.STYLE_UNDERLINE + "Rifle" + TextFormat.STYLE_RESET + "> " : "Rifle [{}]> ".replace("{}", module.getModuleDescription().getName()));
             scanner = new Scanner(inputStream);
 
             if (scanner.hasNextLine()) {
