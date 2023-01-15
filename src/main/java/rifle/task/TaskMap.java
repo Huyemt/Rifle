@@ -1,7 +1,6 @@
 package rifle.task;
 
 import rifle.Rifle;
-import rifle.utils.TextFormat;
 
 import java.util.*;
 
