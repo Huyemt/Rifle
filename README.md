@@ -26,6 +26,8 @@ Keyword parameter:<br>
 ```commandline
 test -a a -b b b -c -d
 ```
+## Development document
+[Click me](https://github.com/Huyemt/Rifle/tree/main/docs)
 ## What can it do?
 You can use it as a tool for processing daily data, or you can make it a useful tool for your work field. The use effect is almost up to you!
 ## Will it be updated continuously?

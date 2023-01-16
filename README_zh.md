@@ -27,6 +27,8 @@ test a b c
 ```commandline
 test -a a -b b b -c -d
 ```
+## 开发文档
+[点我阅读](https://github.com/Huyemt/Rifle/tree/main/docs)
 ## 它能干什么？
 您可以把它当作一个处理日常数据用的工具，也可以把它打造成一个对您的工作领域有用的利器。使用效果几乎由您决定！
 ## 它会持续更新吗？
