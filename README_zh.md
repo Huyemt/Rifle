@@ -16,7 +16,7 @@
 >  * 执行方法```initMainCommands()```，注册<kbd>[Rifle](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/Rifle.java)</kbd>的主要命令
 >    * 执行<kbd>[ModuleManager](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/module/ModuleManager.java)</kbd>的```loadModules()```方法，加载文件夹<kbd>modules</kbd>的所有<kbd>[Module](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/module/Module.java)</kbd>(模块)
 > * ```run()```
->   * 实例化<kbd>[ConsoleThread](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/thrdeads/ConsoleThread.java)</kbd>线程，用于监听用户输入的命令
+>   * 实例化<kbd>[ConsoleThread](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/threads/ConsoleThread.java)</kbd>线程，用于监听用户输入的命令
 >   * 执行方法```getTaskMap().startCheck()```，开启对 <kbd>[TaskMap](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/task/TaskMap.java)</kbd>里面存放的<kbd>[Task](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/task/Task.java)</kbd>进行存活检测，生命周期结束的任务将被移除
 ## 使用命令的规范是怎么样的？
 顺序参数的例子:<br>
