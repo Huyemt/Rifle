@@ -11,6 +11,7 @@ import rifle.utils.MainLogger;
 import rifle.utils.TextFormat;
 
 import java.io.File;
+import java.util.Scanner;
 
 /**
  * @author Huyemt
@@ -74,6 +75,7 @@ public class Rifle {
         } catch (InterruptedException e) {
             getLogger().error(e.getMessage());
             consoleThread.stopIt();
+            new Scanner(System.in);
         }
     }
 
