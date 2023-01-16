@@ -13,11 +13,17 @@ public abstract class Command {
     protected final String description;
     // command usage
     protected final String[] usages;
+    protected boolean canAsTask;
 
-    public Command(String name, String description, String[] usages) {
+    public Command(String name, String description, String[] usages, boolean canAsTask) {
         this.name = name;
         this.description = description;
         this.usages = usages;
+        this.canAsTask = canAsTask;
+    }
+
+    public Command(String name, String description, String[] usages) {
+        this(name, description, usages, false);
     }
 
     /**
@@ -36,5 +42,9 @@ public abstract class Command {
 
     public final String[] getUsages() {
         return usages;
+    }
+
+    public final boolean isCanAsTask() {
+        return canAsTask;
     }
 }

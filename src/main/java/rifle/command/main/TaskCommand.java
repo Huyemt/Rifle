@@ -25,12 +25,12 @@ public class TaskCommand extends Command {
                 return;
             }
 
-            if (cmd[0].equalsIgnoreCase("task") || cmd[0].equalsIgnoreCase("use")) {
-                Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "You cannot suspend the command as a task.");
-                return;
-            }
-
             if (Rifle.getInstance().getCommandMap().exists(cmd[0])) {
+                if (!Rifle.getInstance().getCommandMap().get(cmd[0]).isCanAsTask()) {
+                    Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "You cannot suspend the command as a task.");
+                    return;
+                }
+
                 Task task = new Task() {
                     @Override
                     public void run() {
@@ -49,6 +49,11 @@ public class TaskCommand extends Command {
                     }
 
                     if (module.getCommandMap().exists(cmd[0])) {
+                        if (!module.getCommandMap().get(cmd[0]).isCanAsTask()) {
+                            Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "You cannot suspend the command as a task.");
+                            return;
+                        }
+
                         Task task = new Task() {
                             @Override
                             public void run() {

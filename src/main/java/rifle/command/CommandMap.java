@@ -20,10 +20,7 @@ public class CommandMap {
     }
 
     public final Command get(String name) {
-        if (!exists(name))
-            return null;
-
-        return this.maps.get(name);
+        return this.maps.getOrDefault(name, null);
     }
 
     public final Set<String> getAllCommandNames() {
