@@ -15,7 +15,7 @@ When the <kbd>[Rifle](https://github.com/Huyemt/Rifle/blob/main/src/main/java/ri
 >       * Detect whether the folder <kbd>modules</kbd> already exists, and create it if it does not exist.
 >   * Executing the method ```initMainCommands()``` to register the main command of <kbd>[Rifle](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/Rifle.java)</kbd>.
 > * ```run()```
->   * Instantiating <kbd>[ConsoleThread](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/thrdeads/ConsoleThread.java)</kbd> thread, which is used to listen to the commands input by the user.
+>   * Instantiating <kbd>[ConsoleThread](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/threads/ConsoleThread.java)</kbd> thread, which is used to listen to the commands input by the user.
 >   * Executing the method ```getTaskMap().startCheck()``` to start the survival detection of the tasks stored in <kbd>[TaskMap](https://github.com/Huyemt/Rifle/blob/main/src/main/java/rifle/task/TaskMap.java)</kbd>, and the tasks whose life cycle ends will be removed.
 ## What is the specification for using commands?
 Sequential parameter:<br>
