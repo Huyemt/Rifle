@@ -1,1 +1,1 @@
-The project is being reconstructed.
+Please wait for the update.
