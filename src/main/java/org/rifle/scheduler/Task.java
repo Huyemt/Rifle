@@ -13,7 +13,7 @@ public abstract class Task {
     /**
      * 任务运行，我们需要把要做的工作实现到这个方法之中
      *
-     * Task running, we need to realize the work to be done in this method.
+     * Task running, we need to realize the work to be done in this method
      */
     public abstract void run();
 

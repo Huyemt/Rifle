@@ -31,10 +31,26 @@ public class TaskManager {
         }).start();
     }
 
+    /**
+     * 通过任务id查询任务是否存在
+     *
+     * Query whether a task exists by task id
+     *
+     * @param tid
+     * @return boolean
+     */
     public final boolean exists(String tid) {
         return tasks.containsKey(tid);
     }
 
+    /**
+     * 添加一条任务
+     *
+     * Add a task
+     *
+     * @param task
+     * @return boolean
+     */
     public synchronized final boolean addTask(Task task) {
         if (task == null || task.isRunning())
             return false;
@@ -48,12 +64,20 @@ public class TaskManager {
         return task.isRunning();
     }
 
+    /**
+     * 取消一个任务
+     *
+     * Cancel a task
+     *
+     * @param tid
+     * @return
+     */
     public synchronized final boolean cancelTask(String tid) {
         if (!exists(tid))
             return false;
 
         tasks.get(tid).cancel();
-        return true;
+        return !exists(tid);
     }
 
     public synchronized final void remove(String tid) {

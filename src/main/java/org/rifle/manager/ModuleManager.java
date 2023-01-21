@@ -25,10 +25,26 @@ public class ModuleManager {
         return modules.containsKey(name.toLowerCase());
     }
 
+    /**
+     * 通过名字获取 `IModule` 实例
+     *
+     * Get an instance of `IModule` by name
+     *
+     * @param name
+     * @return IModule
+     */
     public final IModule get(String name) {
         return modules.getOrDefault(name.toLowerCase(), null);
     }
 
+    /**
+     * 通过 `File` 加载一个模块
+     *
+     * Load a module through `File`
+     *
+     * @param file
+     * @return boolean
+     */
     public synchronized final boolean load(File file) {
         IModule module = loader.loadModule(file);
         if (module == null)
@@ -43,6 +59,14 @@ public class ModuleManager {
         return true;
     }
 
+    /**
+     * 通过 `IModule` 卸载一个模块
+     *
+     * Uninstall a module through `IModule`
+     *
+     * @param module
+     * @return boolean
+     */
     public synchronized final boolean unload(IModule module) {
         if (!exists(module.getModuleDescription().getName()))
             return false;
