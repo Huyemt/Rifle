@@ -1,3 +1,6 @@
+## Module using
+1. Please put the modules you want in the `modules` folder under the root directory of <kbd>Rifle</kbd>.
+2. Start <kbd>Rifle</kbd> and use the `use` command to use the specified module.
 ## Basic command specification
 Sequence parameter:
 ```

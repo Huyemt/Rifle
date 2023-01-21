@@ -1,5 +1,7 @@
 package org.rifle.scheduler;
 
+import org.rifle.Rifle;
+import org.rifle.utils.TextFormat;
 import org.rifle.utils.Utils;
 
 /**
@@ -29,6 +31,11 @@ public class Run4Task extends Thread {
 
     @Override
     public final void run() {
-        task.run();
+        try {
+            task.run();
+        } catch (Exception e) {
+            Rifle.getInstance().getLogger().error("An error occurred in the task with ID `{}`: ".replace("{}", TextFormat.FONT_BLUE.toString() + TextFormat.STYLE_BOLD + getTaskId() + TextFormat.RESET) + TextFormat.RESET + e.getMessage());
+            task.cancel();
+        }
     }
 }

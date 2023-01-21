@@ -1,3 +1,6 @@
+## 模块使用
+1. 请将您想要的模块放到<kbd>Rifle</kbd>的根目录之下的`modules`文件夹里面。
+2. 启动<kbd>Rifle</kbd>，使用 `use` 命令使用指定模块。
 ## 基本命令规范
 顺序参数:
 ```
@@ -22,7 +25,7 @@ commandName -key1 arg1 arg2 --key2 --key3
 * `exit`<br>
   * 退出<kbd>Rifle</kbd>程序
 * `ml`<br>
-  * 查看已经被<kbd>Rifle</kbd>加载的模块的信息
+  * 查看已经被<kbd>Rifle</kbd>加载的模块信息
       ```
       ml
       ```

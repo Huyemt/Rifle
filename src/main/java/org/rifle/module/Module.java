@@ -78,7 +78,7 @@ public abstract class Module implements IModule {
     }
 
     @Override
-    public DataFolder getDataFolder() {
+    public final DataFolder getDataFolder() {
         return dataFolder;
     }
 
