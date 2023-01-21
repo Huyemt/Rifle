@@ -10,41 +10,44 @@ commandName -key1 arg1 arg2 --key2 --key3
 更多格式还需根据该命令的帮助进行操作。
 ## 内置命令
 * `help`<br>
-查看命令帮助
-  ```
-  help -cmd <commandName1> <commandName2>... 
-  ```
-  ```
-  help <commandName1> <commandName2>...
-  ```
+  * 查看命令帮助
+    ```
+    help -cmd <commandName1> <commandName2>... 
+    ```
+    ```
+    help <commandName1> <commandName2>...
+    ```
 * `cls`<br>
-清屏
+  * 清屏
 * `exit`<br>
-退出<kbd>Rifle</kbd>程序
+  * 退出<kbd>Rifle</kbd>程序
 * `ml`<br>
-查看已经被<kbd>Rifle</kbd>加载的模块的信息
-    ```
-    ml
-    ```
-    ```
-    ml <moduleName1> <moduleName2>...
-    ```
+  * 查看已经被<kbd>Rifle</kbd>加载的模块的信息
+      ```
+      ml
+      ```
+      ```
+      ml <moduleName1> <moduleName2>...
+      ```
 * `use`<br>
-使用一个模块<br>（当我们使用一个模块的时候，<kbd>Rifle</kbd>会引用该模块的命令）
-    ```
-    use <moduleName>
-    ```
+  * 使用一个模块<br>
+  当我们使用一个模块的时候，<kbd>Rifle</kbd>会引用该模块的命令
+      ```
+      use <moduleName>
+      ```
 * `quit`<br>
-退出当前使用的模块<br>（当我们退出对应模块的时候，我们就无法使用该模块的命令）
+  * 退出当前使用的模块<br>
+  当我们退出对应模块的时候，我们就无法使用该模块的命令
 * `tl`<br>
-查看正在运行的任务ID列表
+  * 查看正在运行的任务ID列表
 * `task`<br>
-将一条命令当作任务运行在后台<br>（此操作会将任务送入任务ID列表）
-    ```
-    task <command>
-    ```
+  * 将一条命令当作任务运行在后台<br>
+  此操作会将任务送入任务ID列表
+      ```
+      task <command>
+      ```
 * `tkill`<br>
-通过任务ID取消该任务
+  * 通过任务ID取消该任务
     ```
     tkill <taskId1> <taskId2>...
     ```
