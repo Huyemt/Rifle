@@ -1,5 +1,7 @@
 ## [Return to the main development manual](../start.md)
 ***
+## Notice
+<kbd>Rifle</kbd> relies on the `Main-Class` attribute of `MANIFEST.MF` file in the `META-INF` folder in the `Jar` to find the main class of the module, so you need to manually configure the path of the main class in the `Jar`.
 ## Example
 ```java
 import org.rifle.module.Module;

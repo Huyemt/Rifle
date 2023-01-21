@@ -1,5 +1,7 @@
 ## [返回主开发文档](../start.md)
 ***
+## 须知
+<kbd>Rifle</kbd>依靠`Jar`内`META-INF`文件夹中的`MANIFEST.MF`文件属性`Main-Class`寻找模块主类，所以需要您手动配置主类在`Jar`中的路径。
 ## 例子
 ```java
 import org.rifle.module.Module;
