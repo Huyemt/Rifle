@@ -58,9 +58,6 @@ public class ModuleLoader implements ILoader {
                     Rifle.getInstance().getLogger().error(e.getMessage());
                 }
                 break;
-            case "py":
-                Rifle.getInstance().getLogger().error("Rifle does not support Python module: " + file.getAbsolutePath());
-                break;
             default:
                 return null;
         }
@@ -84,8 +81,7 @@ public class ModuleLoader implements ILoader {
 
     public Pattern[] getFilters() {
         return new Pattern[]{
-                Pattern.compile("^.+\\.jar$"),
-                Pattern.compile("^.+\\.py$")
+                Pattern.compile("^.+\\.jar$")
         };
     }
 
