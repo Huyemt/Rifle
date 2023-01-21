@@ -1,6 +1,6 @@
 package org.rifle.module;
 
-import org.rifle.manager.CommandMap;
+import org.rifle.manager.CommandManager;
 import org.rifle.console.logger.ModuleLogger;
 import org.rifle.utils.DataFolder;
 
@@ -44,7 +44,7 @@ public interface IModule {
      *
      * @return CommandMap
      */
-    CommandMap getCommandMap();
+    CommandManager getCommandManager();
 
     /**
      * 获取当前模块的描述

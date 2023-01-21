@@ -1,7 +1,7 @@
 package org.rifle;
 
 import org.rifle.command.builtIn.*;
-import org.rifle.manager.CommandMap;
+import org.rifle.manager.CommandManager;
 import org.rifle.console.Console;
 import org.rifle.console.logger.MainLogger;
 import org.rifle.manager.ModuleManager;
@@ -17,7 +17,7 @@ import java.io.File;
 
 public class Rifle {
     private final Console console;
-    private final CommandMap commandMap;
+    private final CommandManager commandManager;
     private final ModuleManager moduleManager;
     private final TaskManager scheduler;
     private final DataFolder dataFolder;
@@ -29,7 +29,7 @@ public class Rifle {
         dataFolder = new DataFolder(System.getProperty("user.dir"));
         console = new Console();
         scheduler = new TaskManager();
-        commandMap = new CommandMap();
+        commandManager = new CommandManager();
         moduleManager = new ModuleManager();
 
         console.clearScreen();
@@ -62,16 +62,16 @@ public class Rifle {
     }
 
     /**
-     * 获取 `CommandMap` 实例
-     * `CommandMap`是存放`Command`的操作容器
+     * 获取 `CommandManager` 实例
+     * `CommandManager`是存放`Command`的操作容器
      *
-     * Get the instance of `CommandMap`
-     * The `CommandMap` is an operation container for storing `Command`
+     * Get the instance of `CommandManager`
+     * The `CommandManager` is an operation container for storing `Command`
      *
-     * @return CommandMap
+     * @return CommandManager
      */
-    public CommandMap getCommandMap() {
-        return commandMap;
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 
     /**
@@ -161,14 +161,14 @@ public class Rifle {
         } else
             modules.mkdirs();
 
-        getCommandMap().register(new HelpCommand());
-        getCommandMap().register(new ClearScreenCommand());
-        getCommandMap().register(new ExitCommand());
-        getCommandMap().register(new UseCommand());
-        getCommandMap().register(new QuitCommand());
-        getCommandMap().register(new ModuleListCommand());
-        getCommandMap().register(new TaskCommand());
-        getCommandMap().register(new TaskListCommand());
-        getCommandMap().register(new TaskKillerCommand());
+        getCommandManager().register(new HelpCommand());
+        getCommandManager().register(new ClearScreenCommand());
+        getCommandManager().register(new ExitCommand());
+        getCommandManager().register(new UseCommand());
+        getCommandManager().register(new QuitCommand());
+        getCommandManager().register(new ModuleListCommand());
+        getCommandManager().register(new TaskCommand());
+        getCommandManager().register(new TaskListCommand());
+        getCommandManager().register(new TaskKillerCommand());
     }
 }

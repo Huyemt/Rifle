@@ -35,18 +35,18 @@ public class ConsoleCommandReader extends Thread {
                 if ((line = commandReader.readLine(TextFormat.STYLE_UNDERLINE + "rifle" + TextFormat.RESET + (Rifle.getInstance().getConsole().isMain() ? "" : " (" + TextFormat.FONT_RED + TextFormat.STYLE_BOLD + Rifle.getInstance().getConsole().getModule().getModuleDescription().getName() + TextFormat.RESET + ")") + " > ")) != null) {
                     cmd = CommmandParser.splitCommand(line.trim());
                     argument = new Argument(cmd[1].trim());
-                    if (!Rifle.getInstance().getCommandMap().execute(cmd[0], argument)) {
+                    if (!Rifle.getInstance().getCommandManager().execute(cmd[0], argument)) {
                         if (Rifle.getInstance().getConsole().isMain())
                             Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "The command `{}` does not exist in the Rifle.".replace("{}", TextFormat.FONT_BLUE.toString() + TextFormat.STYLE_BOLD + cmd[0] + TextFormat.RESET + TextFormat.FONT_RED));
-                        else if (!Rifle.getInstance().getConsole().getModule().getCommandMap().execute(cmd[0], argument))
+                        else if (!Rifle.getInstance().getConsole().getModule().getCommandManager().execute(cmd[0], argument))
                             Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "The command `{}` does not exist in the Rifle and the Module ".replace("{}", TextFormat.FONT_BLUE.toString() + TextFormat.STYLE_BOLD + cmd[0] + TextFormat.RESET + TextFormat.FONT_RED) + "`" + Rifle.getInstance().getConsole().getModule().getModuleDescription().getName() + "`");
                     }
                 }
             } catch (UserInterruptException e) {
                 if (Rifle.getInstance().getConsole().isMain())
-                    Rifle.getInstance().getCommandMap().execute("exit");
+                    Rifle.getInstance().getCommandManager().execute("exit");
                 else
-                    Rifle.getInstance().getCommandMap().execute("quit");
+                    Rifle.getInstance().getCommandManager().execute("quit");
             }
         }
     }

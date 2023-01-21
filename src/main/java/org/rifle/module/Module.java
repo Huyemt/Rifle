@@ -1,7 +1,7 @@
 package org.rifle.module;
 
 import org.rifle.Rifle;
-import org.rifle.manager.CommandMap;
+import org.rifle.manager.CommandManager;
 import org.rifle.console.logger.ModuleLogger;
 import org.rifle.utils.DataFolder;
 
@@ -12,7 +12,7 @@ import java.io.File;
  */
 
 public abstract class Module implements IModule {
-    private final CommandMap commandMap = new CommandMap();
+    private final CommandManager commandManager = new CommandManager();
     private ModuleDescription moduleDescription;
     private ModuleLogger logger;
     private DataFolder dataFolder;
@@ -63,8 +63,8 @@ public abstract class Module implements IModule {
     }
 
     @Override
-    public final CommandMap getCommandMap() {
-        return commandMap;
+    public final CommandManager getCommandManager() {
+        return commandManager;
     }
 
     @Override

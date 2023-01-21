@@ -21,8 +21,8 @@ public class TaskCommand extends Command {
         if (argument.getOrigin().length() > 0) {
             String[] cmd = CommmandParser.splitCommand(argument.getOrigin());
             Task task;
-            if (Rifle.getInstance().getCommandMap().exists(cmd[0])) {
-                Command command = Rifle.getInstance().getCommandMap().getCommand(cmd[0]);
+            if (Rifle.getInstance().getCommandManager().exists(cmd[0])) {
+                Command command = Rifle.getInstance().getCommandManager().getCommand(cmd[0]);
                 if (!command.isCanBeTask()) {
                     Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "This command has been set to disable running in task mode.");
                     return;
@@ -38,8 +38,8 @@ public class TaskCommand extends Command {
                     Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "This command cannot be run as a task in the background for unknown reasons.");
             } else {
                 if (!Rifle.getInstance().getConsole().isMain()) {
-                    if (Rifle.getInstance().getConsole().getModule().getCommandMap().exists(cmd[0])) {
-                        Command command = Rifle.getInstance().getConsole().getModule().getCommandMap().getCommand(cmd[0]);
+                    if (Rifle.getInstance().getConsole().getModule().getCommandManager().exists(cmd[0])) {
+                        Command command = Rifle.getInstance().getConsole().getModule().getCommandManager().getCommand(cmd[0]);
                         if (!command.isCanBeTask()) {
                             Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "This command has been set to disable running in task mode.");
                             return;

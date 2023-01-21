@@ -22,9 +22,9 @@ public class HelpCommand extends Command {
 
     @Override
     public void execute(Argument argument) {
-        Map<String, Command> c = Rifle.getInstance().getCommandMap().getAll();
+        Map<String, Command> c = Rifle.getInstance().getCommandManager().getAll();
         if (!Rifle.getInstance().getConsole().isMain())
-            c = Stream.concat(c.entrySet().stream(), Rifle.getInstance().getConsole().getModule().getCommandMap().getAll().entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            c = Stream.concat(c.entrySet().stream(), Rifle.getInstance().getConsole().getModule().getCommandManager().getAll().entrySet().stream()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         if (argument.getOrigin().length() > 0) {
             if (argument.getOrigin().startsWith("-")) {
                 if (argument.asKeyArgument().existsKey("cmd"))

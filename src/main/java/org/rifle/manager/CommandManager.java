@@ -11,10 +11,10 @@ import java.util.Map;
  * @author Huyemt
  */
 
-public class CommandMap {
+public class CommandManager {
     private final HashMap<String, Command> commands = new HashMap<>();
 
-    public CommandMap() {
+    public CommandManager() {
 
     }
 
