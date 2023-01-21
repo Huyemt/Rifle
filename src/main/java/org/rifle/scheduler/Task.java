@@ -10,6 +10,11 @@ public abstract class Task {
     private TaskManager from;
     private Run4Task run4Task = null;
 
+    /**
+     * 任务运行，我们需要把要做的工作实现到这个方法之中
+     *
+     * Task running, we need to realize the work to be done in this method.
+     */
     public abstract void run();
 
     public final void init(TaskManager from) {
@@ -24,9 +29,15 @@ public abstract class Task {
         run4Task.start();
     }
 
-    public final boolean cancel() {
+    /**
+     * 取消这个任务
+     *
+     * Cancel this task
+     *
+     * @return boolean
+     */
+    public final void cancel() {
         run4Task.stop();
-        return !isRunning();
     }
 
     public final String getTaskId() {
