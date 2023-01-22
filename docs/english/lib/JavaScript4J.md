@@ -1,4 +1,4 @@
-# 前言
+# Foreword
 Since `JDK` version 1.6 and later, `Java` supports calling other scripting languages.
 <br>
 On this basis, this support library provides a more convenient encapsulation method for calling `JavaScript`.
