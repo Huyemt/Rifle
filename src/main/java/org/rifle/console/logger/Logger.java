@@ -15,7 +15,7 @@ public abstract class Logger {
      *
      * @param value
      */
-    public abstract void info(String value);
+    public abstract void info(Object value);
 
     /**
      * 警告的日志输出
@@ -24,7 +24,7 @@ public abstract class Logger {
      *
      * @param value
      */
-    public abstract void warning(String value);
+    public abstract void warning(Object value);
 
     /**
      * 致命错误的日志输出
@@ -33,11 +33,11 @@ public abstract class Logger {
      *
      * @param value
      */
-    public abstract void error(String value);
+    public abstract void error(Object value);
 
-    public synchronized final void println(String value) {
+    public synchronized final void println(Object value) {
         Rifle.getInstance().getConsole().getCommandReader().stash();
-        Rifle.getInstance().getConsole().getTerminal().writer().println(value + TextFormat.RESET);
+        Rifle.getInstance().getConsole().getTerminal().writer().println(String.valueOf(value) + TextFormat.RESET);
         Rifle.getInstance().getConsole().getCommandReader().unstash();
         Rifle.getInstance().getConsole().getTerminal().writer().flush();
     }

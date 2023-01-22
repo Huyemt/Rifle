@@ -22,9 +22,11 @@ public class Rifle {
     private final TaskManager scheduler;
     private final DataFolder dataFolder;
     private static Rifle instance;
-    private final String version = "1.0.0";
+    private final String version = "1.0.1";
 
     public Rifle() {
+        System.setProperty("nashorn.args", "--no-deprecation-warning");
+
         instance = this;
         dataFolder = new DataFolder(System.getProperty("user.dir"));
         console = new Console();
@@ -58,6 +60,8 @@ public class Rifle {
             getConsole().getCommandReader().join();
         } catch (InterruptedException e) {
             getConsole().shutdown();
+        } catch (Exception e) {
+            getLogger().error(e.getMessage());
         }
     }
 
