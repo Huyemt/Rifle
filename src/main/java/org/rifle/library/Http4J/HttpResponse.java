@@ -1,28 +1,37 @@
 package org.rifle.library.Http4J;
 
+import org.rifle.library.Http4J.resource.Cookies;
+import org.rifle.library.Http4J.resource.Headers;
+
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 网络请求的响应体 (暂时未封装Cookie，请等待后续支持)
+ * 网络请求的响应体
  *
- * Response body of network request (Cookie are not encapsulated for the time being, please wait for subsequent support)
+ * Response body of network request
  *
  * @author Huyemt
  */
 
 public class HttpResponse {
-    protected final Map<String, List<String>> headers;
-    protected final byte[] content;
+    public final Headers headers;
+    public final byte[] content;
+    public final Cookies cookies;
+    public final String html;
 
     public HttpResponse(byte[] content, Map<String, List<String>> headers) {
         this.content = content;
+        html = new String(content, StandardCharsets.UTF_8);
 
-        HashMap<String, List<String>> map = new HashMap<>(headers);
+        Map<String, List<String>> map = new LinkedHashMap<>(headers);
         map.remove(null);
-        this.headers = map;
+
+        cookies = new Cookies(map.getOrDefault("Set-Cookie", null));
+
+        this.headers = new Headers(headers);
     }
 
     public final byte[] getContent() {
@@ -30,10 +39,19 @@ public class HttpResponse {
     }
 
     public final String getHtml() {
-        return new String(content, StandardCharsets.UTF_8);
+        return html;
     }
 
-    public final Map<String, List<String>> getHeaders() {
+    public final Cookies getCookies() {
+        return cookies;
+    }
+
+    public final Headers getHeaders() {
         return headers;
+    }
+
+    @Override
+    public String toString() {
+        return headers + "\n" + cookies;
     }
 }

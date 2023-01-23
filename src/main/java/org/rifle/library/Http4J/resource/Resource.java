@@ -1,6 +1,6 @@
 package org.rifle.library.Http4J.resource;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -11,7 +11,7 @@ public class Resource {
     protected Map<String, Object> sources;
 
     public Resource() {
-        sources = new HashMap<>();
+        sources = new LinkedHashMap<>();
     }
 
     public Resource add(String name, Object value) {
@@ -24,7 +24,7 @@ public class Resource {
         return this;
     }
 
-    public Resource set(String name, String value) {
+    public Resource set(String name, Object value) {
         if (sources.containsKey(name))
             sources.put(name, value == null ? "" : String.valueOf(value));
 
@@ -35,11 +35,6 @@ public class Resource {
         if (!sources.containsKey(name))
             sources.put(name, value == null ? "" : String.valueOf(value));
 
-        return this;
-    }
-
-    public Resource setAll(HashMap<String, Object> sources) {
-        this.sources = sources;
         return this;
     }
 

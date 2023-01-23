@@ -2,7 +2,6 @@ package org.rifle.library.Http4J.resource;
 
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +26,7 @@ public class RequestBody extends Resource {
     }
 
     @Override
-    public RequestBody set(String name, String value) {
+    public RequestBody set(String name, Object value) {
         super.set(name, value);
         return this;
     }
@@ -35,12 +34,6 @@ public class RequestBody extends Resource {
     @Override
     public RequestBody defaultValue(String name, Object value) {
         super.defaultValue(name, value);
-        return this;
-    }
-
-    @Override
-    public RequestBody setAll(HashMap<String, Object> body) {
-        super.setAll(body);
         return this;
     }
 

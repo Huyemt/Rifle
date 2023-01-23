@@ -1,14 +1,12 @@
 package org.rifle.library.Http4J;
 
-import org.rifle.library.Http4J.resource.Headers;
-import org.rifle.library.Http4J.resource.Method;
-import org.rifle.library.Http4J.resource.Params;
-import org.rifle.library.Http4J.resource.RequestBody;
+import org.rifle.library.Http4J.resource.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -21,7 +19,7 @@ import java.util.Map;
  */
 
 public class HttpRequest {
-    protected final URL url;
+    public final URL url;
 
     public HttpRequest(URL url) {
         this.url = url;
@@ -31,36 +29,48 @@ public class HttpRequest {
         this(new URL(url.trim()));
     }
 
-    protected HttpResponse send(String method, Headers headers, Params params, RequestBody requestBody, boolean allowsRedirect) throws IOException {
+    public URL getURL() {
+        return url;
+    }
+
+    public HttpResponse send(Method method, Headers headers, Params params, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
+        if (headers == null)
+            headers = new Headers();
+        if (cookies == null)
+            cookies = new Cookies();
+        if (config == null)
+            config = new HttpConfig();
+
         URL url;
         if (params != null && params.size() > 0) {
             String strUrl = this.url.toString();
-            url = new URL(strUrl.endsWith("?") ? strUrl.concat(params.toString()) : strUrl.concat("?").concat(params.toString()));
+            url = new URL(strUrl.endsWith("?") ? strUrl.concat(params.toString()) : strUrl.concat("?").concat(params.toString(config.isTargetUrlEncode())));
         } else
             url = this.url;
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setConnectTimeout(5000);
-        connection.setAllowUserInteraction(allowsRedirect);
+
+        connection.setConnectTimeout(config.getTimeout());
+        connection.setInstanceFollowRedirects(config.isAllowsRedirect());
         connection.setDoInput(true);
-        connection.setRequestMethod(method.toUpperCase());
+        connection.setRequestMethod(method.getMethod());
 
-        if (headers == null)
-            headers = new Headers();
 
-        headers.defaultValue("User-Agent", "RifleHttp/1.0");
+        if (config.isAutoHeaders()) {
+            headers.defaultValue("User-Agent", "Http4J/1.0");
+            headers.defaultValue("Content-Type", "charset=UTF-8");
+            headers.defaultValue("Cache-Control", "no-cache");
+        }
+
         headers.defaultValue("Accept", "*/*");
-        headers.defaultValue("Accept-Language", "zh-CN,zh;");
-        headers.defaultValue("Cache-Control", "no-cache");
         headers.defaultValue("Connection", "Keep-Alive");
-        headers.defaultValue("Charset", "UTF-8");
-        headers.defaultValue("Content-Type", "application/x-www-form-urlencoded");
 
         if (headers.size() > 0)
-            for (Map.Entry<String, Object> entry : headers.getHeaders().entrySet())
+            for (Map.Entry<String, Object> entry : headers.getHeaders().entrySet()) {
                 connection.addRequestProperty(entry.getKey(), String.valueOf(entry.getValue()));
+            }
 
-        if (!method.equalsIgnoreCase(Method.GET.getMethod()) && requestBody != null && requestBody.size() > 0) {
+        if (method == Method.POST && requestBody != null && requestBody.size() > 0) {
             connection.setDoOutput(true);
 
             DataOutputStream stream = new DataOutputStream(connection.getOutputStream());
@@ -69,6 +79,9 @@ public class HttpRequest {
 
             stream.close();
         }
+
+        if (cookies.size() > 0)
+            connection.addRequestProperty("Cookie", cookies.toString(config.isCookieUrlEncode()));
 
         connection.connect();
 
@@ -94,243 +107,15 @@ public class HttpRequest {
         return new HttpResponse(result, connection.getHeaderFields());
     }
 
-    protected HttpResponse send(String method, Headers headers, Params params, RequestBody requestBody) throws IOException {
-        return send(method, headers, params, requestBody, false);
+    public HttpResponse send(Method method, Headers headers, Params params, RequestBody requestBody, Cookies cookies) throws IOException {
+        return send(method, headers, params, requestBody, cookies, new HttpConfig());
     }
 
-    protected HttpResponse send(String method, Headers headers, Params params, boolean allowsRedirect) throws IOException {
-        return send(method, headers, params, null, allowsRedirect);
+    public HttpResponse send(Method method, HttpConfig config) throws IOException {
+        return send(method, new Headers(), new Params(), null, new Cookies(), config);
     }
 
-    protected HttpResponse send(String method, Headers headers, Params params) throws IOException {
-        return send(method, headers, params, null, false);
-    }
-
-    protected HttpResponse send(String method, Headers headers, RequestBody requestBody, Params params, boolean allowsRedirect) throws IOException {
-        return send(method, headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, Headers headers, RequestBody requestBody, Params params) throws IOException {
-        return send(method, headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Headers headers, Params params, boolean allowsRedirect) throws IOException {
-        return send(method, headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Headers headers, Params params) throws IOException {
-        return send(method, headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Params params, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method, headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Params params, Headers headers) throws IOException {
-        return send(method, headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, Params params, RequestBody requestBody, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method, headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, Params params, RequestBody requestBody, Headers headers) throws IOException {
-        return send(method, headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, Params params, RequestBody requestBody, boolean allowsRedirect) throws IOException {
-        return send(method, new Headers(), params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, Params params, RequestBody requestBody) throws IOException {
-        return send(method, new Headers(), params, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, Params params, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method, headers, params, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, Params params, Headers headers) throws IOException {
-        return send(method, headers, params, null, false);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Params params, boolean allowsRedirect) throws IOException {
-        return send(method, new Headers(), params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Params params) throws IOException {
-        return send(method, new Headers(), params, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, Headers headers, RequestBody requestBody, boolean allowsRedirect) throws IOException {
-        return send(method, headers, null, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, Headers headers, RequestBody requestBody) throws IOException {
-        return send(method, headers, null, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method, headers, null, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, Headers headers) throws IOException {
-        return send(method, headers, null, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method, headers, (Params) null, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, Headers headers) throws IOException {
-        return send(method, headers, (Params) null, null, false);
-    }
-
-    protected HttpResponse send(String method, Params params, boolean allowsRedirect) throws IOException {
-        return send(method, new Headers(), params, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, Params params) throws IOException {
-        return send(method, new Headers(), params, null, false);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody, boolean allowsRedirect) throws IOException {
-        return send(method, new Headers(), null, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method, RequestBody requestBody) throws IOException {
-        return send(method, new Headers(), null, requestBody, false);
-    }
-
-    protected HttpResponse send(String method, boolean allowsRedirect) throws IOException {
-        return send(method, new Headers(), (Params) null, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(String method) throws IOException {
-        return send(method, new Headers(), (Params) null, null, false);
-    }
-
-    /////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////
-    /////////////////////////////////////////////////////////////////
-
-    protected HttpResponse send(Method method, Headers headers, Params params, RequestBody requestBody, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, Params params, RequestBody requestBody) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, Params params, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, params, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, Params params) throws IOException {
-        return send(method.getMethod(), headers, params, null, false);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, RequestBody requestBody, Params params, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, RequestBody requestBody, Params params) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Headers headers, Params params, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Headers headers, Params params) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Params params, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Params params, Headers headers) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, Params params, RequestBody requestBody, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Params params, RequestBody requestBody, Headers headers) throws IOException {
-        return send(method.getMethod(), headers, params, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, Params params, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, params, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Params params, Headers headers) throws IOException {
-        return send(method.getMethod(), headers, params, null, false);
-    }
-
-    protected HttpResponse send(Method method, Params params, RequestBody requestBody, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), new Headers(), params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Params params, RequestBody requestBody) throws IOException {
-        return send(method.getMethod(), new Headers(), params, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Params params, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), new Headers(), params, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Params params) throws IOException {
-        return send(method.getMethod(), new Headers(), params, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, RequestBody requestBody, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, null, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, RequestBody requestBody) throws IOException {
-        return send(method.getMethod(), headers, null, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, null, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, Headers headers) throws IOException {
-        return send(method.getMethod(), headers, null, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, Headers headers, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), headers, (Params) null, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Headers headers) throws IOException {
-        return send(method.getMethod(), headers, (Params) null, null, false);
-    }
-
-    protected HttpResponse send(Method method, Params params, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), new Headers(), params, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, Params params) throws IOException {
-        return send(method.getMethod(), new Headers(), params, null, false);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), new Headers(), null, requestBody, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method, RequestBody requestBody) throws IOException {
-        return send(method.getMethod(), new Headers(), null, requestBody, false);
-    }
-
-    protected HttpResponse send(Method method, boolean allowsRedirect) throws IOException {
-        return send(method.getMethod(), new Headers(), (Params) null, null, allowsRedirect);
-    }
-
-    protected HttpResponse send(Method method) throws IOException {
-        return send(method.getMethod(), new Headers(), (Params) null, null, false);
+    public HttpResponse send(Method method) throws IOException {
+        return send(method, new Headers(), new Params(), null, new Cookies(), new HttpConfig());
     }
 }
