@@ -16,3 +16,4 @@ Your support for this project is the biggest financial support for Rifle develop
 * [Custom Tasks](develop/Task.md)
 # Built-in Support Library
 * [JavaScript running](lib/JavaScript4J.md)
+* [Network request](https://github.com/Huyemt/Http4J/blob/main/docs/chinese/develop.md)
