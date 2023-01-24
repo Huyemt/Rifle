@@ -21,8 +21,10 @@ public class HttpResponse {
     public final byte[] content;
     public final Cookies cookies;
     public final String html;
+    public final int status_code;
 
-    public HttpResponse(byte[] content, Map<String, List<String>> headers) {
+    public HttpResponse(int status_code, byte[] content, Map<String, List<String>> headers) {
+        this.status_code = status_code;
         this.content = content;
         html = new String(content, StandardCharsets.UTF_8);
 
@@ -32,6 +34,10 @@ public class HttpResponse {
         cookies = new Cookies(map.getOrDefault("Set-Cookie", null));
 
         this.headers = new Headers(headers);
+    }
+
+    public int getStatusCode() {
+        return status_code;
     }
 
     public final byte[] getContent() {

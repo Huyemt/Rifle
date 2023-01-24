@@ -1,6 +1,8 @@
 package org.rifle.library.Http4J;
 
 import org.rifle.library.Http4J.resource.*;
+import org.rifle.library.Http4J.session.SaveCookieSession;
+import org.rifle.library.Http4J.session.Session;
 
 import java.io.IOException;
 
@@ -17,7 +19,7 @@ public class Http4J {
     // If Headers pass special values (except letters and common headers), they need to be encoded by `URLEncoder.encode()`
 
     /**
-     * 创建一个会话 (此操作可保持Cookies)
+     * 创建一个会话 (此操作可保持会话ID)
      *
      * Create a session (this will keep Cookies)
      *
@@ -25,6 +27,15 @@ public class Http4J {
      */
     public static Session session() {
         return new Session();
+    }
+
+
+    /**
+     *
+     * @return
+     */
+    public static SaveCookieSession saveCookieSession() {
+        return new SaveCookieSession();
     }
 
     /**

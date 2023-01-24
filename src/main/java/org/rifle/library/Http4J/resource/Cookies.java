@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author Huyemt
@@ -85,12 +84,22 @@ public class Cookies {
 
     public Cookies set(String name, Object value) {
         if (cookieMap.containsKey(name))
-            add(name, value);
+            get(name).setValue(value == null ? "" : String.valueOf(value));
+        return this;
+    }
+
+    public Cookies set(String name, HttpCookie cookie) {
+        if (cookieMap.containsKey(name))
+            add(name, cookie);
         return this;
     }
 
     public boolean contains(String name) {
         return cookieMap.containsKey(URLDecoder.decode(name, StandardCharsets.UTF_8));
+    }
+
+    public HttpCookie get(String name) {
+        return cookieMap.getOrDefault(URLDecoder.decode(name, StandardCharsets.UTF_8), null);
     }
 
     public int size() {

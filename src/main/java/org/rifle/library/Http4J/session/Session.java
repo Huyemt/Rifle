@@ -1,5 +1,7 @@
-package org.rifle.library.Http4J;
+package org.rifle.library.Http4J.session;
 
+import org.rifle.library.Http4J.HttpRequest;
+import org.rifle.library.Http4J.HttpResponse;
 import org.rifle.library.Http4J.resource.*;
 
 import java.io.IOException;
@@ -28,7 +30,8 @@ public class Session {
         headers.add("Connection", "keep-alive");
 
         cookies = new Cookies();
-        config = new HttpConfig();
+        config = new HttpConfig()
+                .allowsRedirect(true);
     }
 
     public HttpResponse send(String url, Method method, Headers headers, Params params, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
@@ -37,13 +40,22 @@ public class Session {
 
         Map<String, HttpCookie> cookieMap = response.cookies.getCookieMap();
         for (HttpCookie cookie : cookieMap.values()) {
-            if (cookie.hasExpired() && this.cookies.contains(cookie.getName())) {
-                this.cookies.remove(cookie.getName());
-                continue;
-            }
+            // 将常规格式的SessionID记录下来
+            // Record the SessionID in regular format.
+            if (cookie.getName().toLowerCase().contains("sessionid") || cookie.getName().toLowerCase().contains("session_id") || cookie.getName().toLowerCase().contains("session")) {
+                if (cookie.hasExpired() && this.cookies.contains(cookie.getName())) {
+                    this.cookies.remove(cookie.getName());
+                    continue;
+                }
 
-            if (!this.cookies.contains(cookie.getName()) && !cookie.hasExpired())
-                this.cookies.add(cookie);
+                if (!this.cookies.contains(cookie.getName()) && !cookie.hasExpired()) {
+                    this.cookies.add(cookie);
+                    continue;
+                }
+
+                if (this.cookies.contains(cookie.getName()) && !cookie.getValue().equals(this.cookies.get(cookie.getName()).getValue()))
+                    this.cookies.set(cookie.getName(), cookie.getValue());
+            }
         }
         return response;
     }

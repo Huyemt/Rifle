@@ -5,8 +5,8 @@ import org.rifle.library.Http4J.resource.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -83,11 +83,12 @@ public class HttpRequest {
         if (cookies.size() > 0)
             connection.addRequestProperty("Cookie", cookies.toString(config.isCookieUrlEncode()));
 
-        connection.connect();
-
         byte[] result;
+        int status;
 
-        if (connection.getResponseCode() == 200) {
+        try {
+            connection.connect();
+
             InputStream inputStream = new BufferedInputStream(connection.getInputStream());
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -96,15 +97,18 @@ public class HttpRequest {
                 outStream.write(buffer, 0, len);
 
             result = outStream.toByteArray();
+            status = connection.getResponseCode();
 
             inputStream.close();
             outStream.close();
-        } else
+        } catch (SocketTimeoutException timeoutException) {
             result = new byte[0];
+            status = 408;
+        } finally {
+            connection.disconnect();
+        }
 
-        connection.disconnect();
-
-        return new HttpResponse(result, connection.getHeaderFields());
+        return new HttpResponse(status, result, connection.getHeaderFields());
     }
 
     public HttpResponse send(Method method, Headers headers, Params params, RequestBody requestBody, Cookies cookies) throws IOException {
