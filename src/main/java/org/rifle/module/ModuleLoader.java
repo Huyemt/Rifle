@@ -92,7 +92,7 @@ public class ModuleLoader implements ILoader {
         else {
             for (JavaClassLoader loader : loaders.values()) {
                 try {
-                    theClass = loader.findClass(name);
+                    theClass = loader.findClass(name, false);
                 } catch (ClassNotFoundException e) {
                     continue;
                 }

@@ -44,7 +44,7 @@ public class RequestBody extends Resource {
                 builder.append(entry.getKey()).append("=").append(entry.getValue() == null ? "" : String.valueOf(entry.getValue()));
             }
 
-            if (i + 1 < this.sources.size()) {
+            if (i + 1 < sources.size()) {
                 builder.append("&");
             }
         }

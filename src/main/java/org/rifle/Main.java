@@ -6,6 +6,10 @@ package org.rifle;
 
 public class Main {
     public static void main(String[] args) {
-        new Rifle();
+        try {
+            new Rifle();
+        } catch (Exception e) {
+            Rifle.getInstance().getConsole().shutdown();
+        }
     }
 }

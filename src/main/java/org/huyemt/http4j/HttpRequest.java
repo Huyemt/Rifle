@@ -56,8 +56,6 @@ public class HttpRequest {
         connection.setRequestMethod(method.getMethod());
         if (config.isAutoHeaders()) {
             headers.defaultValue("User-Agent", "Http4J/1.0");
-            headers.defaultValue("Content-Type", "charset=UTF-8");
-            headers.defaultValue("Cache-Control", "no-cache");
         }
 
         headers.defaultValue("Accept", "*/*");
