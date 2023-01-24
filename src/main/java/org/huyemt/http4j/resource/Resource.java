@@ -8,7 +8,11 @@ import java.util.Map;
  */
 
 public class Resource {
-    protected Map<String, Object> sources = new LinkedHashMap<>();
+    protected Map<String, Object> sources;
+
+    public Resource() {
+        sources = new LinkedHashMap<>();
+    }
 
     public Resource add(String name, Object value) {
         this.sources.put(name, value == null ? "" : String.valueOf(value));

@@ -15,7 +15,7 @@ public class Headers extends Resource {
     public Headers(Map<String, List<String>> headers) {
         super();
 
-        if (headers != null && headers.size() != 0) {
+        if (headers != null && headers.size() > 0) {
             for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
                 StringBuilder builder = new StringBuilder();
 
@@ -58,14 +58,10 @@ public class Headers extends Resource {
 
     public final String toString() {
         StringBuilder builder = new StringBuilder();
-        int i = 0;
 
         for (Map.Entry<String, Object> entry : sources.entrySet()) {
             builder.append(entry.getKey()).append("=").append(entry.getValue() == null ? "" : String.valueOf(entry.getValue()));
-
-            if (i + 1 < this.sources.size()) {
-                builder.append("\n");
-            }
+            builder.append("\n");
         }
 
         return builder.toString();

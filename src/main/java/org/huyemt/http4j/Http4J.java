@@ -224,6 +224,12 @@ public class Http4J {
 
     /////////////////////////////////////
 
+    public static HttpResponse post(String url, Headers headers, Params params) throws IOException {
+        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), null, new Cookies());
+    }
+
+    /////////////////////////////////////
+
     public static HttpResponse post(String url, Headers headers, Params params, RequestBody requestBody) throws IOException {
         return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies());
     }

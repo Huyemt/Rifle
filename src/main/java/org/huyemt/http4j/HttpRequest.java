@@ -94,14 +94,13 @@ public class HttpRequest {
             }
 
             result = outStream.toByteArray();
-            status = connection.getResponseCode();
             inputStream.close();
             outStream.close();
         } catch (SocketTimeoutException var18) {
             result = new byte[0];
-            status = 408;
         } finally {
             connection.disconnect();
+            status = connection.getResponseCode();
         }
 
         return new HttpResponse(status, result, connection.getHeaderFields());

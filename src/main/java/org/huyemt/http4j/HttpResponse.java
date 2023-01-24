@@ -26,7 +26,7 @@ public class HttpResponse {
         Map<String, List<String>> map = new LinkedHashMap<>(headers);
         map.remove(null);
         this.cookies = new Cookies(map.getOrDefault("Set-Cookie", null));
-        this.headers = new Headers(headers);
+        this.headers = new Headers(map);
     }
 
     public int getStatusCode() {
