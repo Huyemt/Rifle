@@ -1,6 +1,6 @@
-package org.rifle.library.Http4J;
+package org.rifle.library.http4j;
 
-import org.rifle.library.Http4J.resource.*;
+import org.rifle.library.http4j.resource.*;
 
 import java.io.*;
 import java.net.HttpURLConnection;

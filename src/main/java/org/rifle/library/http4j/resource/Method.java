@@ -1,4 +1,4 @@
-package org.rifle.library.Http4J.resource;
+package org.rifle.library.http4j.resource;
 
 /**
  * 网络请求方式

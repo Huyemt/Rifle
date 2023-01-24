@@ -1,8 +1,8 @@
-package org.rifle.library.Http4J;
+package org.rifle.library.http4j;
 
-import org.rifle.library.Http4J.resource.*;
-import org.rifle.library.Http4J.session.SaveCookieSession;
-import org.rifle.library.Http4J.session.Session;
+import org.rifle.library.http4j.resource.*;
+import org.rifle.library.http4j.session.SaveCookieSession;
+import org.rifle.library.http4j.session.Session;
 
 import java.io.IOException;
 

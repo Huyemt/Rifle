@@ -1,4 +1,4 @@
-package org.rifle.library.Http4J.resource;
+package org.rifle.library.http4j.resource;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

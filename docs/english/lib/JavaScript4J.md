@@ -3,11 +3,12 @@ Since `JDK` version 1.6 and later, `Java` supports calling other scripting langu
 <br>
 On this basis, this support library provides a more convenient encapsulation method for calling `JavaScript`.
 <br><br>
-[Read the source code](../../../src/main/java/org/rifle/library/JavaScript4J)
+[Read the source code](../../../src/main/java/org/rifle/library/javascript4j)
 ***
 ## Eval
+
 ```java
-import org.rifle.library.JavaScript4J.JavaScript4J;
+import org.rifle.library.javascript4j.JavaScript4J;
 
 import java.io.File;
 
@@ -29,8 +30,9 @@ public class Test {
 ```
 ## Compile
 This method needs to call the method after the script to return the value.
+
 ```java
-import org.rifle.library.JavaScript4J.JavaScript4J;
+import org.rifle.library.javascript4j.JavaScript4J;
 
 import javax.script.CompiledScript;
 import java.io.File;
@@ -54,11 +56,11 @@ public class Test {
 }
 ```
 ## Load
-```java
-import org.rifle.library.JavaScript4J.JavaScript4J;
-import org.rifle.library.JavaScript4J.ScriptExecutor;
 
-import javax.script.CompiledScript;
+```java
+import org.rifle.library.javascript4j.JavaScript4J;
+import org.rifle.library.javascript4j.ScriptExecutor;
+
 import java.io.File;
 
 public class Test {

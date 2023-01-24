@@ -1,4 +1,4 @@
-package org.rifle.library.JavaScript4J;
+package org.rifle.library.javascript4j;
 
 import javax.script.*;
 import java.io.File;

@@ -1,7 +1,7 @@
-package org.rifle.library.Http4J;
+package org.rifle.library.http4j;
 
-import org.rifle.library.Http4J.resource.Cookies;
-import org.rifle.library.Http4J.resource.Headers;
+import org.rifle.library.http4j.resource.Cookies;
+import org.rifle.library.http4j.resource.Headers;
 
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
