@@ -1,5 +1,6 @@
 package org.rifle;
 
+import okhttp3.OkHttpClient;
 import org.rifle.command.builtIn.*;
 import org.rifle.manager.CommandManager;
 import org.rifle.console.Console;
