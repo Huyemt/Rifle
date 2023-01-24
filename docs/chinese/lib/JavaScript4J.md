@@ -3,12 +3,12 @@
 <br>
 本支持库在此基础之上，提供了更加方便调用`JavaScript`的封装方法。
 <br><br>
-[阅读源码](../../../src/main/java/org/rifle/library/javascript4j)
+[阅读源码](../../../src/main/java/org/huyemt/javascript4j)
 ***
 ## 直接获得结果
 
 ```java
-import org.rifle.library.javascript4j.JavaScript4J;
+import JavaScript4J;
 
 import java.io.File;
 
@@ -32,7 +32,7 @@ public class Test {
 此方法需要在脚本后面调用方法以返回值
 
 ```java
-import org.rifle.library.javascript4j.JavaScript4J;
+import JavaScript4J;
 
 import javax.script.CompiledScript;
 import java.io.File;
@@ -58,8 +58,8 @@ public class Test {
 ## 加载以调用
 
 ```java
-import org.rifle.library.javascript4j.JavaScript4J;
-import org.rifle.library.javascript4j.ScriptExecutor;
+import JavaScript4J;
+import ScriptExecutor;
 
 import java.io.File;
 
