@@ -30,6 +30,7 @@ public class TaskCommand extends Command {
                 task = new Task() {
                     @Override
                     public void run() {
+                        whenDiePrint = true;
                         Rifle.getInstance().getLogger().println(TextFormat.FONT_GREEN + "Successfully created a command task with ID `{}`: ".replace("{}", TextFormat.FONT_BLUE.toString() + TextFormat.STYLE_BOLD + getTaskId() + TextFormat.RESET + TextFormat.FONT_GREEN) + TextFormat.RESET + argument.getOrigin().trim());
                         command.execute(new Argument(cmd[1].trim()));
                     }
@@ -47,6 +48,7 @@ public class TaskCommand extends Command {
                         task = new Task() {
                             @Override
                             public void run() {
+                                whenDiePrint = true;
                                 Rifle.getInstance().getLogger().println(TextFormat.FONT_GREEN + "Successfully created a command task with ID `{}`: ".replace("{}", TextFormat.FONT_BLUE.toString() + TextFormat.STYLE_BOLD + getTaskId() + TextFormat.RESET + TextFormat.FONT_GREEN) + TextFormat.RESET + argument.getOrigin().trim());
                                 command.execute(new Argument(cmd[1].trim()));
                             }

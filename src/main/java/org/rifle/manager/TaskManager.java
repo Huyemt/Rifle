@@ -21,7 +21,8 @@ public class TaskManager {
                     for (Task task : tasks.values()) {
                         if (!task.isRunning()) {
                             remove(task.getTaskId());
-                            Rifle.getInstance().getLogger().println("The task with ID `" + TextFormat.STYLE_BOLD + TextFormat.FONT_BLUE + task.getTaskId() + TextFormat.RESET + "` has finished its work.");
+                            if (task.whenDiePrint)
+                                Rifle.getInstance().getLogger().println("The task with ID `" + TextFormat.STYLE_BOLD + TextFormat.FONT_BLUE + task.getTaskId() + TextFormat.RESET + "` has finished its work.");
                         }
                     }
                 }

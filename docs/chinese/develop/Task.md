@@ -49,6 +49,9 @@ public class YourModule extends Module {
 class SimpleTask extends Task {
     @Override
     public void run() {
+        
+        // 任务结束时不给输出日志
+        this.whenDiePrint = false;
         while (true) {
             YourModule.getInstance().getLogger().info("Threading...");
             try {

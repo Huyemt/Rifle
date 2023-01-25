@@ -39,14 +39,16 @@ public class RequestBody extends Resource {
 
         for (Map.Entry<String, Object> entry : sources.entrySet()) {
             if (charset != null) {
-                builder.append(URLEncoder.encode(entry.getKey(), charset)).append("=").append(URLEncoder.encode(entry.getValue() == null ? "" : String.valueOf(entry.getValue()), charset));
+                builder.append(URLEncoder.encode(entry.getKey(), charset)).append("=").append(entry.getValue() == null ? "" : URLEncoder.encode(String.valueOf(entry.getValue()), charset));
             } else {
                 builder.append(entry.getKey()).append("=").append(entry.getValue() == null ? "" : String.valueOf(entry.getValue()));
             }
 
-            if (i + 1 < sources.size()) {
+            if ((i + 1) < sources.size()) {
                 builder.append("&");
             }
+
+            i++;
         }
 
         return builder.toString();

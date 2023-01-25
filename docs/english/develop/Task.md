@@ -49,6 +49,9 @@ public class YourModule extends Module {
 class SimpleTask extends Task {
     @Override
     public void run() {
+        
+        // No log is generated when the task is complete
+        this.whenDiePrint = false;
         while (true) {
             YourModule.getInstance().getLogger().info("Threading...");
             try {

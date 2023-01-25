@@ -9,6 +9,7 @@ import org.rifle.manager.TaskManager;
 public abstract class Task {
     private TaskManager from;
     private Run4Task run4Task = null;
+    public boolean whenDiePrint = false;
 
     /**
      * 任务运行，我们需要把要做的工作实现到这个方法之中

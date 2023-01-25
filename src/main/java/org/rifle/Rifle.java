@@ -7,6 +7,7 @@ import org.rifle.console.logger.MainLogger;
 import org.rifle.manager.ModuleManager;
 import org.rifle.manager.TaskManager;
 import org.rifle.utils.DataFolder;
+import org.rifle.utils.RifleDataFolder;
 import org.rifle.utils.TextFormat;
 
 import java.io.File;
@@ -20,7 +21,7 @@ public class Rifle {
     private final CommandManager commandManager;
     private final ModuleManager moduleManager;
     private final TaskManager scheduler;
-    private final DataFolder dataFolder;
+    private final RifleDataFolder dataFolder;
     private static Rifle instance;
     private final String version = "1.0.1";
 
@@ -28,7 +29,7 @@ public class Rifle {
         System.setProperty("nashorn.args", "--no-deprecation-warning");
 
         instance = this;
-        dataFolder = new DataFolder(System.getProperty("user.dir"));
+        dataFolder = new RifleDataFolder();
         console = new Console();
         scheduler = new TaskManager();
         commandManager = new CommandManager();
@@ -120,7 +121,7 @@ public class Rifle {
      *
      * @return DataFolder
      */
-    public DataFolder getDataFolder() {
+    public RifleDataFolder getDataFolder() {
         return dataFolder;
     }
 
@@ -156,15 +157,6 @@ public class Rifle {
     }
 
     private void init() {
-        File modules = new File(getDataFolder() + "modules");
-        if (modules.exists()) {
-            if (modules.isFile()) {
-                modules.delete();
-                modules.mkdirs();
-            }
-        } else
-            modules.mkdirs();
-
         getCommandManager().register(new HelpCommand());
         getCommandManager().register(new ClearScreenCommand());
         getCommandManager().register(new ExitCommand());

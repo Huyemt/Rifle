@@ -10,6 +10,7 @@ public class HttpConfig {
     private boolean autoHeaders = true;
     private boolean cookieUrlEncode = true;
     private boolean targetUrlEncode = true;
+    private boolean dataUrlEncode = true;
 
     public HttpConfig() {
     }
@@ -28,6 +29,10 @@ public class HttpConfig {
 
     public boolean isTargetUrlEncode() {
         return this.targetUrlEncode;
+    }
+
+    public boolean isDataUrlEncode() {
+        return dataUrlEncode;
     }
 
     public int getTimeout() {
@@ -59,6 +64,11 @@ public class HttpConfig {
 
     public HttpConfig targetUrlEncode(boolean encode) {
         this.targetUrlEncode = encode;
+        return this;
+    }
+
+    public HttpConfig dataUrlEncode(boolean encode) {
+        this.dataUrlEncode = encode;
         return this;
     }
 }

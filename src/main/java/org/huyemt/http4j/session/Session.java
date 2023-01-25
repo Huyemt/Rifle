@@ -204,6 +204,106 @@ public class Session {
         return this.send(url, Method.POST, this.headers, new Params(), (RequestBody)null, cookies, config);
     }
 
+    ////////////////////////////////////////
+
+    public HttpResponse post(String url, Headers headers, Params params) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, params, null, this.cookies);
+    }
+
+    public HttpResponse post(String url, Headers headers, Params params, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, params, null, this.cookies, config);
+    }
+
+    public HttpResponse post(String url, Headers headers, RequestBody requestBody) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, this.cookies);
+    }
+
+    public HttpResponse post(String url, Headers headers, RequestBody requestBody, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, this.cookies, config);
+    }
+
+    public HttpResponse post(String url, Headers headers, Cookies cookies) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), null, cookies);
+    }
+
+    public HttpResponse post(String url, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), null, cookies, config);
+    }
+
+    public HttpResponse post(String url, Params params, Headers headers) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, params, null, this.cookies);
+    }
+
+    public HttpResponse post(String url, Params params, Headers headers, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, params, null, this.cookies, config);
+    }
+
+    public HttpResponse post(String url, Params params, RequestBody requestBody) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, requestBody, this.cookies);
+    }
+
+    public HttpResponse post(String url, Params params, RequestBody requestBody, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, requestBody, this.cookies, config);
+    }
+
+    public HttpResponse post(String url, Params params, Cookies cookies) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, null, cookies);
+    }
+
+    public HttpResponse post(String url, Params params, Cookies cookies, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, null, cookies, config);
+    }
+
+    public HttpResponse post(String url, RequestBody requestBody, Headers headers) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, this.cookies);
+    }
+
+    public HttpResponse post(String url, RequestBody requestBody, Headers headers, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, this.cookies, config);
+    }
+
+    public HttpResponse post(String url, RequestBody requestBody, Params params) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, requestBody, this.cookies);
+    }
+
+    public HttpResponse post(String url, RequestBody requestBody, Params params, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, requestBody, this.cookies, config);
+    }
+
+    public HttpResponse post(String url, RequestBody requestBody, Cookies cookies) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, new Params(), requestBody, cookies);
+    }
+
+    public HttpResponse post(String url, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, new Params(), requestBody, cookies, config);
+    }
+
+    public HttpResponse post(String url, Cookies cookies, Headers headers) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), null, cookies);
+    }
+
+    public HttpResponse post(String url, Cookies cookies, Headers headers, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, headers, new Params(), null, cookies, config);
+    }
+
+    public HttpResponse post(String url, Cookies cookies, Params params) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, null, cookies);
+    }
+
+    public HttpResponse post(String url, Cookies cookies, Params params, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, params, null, cookies, config);
+    }
+
+    public HttpResponse post(String url, Cookies cookies, RequestBody requestBody) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, new Params(), requestBody, cookies);
+    }
+
+    public HttpResponse post(String url, Cookies cookies, RequestBody requestBody, HttpConfig config) throws IOException {
+        return new HttpRequest(url).send(Method.POST, this.headers, new Params(), requestBody, cookies, config);
+    }
+
+    ////////////////////////////////////////
+
     public HttpResponse post(String url, Headers headers, Params params, RequestBody requestBody) throws IOException {
         return this.send(url, Method.POST, headers, params, requestBody, this.cookies, this.config);
     }

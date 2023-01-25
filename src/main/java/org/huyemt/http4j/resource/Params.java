@@ -50,6 +50,8 @@ public class Params extends Resource {
             if (i + 1 < sources.size()) {
                 builder.append("&");
             }
+
+            i++;
         }
 
         return builder.toString();

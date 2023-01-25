@@ -7,22 +7,26 @@ import java.io.File;
  */
 
 public class DataFolder {
-    private final String mainPath;
+    protected final File main;
 
-    public DataFolder(String mainPath) {
-        this.mainPath = mainPath;
+    public DataFolder() {
+        main = new File(System.getProperty("user.dir"));
+    }
+
+    public DataFolder(String name) {
+        main = new File(System.getProperty("user.dir") + File.separator + name);
+    }
+
+    public final File getMain() {
+        return main;
     }
 
     public final String getMainPath() {
-        return mainPath;
+        return main.getAbsolutePath() + File.separator;
     }
 
     @Override
     public final String toString() {
-        return mainPath + File.separator;
-    }
-
-    public final File toFile() {
-        return new File(getMainPath());
+        return getMainPath();
     }
 }

@@ -77,7 +77,7 @@ public class ModuleManager {
     }
 
     public synchronized final void loadModules() {
-        File f = new File(Rifle.getInstance().getDataFolder() + "modules");
+        File f = Rifle.getInstance().getDataFolder().getModulesDir();
         if (f.exists() && !f.isFile()) {
             File[] files = f.listFiles();
             if (files != null) {

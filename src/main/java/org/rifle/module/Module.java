@@ -59,7 +59,7 @@ public abstract class Module implements IModule {
         initialized = true;
         moduleDescription = new ModuleDescription(main, name, getModuleVersion(), getModuleWebsite(), getModuleStringDescription(), getModuleAuthors());
         logger = new ModuleLogger(name);
-        dataFolder = new DataFolder(Rifle.getInstance().getDataFolder().getMainPath() + File.separator + "modules");
+        dataFolder = new DataFolder( "modules");
     }
 
     @Override
