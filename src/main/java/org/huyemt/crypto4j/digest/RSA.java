@@ -187,6 +187,10 @@ public class RSA {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), publicKey, new EncryptConfig());
     }
 
+    public String encrypt(String content, String publicKey, EncryptConfig config) {
+        return encrypt(content.getBytes(StandardCharsets.UTF_8), toPublicKey(publicKey.getBytes(StandardCharsets.UTF_8)), config);
+    }
+
     public String encrypt(String content, String publicKey) {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), toPublicKey(publicKey.getBytes(StandardCharsets.UTF_8)), new EncryptConfig());
     }
@@ -300,6 +304,10 @@ public class RSA {
 
     public String decrypt(String content, PrivateKey privateKey) {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), privateKey, new DecryptConfig());
+    }
+
+    public String decrypt(String content, String privateKey, DecryptConfig config) {
+        return decrypt(content.getBytes(StandardCharsets.UTF_8), toPrivateKey(privateKey.getBytes(StandardCharsets.UTF_8)), config);
     }
 
     public String decrypt(String content, String privateKey) {
