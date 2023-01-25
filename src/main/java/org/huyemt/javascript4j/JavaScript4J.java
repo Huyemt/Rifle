@@ -14,6 +14,10 @@ public class JavaScript4J {
     private static final Compilable PUBLIC_JAVASCRIPT_COMPILE_INTERFACE = (Compilable) manager.getEngineByName("javascript");
     private static final Pattern VERIFY = Pattern.compile("^.+\\.js$");
 
+    private JavaScript4J() {
+
+    }
+
     public static ScriptEngine createEngine() {
         return manager.getEngineByName("javascript");
     }

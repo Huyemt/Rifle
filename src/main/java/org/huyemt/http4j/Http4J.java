@@ -17,6 +17,10 @@ public class Http4J {
     // 如果 Headers 传的是特殊值(除了字母和常用报头), 都需要`URLEncoder.encode()`进行编码
     // If Headers pass special values (except letters and common headers), they need to be encoded by `URLEncoder.encode()`
 
+    private Http4J() {
+
+    }
+
     /**
      * 创建一个会话 (此操作可保持会话ID)
      *

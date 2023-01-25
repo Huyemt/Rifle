@@ -9,6 +9,10 @@ import java.net.HttpCookie;
 import java.util.Map;
 
 /**
+ * Session会话保持
+ *
+ * Session session persistence
+ *
  * @author Huyemt
  */
 

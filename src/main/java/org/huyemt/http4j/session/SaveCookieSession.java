@@ -9,6 +9,10 @@ import java.net.HttpCookie;
 import java.util.Map;
 
 /**
+ * SaveCookieSession与Session的区别在于，后者只会保存会话ID的Cookie，而前者会保存响应体设置所有的Cookie，并且同步更新。
+ *
+ * The difference between `SaveCookieSession` and `Session` is that the latter only saves the cookies of the session ID, while the former saves all the cookies set by the response body and synchronizes the update.
+ *
  * @author Huyemt
  */
 
