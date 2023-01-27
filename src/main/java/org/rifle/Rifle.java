@@ -23,7 +23,8 @@ public class Rifle {
     private final TaskManager scheduler;
     private final RifleDataFolder dataFolder;
     private static Rifle instance;
-    private final String version = "1.0.1";
+    private final String version = "1.0.2";
+    private final String github = "http://github.com/Huyemt/Rifle";
 
     public Rifle() {
         System.setProperty("nashorn.args", "--no-deprecation-warning");
@@ -44,6 +45,7 @@ public class Rifle {
                 "  / /_/ /  / /  / /_   / /  / _ \\\n" +
                 " / _, _/  / /  / __/  / /  /  __/\n" +
                 "/_/ |_|  /_/  /_/    /_/   \\___/\n\n\n" +
+                TextFormat.FONT_YELLOW + "Github" + TextFormat.RESET + " -> " + github + "\n" +
                 TextFormat.FONT_YELLOW + "Author" + TextFormat.RESET + " -> " + TextFormat.FONT_BLUE + TextFormat.STYLE_BOLD + "Huyemt (楠生)\n" + TextFormat.RESET +
                 TextFormat.FONT_YELLOW + "Version" + TextFormat.RESET + " -> " + TextFormat.FONT_BLUE + TextFormat.STYLE_BOLD + version + "\n"
         );
@@ -138,6 +140,10 @@ public class Rifle {
 
     public final String getVersion() {
         return version;
+    }
+
+    public final String getGithub() {
+        return github;
     }
 
     /**
