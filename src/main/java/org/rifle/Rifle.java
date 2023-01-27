@@ -6,11 +6,9 @@ import org.rifle.console.Console;
 import org.rifle.console.logger.MainLogger;
 import org.rifle.manager.ModuleManager;
 import org.rifle.manager.TaskManager;
-import org.rifle.utils.DataFolder;
 import org.rifle.utils.RifleDataFolder;
 import org.rifle.utils.TextFormat;
 
-import java.io.File;
 
 /**
  * @author Huyemt
