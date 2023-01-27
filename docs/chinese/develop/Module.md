@@ -3,6 +3,7 @@
 ## 须知
 <kbd>Rifle</kbd>依靠`Jar`内`META-INF`文件夹中的`MANIFEST.MF`文件属性`Main-Class`寻找模块主类，所以需要您手动配置主类在`Jar`中的路径。
 ## 例子
+
 ```java
 import org.rifle.module.Module;
 import org.rifle.utils.TextFormat;
@@ -45,6 +46,12 @@ public class SimpleModule extends Module {
 
     // 选填
     @Override
+    public boolean isUserCanSelect() {
+        return super.isUserCanSelect();
+    }
+
+    // 选填
+    @Override
     public void onLoad() {
         getLogger().info(getModuleName() + ": Hello, World");
         // 如果你想加点色彩, 可以使用 TextFormat 类
@@ -64,7 +71,7 @@ public class SimpleModule extends Module {
         // 被用户取消选用
         super.onQuit();
     }
-    
+
     // 选填
     @Override
     public void onDisable() {

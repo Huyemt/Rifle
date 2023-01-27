@@ -1,3 +1,5 @@
+## JDK Version
+Make sure that your JDK environment is `JDK 11` or above before use. Recommended `adopt-openj9-11.0.11`
 ## Module using
 1. Please put the modules you want in the `modules` folder under the root directory of <kbd>Rifle</kbd>.
 2. Start <kbd>Rifle</kbd> and use the `use` command to use the specified module.

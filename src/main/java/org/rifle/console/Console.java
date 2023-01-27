@@ -133,6 +133,9 @@ public class Console {
 
         IModule module = Rifle.getInstance().getModuleManager().get(name);
 
+        if (!module.isUserCanSelect())
+            return false;
+
         if (module.isSelected())
             return true;
 

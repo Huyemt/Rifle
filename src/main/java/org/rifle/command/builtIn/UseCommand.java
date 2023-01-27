@@ -18,8 +18,13 @@ public class UseCommand extends Command {
     public void execute(Argument argument) {
         if (argument.getOrigin().length() > 0) {
             String moduleName = argument.asOrderArgument().getArgs()[0];
-            if (!Rifle.getInstance().getConsole().setModule(moduleName))
-                Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "This module has not been loaded by Rifle: " + TextFormat.STYLE_BOLD + TextFormat.FONT_BLUE + moduleName);
+            if (!Rifle.getInstance().getConsole().setModule(moduleName)) {
+                if (Rifle.getInstance().getModuleManager().exists(moduleName)) {
+                    Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "This module is set to disable user check:  " + TextFormat.STYLE_BOLD + TextFormat.FONT_BLUE + Rifle.getInstance().getModuleManager().get(moduleName).getModuleDescription().getName());
+                } else {
+                    Rifle.getInstance().getLogger().println(TextFormat.FONT_RED + "This module has not been loaded by Rifle: " + TextFormat.STYLE_BOLD + TextFormat.FONT_BLUE + moduleName);
+                }
+            }
         }
     }
 }

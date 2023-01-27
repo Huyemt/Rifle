@@ -82,5 +82,12 @@ public interface IModule {
      */
     boolean isSelected();
 
+    /**
+     * 该模块是否可以被用户选中
+     *
+     * Whether the module can be selected by the user
+     */
+    boolean isUserCanSelect();
+
     void setSelected(boolean selected);
 }

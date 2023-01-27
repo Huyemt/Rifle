@@ -1,9 +1,8 @@
 package org.rifle.module;
 
-import org.rifle.Rifle;
 import org.rifle.manager.CommandManager;
 import org.rifle.console.logger.ModuleLogger;
-import org.rifle.utils.DataFolder;
+import org.rifle.utils.ModuleDataFolder;
 
 import java.io.File;
 
@@ -15,7 +14,7 @@ public abstract class Module implements IModule {
     private final CommandManager commandManager = new CommandManager();
     private ModuleDescription moduleDescription;
     private ModuleLogger logger;
-    private DataFolder dataFolder;
+    private ModuleDataFolder dataFolder;
     private boolean initialized = false;
     protected boolean selected = false;
 
@@ -51,7 +50,7 @@ public abstract class Module implements IModule {
         return "~";
     }
 
-    public void init(String main) {
+    public void init(String main, File jar) {
         if (initialized)
             return;
         String name = getModuleName().trim().replace("  ", " ").replace(" ", "_");
@@ -59,7 +58,7 @@ public abstract class Module implements IModule {
         initialized = true;
         moduleDescription = new ModuleDescription(main, name, getModuleVersion(), getModuleWebsite(), getModuleStringDescription(), getModuleAuthors());
         logger = new ModuleLogger(name);
-        dataFolder = new DataFolder( "modules");
+        dataFolder = new ModuleDataFolder(jar, getModuleDescription().getName());
     }
 
     @Override
@@ -78,7 +77,7 @@ public abstract class Module implements IModule {
     }
 
     @Override
-    public final DataFolder getDataFolder() {
+    public final ModuleDataFolder getDataFolder() {
         return dataFolder;
     }
 
@@ -97,6 +96,11 @@ public abstract class Module implements IModule {
             onSelected();
         else
             onQuit();
+    }
+
+    @Override
+    public boolean isUserCanSelect() {
+        return true;
     }
 
     @Override

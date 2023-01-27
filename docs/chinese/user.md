@@ -1,3 +1,5 @@
+## JDK版本
+在使用之前，请确保您JDK环境在`JDK 11`或以上。推荐`adopt-openj9-11.0.11`
 ## 模块使用
 1. 请将您想要的模块放到<kbd>Rifle</kbd>的根目录之下的`modules`文件夹里面。
 2. 启动<kbd>Rifle</kbd>，使用 `use` 命令使用指定模块。

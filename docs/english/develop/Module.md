@@ -45,6 +45,12 @@ public class SimpleModule extends Module {
 
     // Optional
     @Override
+    public boolean isUserCanSelect() {
+        return super.isUserCanSelect();
+    }
+
+    // Optional
+    @Override
     public void onLoad() {
         getLogger().info(getModuleName() + ": Hello, World");
         // If you want to add some color, you can use the TextFormat class

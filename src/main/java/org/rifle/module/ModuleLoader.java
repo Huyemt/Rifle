@@ -30,37 +30,33 @@ public class ModuleLoader implements ILoader {
         if (success == null)
             return null;
 
-        switch (success) {
-            case "jar":
-                try (JarFile jarFile = new JarFile(file)) {
-                    Module module;
-                    Attributes attributes = jarFile.getManifest().getMainAttributes();
-                    String main = attributes.getValue("Main-Class");
+        try (JarFile jarFile = new JarFile(file)) {
+            Module module;
+            Attributes attributes = jarFile.getManifest().getMainAttributes();
+            String main = attributes.getValue("Main-Class");
 
-                    if (main == null)
-                        throw new Exception("Unable to load \"" + file.getName() + "\" because \"Main-Class\" could not be found.");
+            if (main == null)
+                throw new Exception("Unable to load \"" + file.getName() + "\" because \"Main-Class\" could not be found.");
 
-                    JavaClassLoader loader = new JavaClassLoader(this, getClass().getClassLoader(), file);
-                    Class<?> clazz = loader.findClass(main);
+            JavaClassLoader loader = new JavaClassLoader(this, getClass().getClassLoader(), file);
+            Class<?> clazz = loader.findClass(main);
 
-                    if (clazz.isAssignableFrom(Module.class))
-                        throw new Exception("The Module main class `" + main + "` must extends `rifle.module.Module`");
+            if (clazz.isAssignableFrom(Module.class))
+                throw new Exception("The Module main class `" + main + "` must extends `rifle.module.Module`");
 
-                    Class<Module> moduleClass = (Class<Module>) clazz.asSubclass(Module.class);
-                    module = moduleClass.getConstructor().newInstance();
-                    module.init(main);
-                    module.onLoad();
-                    loaders.put(module.getModuleName(), loader);
-                    return module;
-                } catch (IOException e) {
-                    Rifle.getInstance().getLogger().error("The jar file with the path \"" + file.getAbsolutePath() + "\" is corrupted.");
-                } catch (Exception e) {
-                    Rifle.getInstance().getLogger().error(e.getMessage());
-                }
-                break;
-            default:
-                return null;
+            Class<Module> moduleClass = (Class<Module>) clazz.asSubclass(Module.class);
+            module = moduleClass.getConstructor().newInstance();
+            module.init(main, file);
+            module.getDataFolder().initLibraryInLocal();
+            module.onLoad();
+            loaders.put(module.getModuleName(), loader);
+            return module;
+        } catch (IOException e) {
+            Rifle.getInstance().getLogger().error("The jar file with the path \"" + file.getAbsolutePath() + "\" is corrupted.");
+        } catch (Exception e) {
+            Rifle.getInstance().getLogger().error(e.getMessage());
         }
+
         return null;
     }
 
