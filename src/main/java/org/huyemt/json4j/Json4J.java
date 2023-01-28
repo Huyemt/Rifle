@@ -24,4 +24,8 @@ public class Json4J {
     public static <T> T parse(Reader reader, Class<?> serialize) {
         return (T) gson.fromJson(reader, serialize);
     }
+
+    public static String toJson(Object object) {
+        return gson.toJson(object);
+    }
 }

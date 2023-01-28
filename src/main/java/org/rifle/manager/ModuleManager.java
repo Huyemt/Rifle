@@ -5,6 +5,7 @@ import org.rifle.module.IModule;
 import org.rifle.module.ModuleLoader;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,7 +91,7 @@ public class ModuleManager {
     }
 
     public synchronized final void unloadModules() {
-        for (IModule module : modules.values()) {
+        for (IModule module : getModules()) {
             unload(module);
         }
     }

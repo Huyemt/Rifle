@@ -53,6 +53,7 @@ public class HttpRequest {
         connection.setConnectTimeout(config.getTimeout());
         connection.setInstanceFollowRedirects(config.isAllowsRedirect());
         connection.setDoInput(true);
+        connection.setUseCaches(false);
         connection.setRequestMethod(method.getMethod());
         if (config.isAutoHeaders()) {
             headers.defaultValue("User-Agent", "Http4J/1.0");
@@ -60,6 +61,14 @@ public class HttpRequest {
 
         headers.defaultValue("Accept", "*/*");
         headers.defaultValue("Connection", "Keep-Alive");
+        if (requestBody != null) {
+            if (requestBody.json == null) {
+                headers.defaultValue("Content-Type", "application/x-www-form-urlencoded");
+            } else {
+                headers.add("Content-Type", "application/json");
+            }
+        }
+
         if (headers.size() > 0) {
             for (String key : headers.getHeaders().keySet()) {
                 connection.addRequestProperty(key, headers.get(key));
@@ -70,10 +79,16 @@ public class HttpRequest {
             connection.addRequestProperty("Cookie", cookies.toString(config.isCookieUrlEncode()));
         }
 
-        if (method == Method.POST && requestBody != null && requestBody.size() > 0) {
+        if (requestBody != null) {
+            byte[] content;
+            if (requestBody.json != null) {
+                content = requestBody.json.getBytes(StandardCharsets.UTF_8);
+            } else {
+                content = requestBody.toString(config.isDataUrlEncode() ? StandardCharsets.UTF_8 : null).getBytes(StandardCharsets.UTF_8);
+            }
             connection.setDoOutput(true);
             OutputStream stream = connection.getOutputStream();
-            stream.write(requestBody.toString(config.isDataUrlEncode() ? StandardCharsets.UTF_8 : null).getBytes(StandardCharsets.UTF_8));
+            stream.write(content);
             stream.flush();
             stream.close();
         }

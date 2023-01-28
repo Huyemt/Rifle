@@ -9,6 +9,13 @@ import java.util.Map;
  */
 
 public class RequestBody extends Resource {
+    public String json;
+
+    public RequestBody() {
+        super();
+        json = null;
+    }
+
     public RequestBody add(String name, Object value) {
         super.add(name, value);
         return this;
@@ -29,6 +36,11 @@ public class RequestBody extends Resource {
         return this;
     }
 
+    public RequestBody setJson(String json) {
+        this.json = json;
+        return this;
+    }
+
     public Map<String, Object> getRequestBody() {
         return this.sources;
     }
@@ -37,22 +49,26 @@ public class RequestBody extends Resource {
         StringBuilder builder = new StringBuilder();
         int i = 0;
 
-        for (Map.Entry<String, Object> entry : sources.entrySet()) {
-            if (charset != null) {
-                builder.append(URLEncoder.encode(entry.getKey(), charset)).append("=").append(entry.getValue() == null ? "" : URLEncoder.encode(String.valueOf(entry.getValue()), charset));
-            } else {
-                builder.append(entry.getKey()).append("=").append(entry.getValue() == null ? "" : String.valueOf(entry.getValue()));
+        if (json == null) {
+
+            for (Map.Entry<String, Object> entry : sources.entrySet()) {
+                if (charset != null) {
+                    builder.append(URLEncoder.encode(entry.getKey(), charset)).append("=").append(entry.getValue() == null ? "" : URLEncoder.encode(String.valueOf(entry.getValue()), charset));
+                } else {
+                    builder.append(entry.getKey()).append("=").append(entry.getValue() == null ? "" : String.valueOf(entry.getValue()));
+                }
+
+                if ((i + 1) < sources.size()) {
+                    builder.append("&");
+                }
+
+                i++;
             }
-
-            if ((i + 1) < sources.size()) {
-                builder.append("&");
-            }
-
-            i++;
-        }
-
+        } else builder.append(json);
         return builder.toString();
     }
+
+
 
     public String toString() {
         return this.toString(null);

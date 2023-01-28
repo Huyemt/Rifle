@@ -167,6 +167,7 @@ public class Rifle {
         getCommandManager().register(new UseCommand());
         getCommandManager().register(new QuitCommand());
         getCommandManager().register(new ModuleListCommand());
+        getCommandManager().register(new MHelpCommand());
         getCommandManager().register(new TaskCommand());
         getCommandManager().register(new TaskListCommand());
         getCommandManager().register(new TaskKillerCommand());
