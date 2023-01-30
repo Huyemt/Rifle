@@ -12,21 +12,25 @@ public class Params extends Resource {
     public Params() {
     }
 
+    @Override
     public Params add(String name, Object value) {
         super.add(name, value);
         return this;
     }
 
+    @Override
     public Params remove(String name) {
         super.remove(name);
         return this;
     }
 
+    @Override
     public Params set(String name, Object value) {
         super.set(name, value);
         return this;
     }
 
+    @Override
     public Params defaultValue(String name, Object value) {
         super.defaultValue(name, value);
         return this;
@@ -57,6 +61,7 @@ public class Params extends Resource {
         return builder.toString();
     }
 
+    @Override
     public final String toString() {
         return this.toString(false);
     }

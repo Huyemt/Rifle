@@ -31,8 +31,35 @@ public class Session {
     }
 
     public HttpResponse send(String url, Method method, Headers headers, Params params, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
+        if (headers == null) {
+            headers = this.headers;
+        } else {
+            for (Map.Entry<String, Object> entry : this.headers.getHeaders().entrySet()) {
+                if (headers.contains(entry.getKey())) {
+                    continue;
+                }
+
+                headers.add(entry.getKey(), entry.getValue());
+            }
+        }
+
+        if (cookies == null) {
+            cookies = this.cookies;
+        } else {
+            for (Map.Entry<String, HttpCookie> entry : this.cookies.getCookieMap().entrySet()) {
+                if (cookies.contains(entry.getKey()))
+                    continue;
+
+                cookies.add(entry.getValue());
+            }
+        }
+
+        if (config == null) {
+            config = this.config;
+        }
+
         HttpRequest request = new HttpRequest(url);
-        HttpResponse response = request.send(method, headers == null ? this.headers : headers, params, requestBody, cookies == null ? this.cookies : cookies, config == null ? this.config : config);
+        HttpResponse response = request.send(method, headers, params, requestBody, cookies, config);
         Map<String, HttpCookie> cookieMap = response.cookies.getCookieMap();
 
         for (HttpCookie cookie : cookieMap.values()) {

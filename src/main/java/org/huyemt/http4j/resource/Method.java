@@ -10,7 +10,7 @@ public enum Method {
 
     private final String method;
 
-    private Method(String method) {
+    Method(String method) {
         this.method = method;
     }
 
