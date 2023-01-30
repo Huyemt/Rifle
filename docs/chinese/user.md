@@ -34,6 +34,14 @@ commandName -key1 arg1 arg2 --key2 --key3
       ```
       ml <moduleName1> <moduleName2>...
       ```
+* `mhelp`<br>
+  * 查看模块的指令
+      ```
+      mhelp
+      ```
+      ```
+      mhelp <moduleName>
+      ```
 * `use`<br>
   * 使用一个模块<br>
   当我们使用一个模块的时候，<kbd>Rifle</kbd>会引用该模块的命令

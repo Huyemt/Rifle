@@ -5,8 +5,6 @@ import org.huyemt.http4j.resource.*;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -130,6 +128,8 @@ public class HttpRequest {
             // If there is a redirect address
             while (response.headers.contains("Location")) {
                 // set url
+                headers.add("Referer", response.url.toString());
+
                 this.url = new URL(response.headers.get("Location"));
 
                 for (HttpCookie cookie : response.cookies.getCookieMap().values()) {

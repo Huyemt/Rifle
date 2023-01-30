@@ -33,6 +33,14 @@ commandName -key1 arg1 arg2 --key2 --key3
       ```
       ml <moduleName1> <moduleName2>...
       ```
+* `mhelp`<br>
+  * View the commands of the module
+      ```
+      mhelp
+      ```
+      ```
+      mhelp <moduleName>
+      ```
 * `use`<br>
   * Use a module<br>
     When we use a module, <kbd>Rifle</kbd> will refer to the command of the module
