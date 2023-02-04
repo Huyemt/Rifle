@@ -54,6 +54,7 @@ public class HttpRequest {
         connection.setRequestMethod(method.getMethod());
         if (config.isAutoHeaders()) {
             headers.defaultValue("User-Agent", "Http4J/1.0");
+            headers.defaultValue("Content-Type", "application/x-www-form-urlencoded");
         }
 
         headers.defaultValue("Accept", "*/*");
@@ -128,8 +129,6 @@ public class HttpRequest {
             // If there is a redirect address
             while (response.headers.contains("Location")) {
                 // set url
-                headers.add("Referer", response.url.toString());
-
                 this.url = new URL(response.headers.get("Location"));
 
                 for (HttpCookie cookie : response.cookies.getCookieMap().values()) {
@@ -141,17 +140,5 @@ public class HttpRequest {
         }
 
         return response;
-    }
-
-    public HttpResponse send(Method method, Headers headers, Params params, RequestBody requestBody, Cookies cookies) throws IOException {
-        return this.send(method, headers, params, requestBody, cookies, new HttpConfig());
-    }
-
-    public HttpResponse send(Method method, HttpConfig config) throws IOException {
-        return this.send(method, new Headers(), new Params(), null, new Cookies(), config);
-    }
-
-    public HttpResponse send(Method method) throws IOException {
-        return this.send(method, new Headers(), new Params(), null, new Cookies(), new HttpConfig());
     }
 }

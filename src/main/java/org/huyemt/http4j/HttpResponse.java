@@ -1,5 +1,6 @@
 package org.huyemt.http4j;
 
+import com.google.gson.Gson;
 import org.huyemt.http4j.resource.Cookies;
 import org.huyemt.http4j.resource.Headers;
 
@@ -32,7 +33,11 @@ public class HttpResponse {
         this.headers = new Headers(map);
     }
 
-    public int getStatusCode() {
+    public <T extends Class<?>> T json(T clazz) {
+        return new Gson().fromJson(getHtml(), clazz);
+    }
+
+    public final int getStatusCode() {
         return this.status_code;
     }
 
@@ -56,7 +61,8 @@ public class HttpResponse {
         return url;
     }
 
-    public String toString() {
+    @Override
+    public final String toString() {
         return headers + "\n" + cookies;
     }
 }

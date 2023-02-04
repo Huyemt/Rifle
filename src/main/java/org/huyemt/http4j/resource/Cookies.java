@@ -12,7 +12,7 @@ import java.util.Map;
  * @author Huyemt
  */
 
-public class Cookies {
+public class Cookies extends HttpAttribute {
     private final Map<String, HttpCookie> cookieMap = new LinkedHashMap<>();
 
     public Cookies() {

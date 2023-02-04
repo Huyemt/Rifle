@@ -4,7 +4,7 @@ package org.huyemt.http4j.resource;
  * @author Huyemt
  */
 
-public class HttpConfig {
+public class HttpConfig extends HttpAttribute {
     private int timeout = 20000;
     private boolean allowsRedirect = false;
     private boolean autoHeaders = true;

@@ -45,135 +45,35 @@ public class Http4J {
     }
 
     /**
-     * 发送GET请求
+     * 发送一个GET请求
      *
      * Send a GET request
      *
      * @param url
+     * @param attributes
      * @return HttpResponse
      * @throws IOException
      */
-    public static HttpResponse get(String url) throws IOException {
-        return new HttpRequest(url).send(Method.GET);
-    }
+    public static HttpResponse get(String url, HttpAttribute ... attributes) throws IOException {
+        Headers headers = null;
+        Params params = null;
+        Cookies cookies = null;
+        HttpConfig config = null;
 
-    public static HttpResponse get(String url, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, config);
-    }
+        for (HttpAttribute attribute : attributes) {
+            if (attribute instanceof Headers) {
+                headers = headers == null ? (Headers) attribute : headers;
+            } else if (attribute instanceof Params) {
+                params = params == null ? (Params) attribute : params;
+            }else if (attribute instanceof Cookies) {
+                cookies = cookies == null ? (Cookies) attribute : cookies;
+            } else if (attribute instanceof HttpConfig) {
+                config = config == null ? (HttpConfig) attribute : config;
+            }
+        }
 
-    /////////////////////////////////////
-
-    public static HttpResponse get(String url, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, new Params(), null, new Cookies());
-    }
-
-    public static HttpResponse get(String url, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, new Params(), null, new Cookies(), config);
-    }
-
-    public static HttpResponse get(String url, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.GET, new Headers(), params, null, new Cookies());
-    }
-
-    public static HttpResponse get(String url, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, new Headers(), params, null, new Cookies(), config);
-    }
-
-    public static HttpResponse get(String url, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.GET, new Headers(), new Params(), null, cookies);
-    }
-
-    public static HttpResponse get(String url, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, new Headers(), new Params(), null, cookies, config);
-    }
-
-    /////////////////////////////////////
-
-    public static HttpResponse get(String url, Headers headers, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, new Cookies());
-    }
-
-    public static HttpResponse get(String url, Headers headers, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, new Cookies(), config);
-    }
-
-    public static HttpResponse get(String url, Headers headers, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, new Params(), null, cookies);
-    }
-
-    public static HttpResponse get(String url, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, new Params(), null, cookies, config);
-    }
-
-    public static HttpResponse get(String url, Params params, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, new Cookies());
-    }
-
-    public static HttpResponse get(String url, Params params, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, new Cookies(), config);
-    }
-
-    public static HttpResponse get(String url, Params params, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.GET, new Headers(), params, null, cookies);
-    }
-
-    public static HttpResponse get(String url, Params params, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, new Headers(), params, null, cookies, config);
-    }
-
-    /////////////////////////////////////
-
-    public static HttpResponse get(String url, Headers headers, Params params, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies);
-    }
-
-    public static HttpResponse get(String url, Headers headers, Params params, Cookies cookies, HttpConfig config) throws IOException {
         return new HttpRequest(url).send(Method.GET, headers, params, null, cookies, config);
     }
-
-    public static HttpResponse get(String url, Headers headers, Cookies cookies, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies);
-    }
-
-    public static HttpResponse get(String url, Headers headers, Cookies cookies, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies, config);
-    }
-
-    public static HttpResponse get(String url, Cookies cookies, Headers headers, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies);
-    }
-
-    public static HttpResponse get(String url, Cookies cookies, Headers headers, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies, config);
-    }
-
-    public static HttpResponse get(String url, Cookies cookies, Params params, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies);
-    }
-
-    public static HttpResponse get(String url, Cookies cookies, Params params, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies, config);
-    }
-
-    public static HttpResponse get(String url, Params params, Cookies cookies, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies);
-    }
-
-    public static HttpResponse get(String url, Params params, Cookies cookies, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies, config);
-    }
-
-    public static HttpResponse get(String url, Params params, Headers headers, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies);
-    }
-
-    public static HttpResponse get(String url, Params params, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies, config);
-    }
-
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////////////////////
 
     /**
      * 发送一个POST请求
@@ -181,534 +81,65 @@ public class Http4J {
      * Send a POST request
      *
      * @param url
+     * @param attributes
      * @return HttpResponse
      * @throws IOException
      */
-    public static HttpResponse post(String url) throws IOException {
-        return new HttpRequest(url).send(Method.POST);
-    }
+    public static HttpResponse post(String url, HttpAttribute ... attributes) throws IOException {
+        Headers headers = null;
+        Params params = null;
+        RequestBody requestBody = null;
+        Cookies cookies = null;
+        HttpConfig config = null;
+
+        for (HttpAttribute attribute : attributes) {
+            if (attribute instanceof Headers) {
+                headers = headers == null ? (Headers) attribute : headers;
+            } else if (attribute instanceof Params) {
+                params = params == null ? (Params) attribute : params;
+            } else if (attribute instanceof RequestBody) {
+                requestBody = requestBody == null ? (RequestBody) attribute : requestBody;
+            }else if (attribute instanceof Cookies) {
+                cookies = cookies == null ? (Cookies) attribute : cookies;
+            } else if (attribute instanceof HttpConfig) {
+                config = config == null ? (HttpConfig) attribute : config;
+            }
+        }
 
-    public static HttpResponse post(String url, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, config);
-    }
-
-    /////////////////////////////////////
-
-    public static HttpResponse post(String url, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), null, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), null, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, null, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, null, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), null, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), null, cookies, config);
-    }
-
-    /////////////////////////////////////
-
-    public static HttpResponse post(String url, Headers headers, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), new Cookies());
-    }
-
-    public static HttpResponse post(String url, Headers headers, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), new Cookies());
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), new Params(), requestBody, cookies, config);
-    }
-
-    /////////////////////////////////////
-
-    public static HttpResponse post(String url, Headers headers, Params params, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Headers headers, Params params, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Params params, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Params params, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies());
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, new Cookies(), config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, new RequestBody(), cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, new Params(), requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, new Headers(), params, requestBody, cookies, config);
-    }
-
-    /////////////////////////////////////
-
-    public static HttpResponse post(String url, Headers headers, Params params, RequestBody requestBody, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Params params, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
         return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
     }
 
-    public static HttpResponse post(String url, Headers headers, Params params, Cookies cookies, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
+    /**
+     * 发送一个PUT请求
+     *
+     * Send a PUT request
+     *
+     * @param url
+     * @param attributes
+     * @return HttpResponse
+     * @throws IOException
+     */
+    public static HttpResponse put(String url, HttpAttribute ... attributes) throws IOException {
+        Headers headers = null;
+        Params params = null;
+        RequestBody requestBody = null;
+        Cookies cookies = null;
+        HttpConfig config = null;
 
-    public static HttpResponse post(String url, Headers headers, Params params, Cookies cookies, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
+        for (HttpAttribute attribute : attributes) {
+            if (attribute instanceof Headers) {
+                headers = headers == null ? (Headers) attribute : headers;
+            } else if (attribute instanceof Params) {
+                params = params == null ? (Params) attribute : params;
+            } else if (attribute instanceof RequestBody) {
+                requestBody = requestBody == null ? (RequestBody) attribute : requestBody;
+            }else if (attribute instanceof Cookies) {
+                cookies = cookies == null ? (Cookies) attribute : cookies;
+            } else if (attribute instanceof HttpConfig) {
+                config = config == null ? (HttpConfig) attribute : config;
+            }
+        }
 
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Params params, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Params params, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Cookies cookies, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, RequestBody requestBody, Cookies cookies, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, Params params, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, Params params, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, RequestBody requestBody, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Headers headers, Cookies cookies, RequestBody requestBody, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, RequestBody requestBody, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, Cookies cookies, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Headers headers, Cookies cookies, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Headers headers, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Cookies cookies, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, RequestBody requestBody, Cookies cookies, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, Headers headers, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, Headers headers, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, RequestBody requestBody, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Params params, Cookies cookies, RequestBody requestBody, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Params params, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Params params, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Cookies cookies, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Headers headers, Cookies cookies, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Headers headers, Cookies cookies) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Headers headers, Cookies cookies, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Cookies cookies, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Params params, Cookies cookies, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Headers headers, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Headers headers, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Params params, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, RequestBody requestBody, Cookies cookies, Params params, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, Params params, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, Params params, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, RequestBody requestBody, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Headers headers, RequestBody requestBody, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, Headers headers, RequestBody requestBody) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, Headers headers, RequestBody requestBody, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, RequestBody requestBody, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, Params params, RequestBody requestBody, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Headers headers, Params params) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Headers headers, Params params, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Params params, Headers headers) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies);
-    }
-
-    public static HttpResponse post(String url, Cookies cookies, RequestBody requestBody, Params params, Headers headers, HttpConfig config) throws IOException {
-        return new HttpRequest(url).send(Method.POST, headers, params, requestBody, cookies, config);
+        return new HttpRequest(url).send(Method.PUT, headers, params, requestBody, cookies, config);
     }
 }

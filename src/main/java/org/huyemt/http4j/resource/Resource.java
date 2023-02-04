@@ -7,7 +7,7 @@ import java.util.Map;
  * @author Huyemt
  */
 
-public class Resource {
+public class Resource extends HttpAttribute {
     protected Map<String, Object> sources;
 
     public Resource() {

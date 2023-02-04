@@ -15,6 +15,7 @@ public class Crypto4J {
 
     public static final Base64 Base64 = new Base64();
     public static final Unicode Unicode = new Unicode();
+    public static final Caesar Caesar = new Caesar();
     public static final MD5 MD5 = new MD5();
     public static final SHA SHA1 = new SHA();
     public static final SHA SHA256 = new SHA("256");
