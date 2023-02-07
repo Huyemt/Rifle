@@ -101,7 +101,7 @@ public class Session {
             }
         }
 
-        return new HttpRequest(url).send(Method.GET, headers, params, null, cookies, config);
+        return send(url, Method.GET, headers, params, null, cookies, config);
     }
 
     public HttpResponse post(String url, HttpAttribute ... attributes) throws IOException {
@@ -125,7 +125,7 @@ public class Session {
             }
         }
 
-        return new HttpRequest(url).send(Method.POST, headers, params, null, cookies, config);
+        return send(url, Method.POST, headers, params, null, cookies, config);
     }
 
     public HttpResponse put(String url, HttpAttribute ... attributes) throws IOException {
@@ -149,6 +149,6 @@ public class Session {
             }
         }
 
-        return new HttpRequest(url).send(Method.PUT, headers, params, null, cookies, config);
+        return send(url, Method.PUT, headers, params, null, cookies, config);
     }
 }
