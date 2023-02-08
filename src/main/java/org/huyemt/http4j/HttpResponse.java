@@ -16,13 +16,14 @@ import java.util.Map;
 
 public class HttpResponse {
     public final Headers headers;
+    public final Headers originHeaders;
     public final byte[] content;
     public final Cookies cookies;
     public final String html;
     public final int status_code;
     public final URL url;
 
-    public HttpResponse(int status_code, URL url, byte[] content, Map<String, List<String>> headers) {
+    public HttpResponse(int status_code, URL url, byte[] content, Map<String, List<String>> headers, Headers originHeaders) {
         this.status_code = status_code;
         this.url = url;
         this.content = content;
@@ -31,10 +32,11 @@ public class HttpResponse {
         map.remove(null);
         this.cookies = new Cookies(map.getOrDefault("Set-Cookie", null));
         this.headers = new Headers(map);
+        this.originHeaders = originHeaders;
     }
 
-    public <T extends Class<?>> T json(T clazz) {
-        return new Gson().fromJson(getHtml(), clazz);
+    public <T> T json(Class<T> type) {
+        return new Gson().fromJson(getHtml(), type);
     }
 
     public final int getStatusCode() {
@@ -59,6 +61,10 @@ public class HttpResponse {
 
     public final URL getUrl() {
         return url;
+    }
+
+    public final Headers getOriginHeaders() {
+        return originHeaders;
     }
 
     @Override

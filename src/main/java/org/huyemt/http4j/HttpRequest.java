@@ -57,15 +57,12 @@ public class HttpRequest {
             headers.defaultValue("Content-Type", "application/x-www-form-urlencoded");
         }
 
+        if (method != Method.GET && requestBody != null && requestBody.json != null) {
+            headers.add("Content-Type", "application/json");
+        }
+
         headers.defaultValue("Accept", "*/*");
         headers.defaultValue("Connection", "Keep-Alive");
-        if (requestBody != null) {
-            if (requestBody.json == null) {
-                headers.defaultValue("Content-Type", "application/x-www-form-urlencoded");
-            } else {
-                headers.add("Content-Type", "application/json");
-            }
-        }
 
         if (headers.size() > 0) {
             for (String key : headers.getHeaders().keySet()) {
@@ -123,19 +120,22 @@ public class HttpRequest {
             status = connection.getResponseCode();
         }
 
-        HttpResponse response = new HttpResponse(status, connection.getURL(), result, connection.getHeaderFields());
+        HttpResponse response = new HttpResponse(status, connection.getURL(), result, connection.getHeaderFields(), headers);
+
 
         if (config.isAllowsRedirect()) {
             // If there is a redirect address
-            while (response.headers.contains("Location")) {
+            if (response.headers.contains("Location")) {
                 // set url
                 this.url = new URL(response.headers.get("Location"));
+                response.headers.remove("Location");
+
 
                 for (HttpCookie cookie : response.cookies.getCookieMap().values()) {
                     cookies.add(cookie);
                 }
 
-                response = send(method, headers, null, null, cookies, config);
+                return send(method, headers, null, null, cookies, config);
             }
         }
 

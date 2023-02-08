@@ -17,17 +17,17 @@ import java.util.Map;
  */
 
 public class Session {
-    public Headers headers = new Headers();
+    public Headers headers;
     public Cookies cookies;
     public HttpConfig config;
 
     public Session() {
+        this.headers = new Headers();
+        this.cookies = new Cookies();
+        this.config = new HttpConfig().allowsRedirect(true);
         this.headers.add("User-Agent", "Http4J/1.0");
-        this.headers.add("Accept-Encoding", "gzip, deflate");
         this.headers.add("Accept", "*/*");
         this.headers.add("Connection", "keep-alive");
-        this.cookies = new Cookies();
-        this.config = (new HttpConfig()).allowsRedirect(true);
     }
 
     public HttpResponse send(String url, Method method, Headers headers, Params params, RequestBody requestBody, Cookies cookies, HttpConfig config) throws IOException {
@@ -84,10 +84,10 @@ public class Session {
     }
 
     public HttpResponse get(String url, HttpAttribute ... attributes) throws IOException {
-        Headers headers = this.headers;
+        Headers headers = null;
         Params params = null;
-        Cookies cookies = this.cookies;
-        HttpConfig config = this.config;
+        Cookies cookies = null;
+        HttpConfig config = null;
 
         for (HttpAttribute attribute : attributes) {
             if (attribute instanceof Headers) {
@@ -105,11 +105,11 @@ public class Session {
     }
 
     public HttpResponse post(String url, HttpAttribute ... attributes) throws IOException {
-        Headers headers = this.headers;
+        Headers headers = null;
         Params params = null;
+        Cookies cookies = null;
+        HttpConfig config = null;
         RequestBody requestBody = null;
-        Cookies cookies = this.cookies;
-        HttpConfig config = this.config;
 
         for (HttpAttribute attribute : attributes) {
             if (attribute instanceof Headers) {
@@ -125,15 +125,15 @@ public class Session {
             }
         }
 
-        return send(url, Method.POST, headers, params, null, cookies, config);
+        return send(url, Method.POST, headers, params, requestBody, cookies, config);
     }
 
     public HttpResponse put(String url, HttpAttribute ... attributes) throws IOException {
-        Headers headers = this.headers;
+        Headers headers = null;
         Params params = null;
+        Cookies cookies = null;
+        HttpConfig config = null;
         RequestBody requestBody = null;
-        Cookies cookies = this.cookies;
-        HttpConfig config = this.config;
 
         for (HttpAttribute attribute : attributes) {
             if (attribute instanceof Headers) {
@@ -149,6 +149,6 @@ public class Session {
             }
         }
 
-        return send(url, Method.PUT, headers, params, null, cookies, config);
+        return send(url, Method.PUT, headers, params, requestBody, cookies, config);
     }
 }
