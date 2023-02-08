@@ -21,7 +21,7 @@ public class Rifle {
     private final TaskManager scheduler;
     private final RifleDataFolder dataFolder;
     private static Rifle instance;
-    private final String version = "1.0.2";
+    private final String version = "1.0.3";
     private final String github = "http://github.com/Huyemt/Rifle";
 
     public Rifle() {
