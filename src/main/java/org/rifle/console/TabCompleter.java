@@ -41,11 +41,6 @@ public class TabCompleter implements Completer {
                 list.clear();
                 addR(list, getModules());
             }
-        } else {
-            if (args[0].equalsIgnoreCase("use") && args.length == 2) {
-                list.clear();
-                addR(list, getModules(args[1]));
-            }
         }
     }
 
