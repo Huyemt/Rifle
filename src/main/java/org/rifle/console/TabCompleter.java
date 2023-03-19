@@ -127,27 +127,4 @@ public class TabCompleter implements Completer {
 
         return r.toArray(String[]::new);
     }
-
-
-
-//    private static class MyCompleter implements Completer {
-//        @Override
-//        public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
-//            String buffer = line.line();
-//            String[] words = buffer.split("\\s+");
-//            if (words.length == 1) {
-//                String[] options = {"help", "hello", "goodbye"};
-//                addCandidates(candidates, options);
-//            } else if (words.length == 2 && words[0].equals("help")) {
-//                String[] options = {"command1", "command2", "command3"};
-//                addCandidates(candidates, options);
-//            }
-//        }
-//
-//        private void addCandidates(List<Candidate> candidates, String[] options) {
-//            Arrays.stream(options).forEach(option -> {
-//                candidates.add(new Candidate(option));
-//            });
-//        }
-//    }
 }
