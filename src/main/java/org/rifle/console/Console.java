@@ -39,6 +39,7 @@ public class Console {
                     .option(LineReader.Option.HISTORY_IGNORE_SPACE, true)
                     .option(LineReader.Option.HISTORY_IGNORE_DUPS, true)
                     .option(LineReader.Option.HISTORY_BEEP, false)
+                    .completer(new TabCompleter())
                     .build());
         } catch (IOException e) {
             e.printStackTrace();

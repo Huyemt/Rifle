@@ -29,10 +29,10 @@ public class Rifle {
 
         instance = this;
         dataFolder = new RifleDataFolder();
-        console = new Console();
-        scheduler = new TaskManager();
         commandManager = new CommandManager();
+        console = new Console();
         moduleManager = new ModuleManager();
+        scheduler = new TaskManager();
 
         console.clearScreen();
 
