@@ -42,7 +42,7 @@ public class Rifle {
                 "   / __ \\   (_)  / __/  / /  ___\n" +
                 "  / /_/ /  / /  / /_   / /  / _ \\\n" +
                 " / _, _/  / /  / __/  / /  /  __/\n" +
-                "/_/ |_|  /_/  /_/    /_/   \\___/\n\n\n" +
+                "/_/ |_|  /_/  /_/    /_/   \\___/\n\n\n\n\n" +
                 TextFormat.FONT_YELLOW + "Github" + TextFormat.RESET + " -> " + github + "\n" +
                 TextFormat.FONT_YELLOW + "Author" + TextFormat.RESET + " -> " + TextFormat.FONT_BLUE + TextFormat.STYLE_BOLD + "Huyemt (楠生)\n" + TextFormat.RESET +
                 TextFormat.FONT_YELLOW + "Version" + TextFormat.RESET + " -> " + TextFormat.FONT_BLUE + TextFormat.STYLE_BOLD + version + "\n"

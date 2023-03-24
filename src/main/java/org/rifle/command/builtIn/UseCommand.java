@@ -1,9 +1,15 @@
 package org.rifle.command.builtIn;
 
+import org.jline.reader.Candidate;
 import org.rifle.Rifle;
 import org.rifle.command.Command;
 import org.rifle.command.arguments.Argument;
+import org.rifle.module.IModule;
 import org.rifle.utils.TextFormat;
+
+import java.util.LinkedList;
+import java.util.List;
+
 
 /**
  * @author Huyemt
@@ -26,5 +32,56 @@ public class UseCommand extends Command {
                 }
             }
         }
+    }
+
+    @Override
+    public String[] complete(String reference, String[] args) {
+        if (args.length <= 1) {
+            return args.length == 0 ? getModules() : ((!Rifle.getInstance().getModuleManager().exists(reference) && !reference.equalsIgnoreCase("rifle")) ? getModules(reference) : new String[0]);
+        }
+
+        return new String[0];
+    }
+
+    private String[] getModules() {
+        LinkedList<String> r = new LinkedList<>();
+
+        for (IModule n : Rifle.getInstance().getModuleManager().getModules()) {
+            if (!n.isUserCanSelect()) {
+                continue;
+            }
+
+            r.add(n.getModuleDescription().getName());
+        }
+
+        r.add("Rifle");
+
+        return r.toArray(String[]::new);
+    }
+
+    private String[] getModules(String name) {
+        LinkedList<String> r = new LinkedList<>();
+
+        for (IModule n : Rifle.getInstance().getModuleManager().getModules()) {
+            if (!n.isUserCanSelect()) {
+                continue;
+            }
+
+            if (n.getModuleDescription().getName().length() < name.length()) {
+                continue;
+            }
+
+            if (n.getModuleDescription().getName().toLowerCase().substring(0, name.length()).equals(name.toLowerCase())) {
+                r.add(n.getModuleDescription().getName());
+            }
+        }
+
+        String main = "Rifle";
+
+        if (main.length() >= name.length() && main.toLowerCase().substring(0, name.length()).equals(name.toLowerCase())) {
+            r.add(main);
+        }
+
+        return r.toArray(String[]::new);
     }
 }

@@ -1,6 +1,9 @@
 package org.rifle.command;
 
+import org.jline.reader.Candidate;
 import org.rifle.command.arguments.Argument;
+
+import java.util.List;
 
 /**
  * @author Huyemt
@@ -30,6 +33,11 @@ public abstract class Command {
      * Executing this command
      */
     public abstract void execute(Argument argument);
+
+
+    public String[] complete(String reference, String[] args) {
+        return new String[0];
+    }
 
     /**
      * 获取指令的名称

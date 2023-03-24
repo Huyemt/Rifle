@@ -10,8 +10,6 @@ import org.rifle.module.IModule;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Huyemt
@@ -26,20 +24,23 @@ public class TabCompleter implements Completer {
         String[] r = getCommands();
 
         if (args.length == 0) {
-            // If the user does not enter anything, then add all the commands available in the current module environment
-            // 如果用户没有输入任何东西，那么就将当前模块环境下可以使用的所有命令全部推送
             addR(list, r);
-        } else if (args.length == 1) {
-            if (Arrays.stream(r).noneMatch(s -> s.equals(args[0].toLowerCase()))) {
-                list.clear();
-                r = getCommands(args[0], r);
-                addR(list, r);
-                return;
-            }
+            return;
+        }
 
-            if (args[0].equalsIgnoreCase("use")) {
-                list.clear();
-                addR(list, getModules());
+        if (args.length == 1 && Arrays.stream(r).noneMatch(s -> s.equals(args[0].toLowerCase()))) {
+            addR(list, getCommands(args[0], r));
+            return;
+        }
+
+        // existing this name of commands
+        if (Arrays.stream(r).anyMatch(s -> s.equals(args[0].toLowerCase()))) {
+            String[] ags = buffer.contains(" ") ? buffer.substring(buffer.indexOf(' ') + 1).split(" ") : new String[]{};
+            if (Rifle.getInstance().getConsole().isMain()) {
+                addR(list, Rifle.getInstance().getCommandManager().getCommand(args[0]).complete(ags.length == 0 ? null : ags[ags.length-1], ags));
+            } else {
+
+                addR(list, Rifle.getInstance().getCommandManager().exists(args[0]) ? Rifle.getInstance().getCommandManager().getCommand(args[0]).complete(ags.length == 0 ? null : ags[ags.length-1], ags) : Rifle.getInstance().getConsole().getModule().getCommandManager().getCommand(args[0]).complete(ags.length == 0 ? null : ags[ags.length-1], ags));
             }
         }
     }
@@ -76,48 +77,6 @@ public class TabCompleter implements Completer {
             if (cmd.substring(0, name.length()).equals(name.toLowerCase())) {
                 r.add(cmd);
             }
-        }
-
-        return r.toArray(String[]::new);
-    }
-
-    private String[] getModules() {
-        LinkedList<String> r = new LinkedList<>();
-
-        for (IModule n : Rifle.getInstance().getModuleManager().getModules()) {
-            if (!n.isUserCanSelect()) {
-                continue;
-            }
-
-            r.add(n.getModuleDescription().getName());
-        }
-
-        r.add("Rifle");
-
-        return r.toArray(String[]::new);
-    }
-
-    private String[] getModules(String name) {
-        LinkedList<String> r = new LinkedList<>();
-
-        for (IModule n : Rifle.getInstance().getModuleManager().getModules()) {
-            if (!n.isUserCanSelect()) {
-                continue;
-            }
-
-            if (n.getModuleDescription().getName().length() < name.length()) {
-                continue;
-            }
-
-            if (n.getModuleDescription().getName().toLowerCase().substring(0, name.length()).equals(name.toLowerCase())) {
-                r.add(n.getModuleDescription().getName());
-            }
-        }
-
-        String main = "Rifle";
-
-        if (main.length() >= name.length() && main.substring(0, name.length()).equals(name.toLowerCase())) {
-            r.add(main);
         }
 
         return r.toArray(String[]::new);
