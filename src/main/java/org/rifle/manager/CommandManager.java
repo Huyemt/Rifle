@@ -19,7 +19,7 @@ public class CommandManager {
     }
 
     /**
-     * 通过名字判断该命令是否已经被注册
+     * 通过名字判断该命令是否已经被注册<br><br>
      *
      * Judging whether the command has been registered by name.
      *
@@ -31,7 +31,7 @@ public class CommandManager {
     }
 
     /**
-     * 通过名字获取一个命令实例
+     * 通过名字获取一个命令实例<br><br>
      *
      * Get a command instance by name.
      *
@@ -43,7 +43,7 @@ public class CommandManager {
     }
 
     /**
-     * 注册一个命令
+     * 注册一个命令<br><br>
      *
      * Register a command
      *
@@ -57,7 +57,7 @@ public class CommandManager {
     }
 
     /**
-     * 注销一个命令
+     * 注销一个命令<br><br>
      *
      * Unregister a command
      *
@@ -76,7 +76,7 @@ public class CommandManager {
     }
 
     /**
-     * 执行一个命令
+     * 执行一个命令<br><br>
      *
      * Execute a command
      *
@@ -96,7 +96,7 @@ public class CommandManager {
     }
 
     /**
-     * 获取所有已经被注册的命令
+     * 获取所有已经被注册的命令<br><br>
      *
      * Get all registered commands.
      *

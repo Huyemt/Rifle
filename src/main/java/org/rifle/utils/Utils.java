@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class Utils {
     /**
-     * 随机生成指定长度(length >= 2)的ID (不以0开头)
+     * 随机生成指定长度(length >= 2)的ID (不以0开头)<br>
      *
      * Randomly generate an ID of a specified length (length >= 2 && not starting with 0)
      *

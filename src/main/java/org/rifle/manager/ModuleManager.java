@@ -5,7 +5,6 @@ import org.rifle.module.IModule;
 import org.rifle.module.ModuleLoader;
 
 import java.io.File;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +26,7 @@ public class ModuleManager {
     }
 
     /**
-     * 通过名字获取 `IModule` 实例
+     * 通过名字获取 `IModule` 实例<br><br>
      *
      * Get an instance of `IModule` by name
      *
@@ -39,7 +38,7 @@ public class ModuleManager {
     }
 
     /**
-     * 通过 `File` 加载一个模块
+     * 通过 `File` 加载一个模块<br><br>
      *
      * Load a module through `File`
      *
@@ -61,7 +60,7 @@ public class ModuleManager {
     }
 
     /**
-     * 通过 `IModule` 卸载一个模块
+     * 通过 `IModule` 卸载一个模块<br><br>
      *
      * Uninstall a module through `IModule`
      *

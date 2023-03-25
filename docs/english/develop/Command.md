@@ -38,6 +38,24 @@ class SimpleCommand extends Command {
         // No matter how many times "-" repeatedly appears in the string of this keyword, its valid field is always the content after "-".
         LinkedList<String> list = argument.asKeyArgument().getArgument("key");
     }
+
+   // When the user presses the Tab key, this method is called based on the command name
+   @Override
+   public String[] complete(String reference, String[] args) {
+      // `reference` is the current content, which is the last value in `args`. If the value is null, then the length of `args` is 0
+      // `args` does not contain command names
+      /**
+       * A simple example
+       * Enter the following command:
+       * "simple a b"
+       *
+       * So you get the following parameters:
+       *
+       * args = [a, b]
+       * reference = b
+       */
+      return new String[0];
+   }
 }
 ```
 Of course, you can also write custom commands in separate files, referring to [Rifle's built-in commands](../../../src/main/java/org/rifle/command/builtIn).

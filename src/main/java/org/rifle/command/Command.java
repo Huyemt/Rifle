@@ -1,9 +1,6 @@
 package org.rifle.command;
 
-import org.jline.reader.Candidate;
 import org.rifle.command.arguments.Argument;
-
-import java.util.List;
 
 /**
  * @author Huyemt
@@ -28,19 +25,27 @@ public abstract class Command {
     }
 
     /**
-     * 执行该命令
+     * 执行该命令<br><br>
      *
      * Executing this command
      */
     public abstract void execute(Argument argument);
 
-
+    /**
+     * 命令补全操作<br><br>
+     *
+     * Command completion operation
+     *
+     * @param reference
+     * @param args
+     * @return String[]
+     */
     public String[] complete(String reference, String[] args) {
         return new String[0];
     }
 
     /**
-     * 获取指令的名称
+     * 获取指令的名称<br><br>
      *
      * Get the name of the command.
      *
@@ -51,7 +56,7 @@ public abstract class Command {
     }
 
     /**
-     * 获取指令的用法
+     * 获取指令的用法<br><br>
      *
      * Get the usage of the command.
      *
@@ -62,7 +67,7 @@ public abstract class Command {
     }
 
     /**
-     * 获取指令的说明
+     * 获取指令的说明<br><br>
      *
      * Get the description of the command.
      *
@@ -73,7 +78,7 @@ public abstract class Command {
     }
 
     /**
-     * 是否可被当作任务挂起执行
+     * 是否可被当作任务挂起执行<br><br>
      *
      * Gets whether this command can be suspended as a task.
      *

@@ -43,9 +43,9 @@ public class Rifle {
                 "  / /_/ /  / /  / /_   / /  / _ \\\n" +
                 " / _, _/  / /  / __/  / /  /  __/\n" +
                 "/_/ |_|  /_/  /_/    /_/   \\___/\n\n\n\n\n" +
-                TextFormat.FONT_YELLOW + "Github" + TextFormat.RESET + " -> " + github + "\n" +
+                TextFormat.FONT_YELLOW + "Github" + TextFormat.RESET + " -> " + getGithub() + "\n" +
                 TextFormat.FONT_YELLOW + "Author" + TextFormat.RESET + " -> " + TextFormat.FONT_BLUE + TextFormat.STYLE_BOLD + "Huyemt (楠生)\n" + TextFormat.RESET +
-                TextFormat.FONT_YELLOW + "Version" + TextFormat.RESET + " -> " + TextFormat.FONT_BLUE + TextFormat.STYLE_BOLD + version + "\n"
+                TextFormat.FONT_YELLOW + "Version" + TextFormat.RESET + " -> " + TextFormat.FONT_BLUE + TextFormat.STYLE_BOLD + getVersion() + "\n"
         );
 
         onLoad();
@@ -67,10 +67,10 @@ public class Rifle {
     }
 
     /**
-     * 获取 `CommandManager` 实例
-     * `CommandManager`是存放`Command`的操作容器
+     * 获取 `CommandManager` 实例<br>
+     * `CommandManager`是存放`Command`的操作容器<br><br>
      *
-     * Get the instance of `CommandManager`
+     * Get the instance of `CommandManager`<br>
      * The `CommandManager` is an operation container for storing `Command`
      *
      * @return CommandManager
@@ -80,7 +80,7 @@ public class Rifle {
     }
 
     /**
-     * 获取 `Console` 实例
+     * 获取 `Console` 实例<br><br>
      *
      * Get the instance of `Console`
      *
@@ -91,7 +91,7 @@ public class Rifle {
     }
 
     /**
-     * 获取 `MainLogger` 实例
+     * 获取 `MainLogger` 实例<br><br>
      *
      * Get the instance of `MainLogger`
      *
@@ -102,10 +102,10 @@ public class Rifle {
     }
 
     /**
-     * 获取 `ModuleManager` 实例
-     * `ModuleManager`是存放`Module`的操作容器
+     * 获取 `ModuleManager` 实例<br>
+     * `ModuleManager`是存放`Module`的操作容器<br><br>
      *
-     * Get the instance of `ModuleManager`
+     * Get the instance of `ModuleManager`<br>
      * The `ModuleManager` is an operation container for storing `Module`
      *
      * @return ModuleManager
@@ -115,7 +115,7 @@ public class Rifle {
     }
 
     /**
-     * 获取 `DataFolder` 实例
+     * 获取 `DataFolder` 实例<br><br>
      *
      * Get the instance of `DataFolder`
      *
@@ -126,7 +126,7 @@ public class Rifle {
     }
 
     /**
-     * 获取 `TaskManager` 实例
+     * 获取 `TaskManager` 实例<br><br>
      *
      * Get the instance of `TaskManager`
      *
@@ -145,7 +145,7 @@ public class Rifle {
     }
 
     /**
-     * 获取 `Rifle` 实例
+     * 获取 `Rifle` 实例<br><br>
      *
      * Get the instance of `Rifle`
      *

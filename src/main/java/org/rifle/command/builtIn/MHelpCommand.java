@@ -39,6 +39,13 @@ public class MHelpCommand extends Command {
         }
     }
 
+    @Override
+    public String[] complete(String reference, String[] args) {
+        String[] f = getCommands();
+
+        return args.length == 0 ? f : getCommands(reference, f);
+    }
+
     private void printAll(LinkedList<Command> commandList) {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -87,5 +94,25 @@ public class MHelpCommand extends Command {
         }
 
         Rifle.getInstance().getLogger().println(success == 0 ? TextFormat.FONT_RED + "None of the commands you want to query exist." : stringBuilder.toString());
+    }
+
+    private String[] getCommands() {
+        return new LinkedList<>(Rifle.getInstance().getConsole().isMain() ? Rifle.getInstance().getCommandManager().getAll().keySet() : Rifle.getInstance().getConsole().getModule().getCommandManager().getAll().keySet()).toArray(String[]::new);
+    }
+
+    private String[] getCommands(String name, String[] f) {
+        LinkedList<String> r = new LinkedList<>();
+
+        for (String cmd : f) {
+            if (cmd.length() < name.length()) {
+                continue;
+            }
+
+            if (cmd.substring(0, name.length()).equals(name.toLowerCase())) {
+                r.add(cmd);
+            }
+        }
+
+        return r.toArray(String[]::new);
     }
 }

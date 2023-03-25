@@ -63,3 +63,4 @@ commandName -key1 arg1 arg2 --key2 --key3
       ```
 ## Quick operation
 1. When you are using a module, if you want to exit the module quickly, you can use <kbd>Ctrl + C</kbd> to exit.
+2. When you want to complete a command quickly, you can use the key <kbd>Tab</kbd> for intelligent command completion.

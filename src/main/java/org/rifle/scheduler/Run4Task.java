@@ -5,7 +5,7 @@ import org.rifle.utils.TextFormat;
 import org.rifle.utils.Utils;
 
 /**
- * 将任务执行的放到线程之中运行，做到后台运行的效果
+ * 将任务执行的放到线程之中运行，做到后台运行的效果<br><br>
  *
  * Put the task execution into the thread to run, so as to achieve the effect of running in the background
  *

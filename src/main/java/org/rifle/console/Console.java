@@ -11,7 +11,7 @@ import org.rifle.module.IModule;
 import java.io.IOException;
 
 /**
- * Console 负责消息输出与命令监听。
+ * Console 负责消息输出与命令监听<br><br>
  *
  * The Console class of Rifle is responsible for message output and command listening.
  *
@@ -47,7 +47,7 @@ public class Console {
     }
 
     /**
-     * 获取 `Terminal` 实例
+     * 获取 `Terminal` 实例<br><br>
      *
      * Get the instance of `Terminal`
      *
@@ -58,7 +58,7 @@ public class Console {
     }
 
     /**
-     * 获取 `ConsoleCommandReader` 实例
+     * 获取 `ConsoleCommandReader` 实例<br><br>
      *
      * Get the instance of `ConsoleCommandReader`
      *
@@ -69,7 +69,7 @@ public class Console {
     }
 
     /**
-     * 查询 Rifle 是否在运行
+     * 查询 Rifle 是否在运行<br><br>
      *
      * Query whether the Rifle process is running.
      *
@@ -80,7 +80,7 @@ public class Console {
     }
 
     /**
-     * 获取 `MainLogger` 实例, 用于日志输出
+     * 获取 `MainLogger` 实例, 用于日志输出<br><br>
      *
      * Get the instance of `MainLogger` for log output.
      *
@@ -91,7 +91,7 @@ public class Console {
     }
 
     /**
-     * 关闭 Rifle
+     * 关闭 Rifle<br><br>
      *
      * Closing the Rifle process.
      */
@@ -102,7 +102,7 @@ public class Console {
     }
 
     /**
-     * 获取当前选中的模块
+     * 获取当前选中的模块<br><br>
      *
      * Get the currently selected module.
      *
@@ -113,7 +113,7 @@ public class Console {
     }
 
     /**
-     * 选用一个模块
+     * 选用一个模块<br><br>
      *
      * Select a module
      *
@@ -148,7 +148,7 @@ public class Console {
     }
 
     /**
-     * 重置正在选用的模块 (退出当前模块)
+     * 重置正在选用的模块 (退出当前模块)<br><br>
      *
      * Reset the module being selected (exit the current module)
      */
@@ -159,7 +159,7 @@ public class Console {
     }
 
     /**
-     * 当前模块是否为主模块Rifle
+     * 当前模块是否为主模块Rifle<br><br>
      *
      * Whether the current module is the main module Rifle?
      *

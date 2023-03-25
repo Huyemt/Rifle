@@ -5,7 +5,6 @@ import org.jline.reader.Completer;
 import org.jline.reader.LineReader;
 import org.jline.reader.ParsedLine;
 import org.rifle.Rifle;
-import org.rifle.module.IModule;
 
 import java.util.Arrays;
 import java.util.LinkedList;

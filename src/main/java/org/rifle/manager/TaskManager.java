@@ -33,7 +33,7 @@ public class TaskManager {
     }
 
     /**
-     * 通过任务id查询任务是否存在
+     * 通过任务id查询任务是否存在<br><br>
      *
      * Query whether a task exists by task id
      *
@@ -45,7 +45,7 @@ public class TaskManager {
     }
 
     /**
-     * 添加一条任务
+     * 添加一条任务<br><br>
      *
      * Add a task
      *
@@ -66,7 +66,7 @@ public class TaskManager {
     }
 
     /**
-     * 取消一个任务
+     * 取消一个任务<br><br>
      *
      * Cancel a task
      *

@@ -9,7 +9,7 @@ import org.rifle.utils.TextFormat;
 
 public abstract class Logger {
     /**
-     * 正常的日志输出
+     * 正常的日志输出<br><br>
      *
      * Normal log output
      *
@@ -18,7 +18,7 @@ public abstract class Logger {
     public abstract void info(Object value);
 
     /**
-     * 警告的日志输出
+     * 警告的日志输出<br><br>
      *
      * Log output of warnings
      *
@@ -27,7 +27,7 @@ public abstract class Logger {
     public abstract void warning(Object value);
 
     /**
-     * 致命错误的日志输出
+     * 致命错误的日志输出<br><br>
      *
      * Log output of errors
      *

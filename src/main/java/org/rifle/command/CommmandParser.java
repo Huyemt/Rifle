@@ -7,7 +7,7 @@ package org.rifle.command;
 public class CommmandParser {
 
     /**
-     * 将整条指令拆分为两部分 -> 指令名称, 指令参数
+     * 将整条指令拆分为两部分 -> 指令名称, 指令参数<br><br>
      *
      * Split the whole command into two parts -> command name, command parameters
      *
@@ -26,7 +26,7 @@ public class CommmandParser {
     }
 
     /**
-     * 提取键名, 用于KeyArgument的keys名称提取
+     * 提取键名, 用于KeyArgument的keys名称提取<br><br>
      *
      * Extracting the key name (Keys name extraction for KeyArgument)
      *

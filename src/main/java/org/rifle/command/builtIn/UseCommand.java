@@ -1,6 +1,5 @@
 package org.rifle.command.builtIn;
 
-import org.jline.reader.Candidate;
 import org.rifle.Rifle;
 import org.rifle.command.Command;
 import org.rifle.command.arguments.Argument;
@@ -8,7 +7,6 @@ import org.rifle.module.IModule;
 import org.rifle.utils.TextFormat;
 
 import java.util.LinkedList;
-import java.util.List;
 
 
 /**

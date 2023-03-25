@@ -20,7 +20,7 @@ public class ConsoleCommandReader extends Thread {
     }
 
     /**
-     * 在 `Console` 的存活期内, 一直监听用户输入的命令
+     * 在 `Console` 的存活期内, 一直监听用户输入的命令<br><br>
      *
      * During the lifetime of the `Console`, it has been listening to the commands input by users.
      */
@@ -52,7 +52,7 @@ public class ConsoleCommandReader extends Thread {
     }
 
     /**
-     * 隐藏输入光标
+     * 隐藏输入光标<br><br>
      *
      * Hide input cursor.
      */
@@ -65,7 +65,7 @@ public class ConsoleCommandReader extends Thread {
     }
 
     /**
-     * 显示输入光标
+     * 显示输入光标<br><br>
      *
      * Display input cursor.
      */
@@ -78,7 +78,7 @@ public class ConsoleCommandReader extends Thread {
     }
 
     /**
-     * 获取 JLine 的输入行监听器
+     * 获取 JLine 的输入行监听器<br><br>
      *
      * Gets JLine's input line listener.
      *

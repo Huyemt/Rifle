@@ -10,35 +10,35 @@ import org.rifle.utils.DataFolder;
 
 public interface IModule {
     /**
-     * 当模块被加载的时候，将执行这个方法
+     * 当模块被加载的时候，将执行这个方法<br><br>
      *
      * This method will be executed when the module is loaded
      */
     void onLoad();
 
     /**
-     * 当模块被选用的时候，将执行这个方法
+     * 当模块被选用的时候，将执行这个方法<br><br>
      *
      * This method will be executed when the module is selected
      */
     void onSelected();
 
     /**
-     * 当模块被退出时，将执行这个方法（此处并非模块被卸载）
+     * 当模块被退出时，将执行这个方法（此处并非模块被卸载）<br><br>
      *
      * This method will be executed when the module is exited (the module is not uninstalled here)
      */
     void onQuit();
 
     /**
-     * 当模块被卸载，将执行这个方法
+     * 当模块被卸载，将执行这个方法<br><br>
      *
      * This method will be executed when the module is uninstalled
      */
     void onDisable();
 
     /**
-     * 获取当前模块的命令管理器
+     * 获取当前模块的命令管理器<br><br>
      *
      * Gets the command manager for the current module
      *
@@ -47,7 +47,7 @@ public interface IModule {
     CommandManager getCommandManager();
 
     /**
-     * 获取当前模块的描述
+     * 获取当前模块的描述<br><br>
      *
      * Gets the description of the current module
      *
@@ -56,7 +56,7 @@ public interface IModule {
     ModuleDescription getModuleDescription();
 
     /**
-     * 获取当前模块的日志输出类
+     * 获取当前模块的日志输出类<br><br>
      *
      * Get the log output class of the current module
      *
@@ -65,7 +65,7 @@ public interface IModule {
     ModuleLogger getLogger();
 
     /**
-     * 获取当前模块的数据文件夹
+     * 获取当前模块的数据文件夹<br><br>
      *
      * Get the data folder of the current module
      *
@@ -74,7 +74,7 @@ public interface IModule {
     DataFolder getDataFolder();
 
     /**
-     * 该模块是否被选用
+     * 该模块是否被选用<br><br>
      *
      * Is this module selected
      *
@@ -83,7 +83,7 @@ public interface IModule {
     boolean isSelected();
 
     /**
-     * 该模块是否可以被用户选中
+     * 该模块是否可以被用户选中<br><br>
      *
      * Whether the module can be selected by the user
      */

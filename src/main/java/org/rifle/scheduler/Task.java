@@ -12,7 +12,7 @@ public abstract class Task {
     public boolean whenDiePrint = false;
 
     /**
-     * 任务运行，我们需要把要做的工作实现到这个方法之中
+     * 任务运行，我们需要把要做的工作实现到这个方法之中<br><br>
      *
      * Task running, we need to realize the work to be done in this method
      */
@@ -31,11 +31,9 @@ public abstract class Task {
     }
 
     /**
-     * 取消这个任务
+     * 取消这个任务<br><br>
      *
      * Cancel this task
-     *
-     * @return boolean
      */
     public final void cancel() {
         run4Task.stop();

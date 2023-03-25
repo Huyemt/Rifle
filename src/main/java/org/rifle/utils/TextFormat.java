@@ -1,7 +1,7 @@
 package org.rifle.utils;
 
 /**
- * Color output based on "JANSI"
+ * Color output based on "JANSI"<br><br>
  *
  * @author Huyemt
  */

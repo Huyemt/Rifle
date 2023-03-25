@@ -8,7 +8,7 @@ import org.rifle.utils.TextFormat;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.LinkedList;
 
 
 /**
@@ -26,6 +26,11 @@ public class ModuleListCommand extends Command {
             formatHelp(argument.asOrderArgument().getArgs());
         else
             printAll();
+    }
+
+    @Override
+    public String[] complete(String reference, String[] args) {
+        return args.length == 0 ? getModules() : getModules(reference);
     }
 
     private void printAll() {
@@ -84,5 +89,32 @@ public class ModuleListCommand extends Command {
         }
 
         Rifle.getInstance().getLogger().println(success == 0 ? TextFormat.FONT_RED + "None of the modules you want to query exist." : stringBuilder.toString());
+    }
+
+    private String[] getModules() {
+        LinkedList<String> r = new LinkedList<>();
+
+        for (IModule n : Rifle.getInstance().getModuleManager().getModules()) {
+            r.add(n.getModuleDescription().getName());
+        }
+
+        return r.toArray(String[]::new);
+    }
+
+    private String[] getModules(String name) {
+        LinkedList<String> r = new LinkedList<>();
+
+        for (IModule n : Rifle.getInstance().getModuleManager().getModules()) {
+
+            if (n.getModuleDescription().getName().length() < name.length()) {
+                continue;
+            }
+
+            if (n.getModuleDescription().getName().toLowerCase().substring(0, name.length()).equals(name.toLowerCase())) {
+                r.add(n.getModuleDescription().getName());
+            }
+        }
+
+        return r.toArray(String[]::new);
     }
 }
