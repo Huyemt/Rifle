@@ -69,15 +69,15 @@ public class Test {
          * 方法一，传递JavaScript文件
          */
         File file = new File(Test.class.getResource("").getPath() + "test.js");
-        ScriptExecutor executor = JavaScript4J.load(file);
-        System.out.println(executor.invokeFunction("test", 1, 2));
+        ScriptExecutor interpreter = JavaScript4J.load(file);
+        System.out.println(interpreter.invokeFunction("test", 1, 2));
 
         /**
          * 方法二，传入代码
          */
         String script = "function test(a,b) { return a+b; }";
-        ScriptExecutor executor = JavaScript4J.load(file);
-        System.out.println(executor.invokeFunction("test", 1, 2));
+        ScriptExecutor interpreter = JavaScript4J.load(file);
+        System.out.println(interpreter.invokeFunction("test", 1, 2));
     }
 }
 ```

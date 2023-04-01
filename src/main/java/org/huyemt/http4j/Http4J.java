@@ -52,7 +52,6 @@ public class Http4J {
      * @param url
      * @param attributes
      * @return HttpResponse
-     * @throws IOException
      */
     public static HttpResponse get(String url, HttpAttribute ... attributes) throws IOException {
         Headers headers = null;
@@ -65,7 +64,7 @@ public class Http4J {
                 headers = headers == null ? (Headers) attribute : headers;
             } else if (attribute instanceof Params) {
                 params = params == null ? (Params) attribute : params;
-            }else if (attribute instanceof Cookies) {
+            } else if (attribute instanceof Cookies) {
                 cookies = cookies == null ? (Cookies) attribute : cookies;
             } else if (attribute instanceof HttpConfig) {
                 config = config == null ? (HttpConfig) attribute : config;
@@ -99,7 +98,7 @@ public class Http4J {
                 params = params == null ? (Params) attribute : params;
             } else if (attribute instanceof RequestBody) {
                 requestBody = requestBody == null ? (RequestBody) attribute : requestBody;
-            }else if (attribute instanceof Cookies) {
+            } else if (attribute instanceof Cookies) {
                 cookies = cookies == null ? (Cookies) attribute : cookies;
             } else if (attribute instanceof HttpConfig) {
                 config = config == null ? (HttpConfig) attribute : config;
@@ -133,7 +132,7 @@ public class Http4J {
                 params = params == null ? (Params) attribute : params;
             } else if (attribute instanceof RequestBody) {
                 requestBody = requestBody == null ? (RequestBody) attribute : requestBody;
-            }else if (attribute instanceof Cookies) {
+            } else if (attribute instanceof Cookies) {
                 cookies = cookies == null ? (Cookies) attribute : cookies;
             } else if (attribute instanceof HttpConfig) {
                 config = config == null ? (HttpConfig) attribute : config;

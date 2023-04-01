@@ -69,15 +69,15 @@ public class Test {
          * Method 1: Pass JavaScript files.
          */
         File file = new File(Test.class.getResource("").getPath() + "test.js");
-        ScriptExecutor executor = JavaScript4J.load(file);
-        System.out.println(executor.invokeFunction("test", 1, 2));
+        ScriptExecutor interpreter = JavaScript4J.load(file);
+        System.out.println(interpreter.invokeFunction("test", 1, 2));
 
         /**
          * Method 2: Pass in the code.
          */
         String script = "function test(a,b) { return a+b; }";
-        ScriptExecutor executor = JavaScript4J.load(file);
-        System.out.println(executor.invokeFunction("test", 1, 2));
+        ScriptExecutor interpreter = JavaScript4J.load(file);
+        System.out.println(interpreter.invokeFunction("test", 1, 2));
     }
 }
 ```

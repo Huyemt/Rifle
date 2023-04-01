@@ -21,8 +21,6 @@ public class Rifle {
     private final TaskManager scheduler;
     private final RifleDataFolder dataFolder;
     private static Rifle instance;
-    private final String version = "1.0.4";
-    private final String github = "http://github.com/Huyemt/Rifle";
 
     public Rifle() {
         System.setProperty("nashorn.args", "--no-deprecation-warning");
@@ -137,11 +135,11 @@ public class Rifle {
     }
 
     public final String getVersion() {
-        return version;
+        return "1.0.5";
     }
 
     public final String getGithub() {
-        return github;
+        return "http://github.com/Huyemt/Rifle";
     }
 
     /**
