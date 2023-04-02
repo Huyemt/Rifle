@@ -11,11 +11,11 @@ import org.bullet.interpreter.Interpreter;
 public class Shell {
     public static void main(String[] args) {
         try {
-            String script = "124832148 / (22 - 22)";
+            String script = "198461826411243 * 1234";
             Interpreter interpreter = new Interpreter(script);
             System.out.println(interpreter.eval());
         } catch (ParsingException e) {
-            Reporter.report(e.position, "ParsingException", e.getMessage());
+            Reporter.report(e.position, e.getMessage());
         } catch (RuntimeException e) {
             Reporter.report(e.position, e.getMessage());
         }
