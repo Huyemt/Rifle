@@ -23,7 +23,7 @@ public class JavaScript4J {
     }
 
     /**
-     * 加载JavaScript文件
+     * 加载JavaScript文件<br><br>
      *
      * Load JavaScript file
      *
@@ -40,7 +40,7 @@ public class JavaScript4J {
     }
 
     /**
-     * 加载JavaScript代码
+     * 加载JavaScript代码<br><br>
      *
      * Load JavaScript code
      *
@@ -55,7 +55,7 @@ public class JavaScript4J {
     }
 
     /**
-     * 编译JavaScript文件
+     * 编译JavaScript文件<br><br>
      *
      * Compile JavaScript files
      *
@@ -68,7 +68,7 @@ public class JavaScript4J {
     }
 
     /**
-     * 编译JavaScript代码
+     * 编译JavaScript代码<br><br>
      *
      * Compile JavaScript code
      *
@@ -83,7 +83,7 @@ public class JavaScript4J {
     }
 
     /**
-     * 执行JavaScript文件
+     * 执行JavaScript文件<br><br>
      *
      * Execute JavaScript files
      *
@@ -96,7 +96,7 @@ public class JavaScript4J {
     }
 
     /**
-     * 执行JavaScript代码
+     * 执行JavaScript代码<br><br>
      *
      * Execute JavaScript code
      *

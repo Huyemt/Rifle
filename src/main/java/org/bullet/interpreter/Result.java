@@ -1,4 +1,4 @@
-package org.bullet.frontend.results;
+package org.bullet.interpreter;
 
 /**
  * @author Huyemt
@@ -23,5 +23,4 @@ public class Result<T> {
     public String toString() {
         return value.toString();
     }
-
 }
