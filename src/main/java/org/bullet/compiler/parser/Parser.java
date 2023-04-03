@@ -1,10 +1,7 @@
 package org.bullet.compiler.parser;
 
 import org.bullet.compiler.ast.Node;
-import org.bullet.compiler.ast.nodes.BinaryNode;
-import org.bullet.compiler.ast.nodes.ConstantNode;
-import org.bullet.compiler.ast.nodes.ProgramNode;
-import org.bullet.compiler.ast.nodes.UnaryNode;
+import org.bullet.compiler.ast.nodes.*;
 import org.bullet.compiler.lexer.Lexer;
 import org.bullet.compiler.lexer.TokenKind;
 import org.bullet.compiler.lexer.VToken;
@@ -27,14 +24,47 @@ public class Parser implements IParser {
     @Override
     public ProgramNode parse() throws ParsingException {
         ProgramNode node = new ProgramNode();
-        node.left = this.expression();
-        node.position = lexer.position.clone();
+
+        while (lexer.currentToken.kind != TokenKind.EOF) {
+            node.statements.add(this.statement());
+        }
+
         return node;
     }
 
     @Override
+    public Node statement() throws ParsingException {
+        StatementNode node = new StatementNode();
+
+        node.left = this.expression();
+        node.position = lexer.position.clone();
+
+        lexer.expectToken(TokenKind.SEMICOLON);
+
+        return node;
+    }
+
+    @Override
+    public Node assign() throws ParsingException {
+        Node left = this.term();
+
+        if (lexer.currentToken.kind == TokenKind.ASSIGN) {
+            lexer.next();
+
+            AssginNode node = new AssginNode();
+            node.position = lexer.position.clone();
+            node.left = left;
+            node.right = this.assign();
+
+            return node;
+        }
+
+        return left;
+    }
+
+    @Override
     public Node expression() throws ParsingException {
-        return this.term();
+        return this.assign();
     }
 
     @Override
@@ -93,6 +123,7 @@ public class Parser implements IParser {
             node.value = new BigDecimal(((VToken)lexer.currentToken).value);
             node.position = lexer.position.clone();
             lexer.next();
+
             return node;
         }
 
@@ -100,6 +131,16 @@ public class Parser implements IParser {
             lexer.next();
             Node node = this.expression();
             lexer.expectToken(TokenKind.SRPAREN);
+
+            return node;
+        }
+
+        if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
+            VariableNode node = new VariableNode();
+            node.name = ((VToken) lexer.currentToken).value;
+            node.position = lexer.position.clone();
+            lexer.next();
+
             return node;
         }
 

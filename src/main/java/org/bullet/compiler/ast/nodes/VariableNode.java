@@ -8,22 +8,16 @@ import org.bullet.exceptions.RuntimeException;
  * @author Huyemt
  */
 
-public class UnaryNode extends Node {
+public class VariableNode extends Node {
 
-    public enum Operator {
-        PLUS,
-        MINUS
-    }
+    public String name;
 
-    public Operator operator;
-    public Node left;
-
-    public UnaryNode() {
+    public VariableNode() {
 
     }
 
     @Override
     public Object accept(Visitor visitor) throws RuntimeException {
-        return visitor.goUnary(this);
+        return visitor.goVariable(this);
     }
 }

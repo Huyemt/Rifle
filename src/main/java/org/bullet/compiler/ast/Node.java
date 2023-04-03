@@ -2,7 +2,6 @@ package org.bullet.compiler.ast;
 
 import org.bullet.compiler.lexer.Position;
 import org.bullet.exceptions.RuntimeException;
-import org.bullet.interpreter.Result;
 
 /**
  * @author Huyemt
@@ -11,5 +10,5 @@ import org.bullet.interpreter.Result;
 public abstract class Node {
     public Position position;
 
-    public abstract Result<?> accept(Visitor visitor) throws RuntimeException;
+    public abstract Object accept(Visitor visitor) throws RuntimeException;
 }

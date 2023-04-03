@@ -26,6 +26,8 @@ public class Lexer implements ILexer {
         tokens.put("/", TokenKind.SLASH);
         tokens.put("(", TokenKind.SLPAREN);
         tokens.put(")", TokenKind.SRPAREN);
+        tokens.put(";", TokenKind.SEMICOLON);
+        tokens.put("=", TokenKind.ASSIGN);
     }
 
     public Lexer(String source) throws ParsingException {
@@ -51,6 +53,12 @@ public class Lexer implements ILexer {
     @Override
     public void next() throws ParsingException {
         while (Character.isWhitespace(position.currentChar)) {
+            if (position.currentChar == '\n') {
+                position.y++;
+                position.x = 1;
+                position.lineX = position.index + 1;
+            }
+
             position.next();
         }
 
@@ -62,6 +70,11 @@ public class Lexer implements ILexer {
 
         if (Character.isDigit(position.currentChar)) {
             this.makeNumber();
+            return;
+        }
+
+        if (Character.isLetter(position.currentChar)) {
+            this.makeIdentifier();
             return;
         }
 
@@ -102,6 +115,27 @@ public class Lexer implements ILexer {
             position.next();
         }
 
+        if (Character.isLetter(position.currentChar)) {
+            throw new ParsingException(position, "Identifiers cannot start with a number");
+        }
+
         this.makeToken(TokenKind.VT_NUMBER, position.source.substring(start, position.index));
+    }
+
+    private void makeIdentifier() throws ParsingException {
+        int start = position.index;
+
+        while (Character.isLetterOrDigit(position.currentChar)) {
+            position.next();
+        }
+
+        String identifier = position.source.substring(start, position.index);
+
+        if (identifier.equalsIgnoreCase(TokenKind.VAR.toString())) {
+            this.makeToken(TokenKind.VAR);
+            return;
+        }
+
+        this.makeToken(TokenKind.IDENTIFIER, identifier);
     }
 }

@@ -20,15 +20,8 @@ public class Position {
 
     public void next() {
         index++;
+        x++;
         currentChar = index < source.length() ? source.charAt(index) : '\0';
-
-        if (currentChar.equals('\n')) {
-            y++;
-            x = 0;
-            lineX = index + 1;
-        } else {
-            x++;
-        }
     }
 
     @Override

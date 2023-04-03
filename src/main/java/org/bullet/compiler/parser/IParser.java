@@ -10,6 +10,8 @@ import org.bullet.exceptions.ParsingException;
 
 public interface IParser {
     ProgramNode parse() throws ParsingException;
+    Node statement() throws ParsingException;
+    Node assign() throws ParsingException;
     Node expression() throws ParsingException;
     Node term() throws ParsingException;
     Node factor() throws ParsingException;

@@ -2,7 +2,6 @@ package org.bullet;
 
 import org.bullet.exceptions.ParsingException;
 import org.bullet.exceptions.RuntimeException;
-import org.bullet.interpreter.Interpreter;
 
 /**
  * @author Huyemt
@@ -11,7 +10,7 @@ import org.bullet.interpreter.Interpreter;
 public class Shell {
     public static void main(String[] args) {
         try {
-            String script = "198461826411243 * 1234";
+            String script = "a = 0; 19284719824 / ( 1289417984 * a );";
             Interpreter interpreter = new Interpreter(script);
             System.out.println(interpreter.eval());
         } catch (ParsingException e) {

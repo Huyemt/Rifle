@@ -8,22 +8,17 @@ import org.bullet.exceptions.RuntimeException;
  * @author Huyemt
  */
 
-public class UnaryNode extends Node {
+public class AssginNode extends Node {
 
-    public enum Operator {
-        PLUS,
-        MINUS
-    }
-
-    public Operator operator;
     public Node left;
+    public Node right;
 
-    public UnaryNode() {
+    public AssginNode() {
 
     }
 
     @Override
     public Object accept(Visitor visitor) throws RuntimeException {
-        return visitor.goUnary(this);
+        return visitor.goAssign(this);
     }
 }

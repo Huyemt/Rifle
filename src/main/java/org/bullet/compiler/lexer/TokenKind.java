@@ -12,6 +12,12 @@ public enum TokenKind {
     IDENTIFIER("IDENTIFIER"),
 
     /*
+    关键字
+    Keyword
+     */
+    VAR("var"),
+
+    /*
     运算符
     Operator
      */
@@ -26,6 +32,9 @@ public enum TokenKind {
      */
     SLPAREN("("),
     SRPAREN(")"),
+    ASSIGN("="),
+    SEMICOLON(";"),
+
     EOF("EOF"),
 
     /*

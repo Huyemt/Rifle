@@ -3,7 +3,8 @@ package org.bullet.compiler.ast.nodes;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.exceptions.RuntimeException;
-import org.bullet.interpreter.Result;
+
+import java.util.ArrayList;
 
 /**
  * @author Huyemt
@@ -11,14 +12,14 @@ import org.bullet.interpreter.Result;
 
 public class ProgramNode extends Node {
 
-    public Node left;
+    public ArrayList<Node> statements;
 
     public ProgramNode() {
-
+        statements = new ArrayList<>();
     }
 
     @Override
-    public Result<?> accept(Visitor visitor) throws RuntimeException {
+    public Object accept(Visitor visitor) throws RuntimeException {
         return visitor.goProgram(this);
     }
 }
