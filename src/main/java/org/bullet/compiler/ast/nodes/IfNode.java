@@ -4,23 +4,22 @@ import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.exceptions.RuntimeException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 /**
  * @author Huyemt
  */
 
-public class ProgramNode extends Node {
+public class IfNode extends Node {
 
-    public ArrayList<Node> statements;
+    public Node condition;
+    public Node body;
+    public Node elseBody;
 
-    public ProgramNode() {
-        statements = new ArrayList<>();
+    public IfNode() {
+
     }
 
     @Override
     public Object accept(Visitor visitor) throws RuntimeException {
-        return visitor.goProgram(this);
+        return visitor.goIf(this);
     }
 }

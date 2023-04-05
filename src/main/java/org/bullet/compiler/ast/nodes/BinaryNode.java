@@ -13,7 +13,13 @@ public class BinaryNode extends Node {
         ADD,
         SUB,
         MUL,
-        DIV
+        DIV,
+        EQUAL,
+        NOT_EQUAL,
+        GREATER,
+        GREATER_OR_EQUAL,
+        LESSER,
+        LESSER_OR_EQUAL
     }
 
     public Operator operator;

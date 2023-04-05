@@ -7,6 +7,7 @@ import org.rifle.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * @author Huyemt
@@ -14,9 +15,12 @@ import java.util.HashMap;
 
 public class Lexer implements ILexer {
 
-    public final Position position;
+    public Position position;
     public Token currentToken;
+    public Position peekPosition;
+    public Token currentPeekToken;
     public static final HashMap<String, TokenKind> tokens = new HashMap<>();
+    public static final HashMap<String, TokenKind> keywords = new HashMap<>();
 
     static {
         tokens.put("\0", TokenKind.EOF);
@@ -26,12 +30,27 @@ public class Lexer implements ILexer {
         tokens.put("/", TokenKind.SLASH);
         tokens.put("(", TokenKind.SLPAREN);
         tokens.put(")", TokenKind.SRPAREN);
+        tokens.put("{", TokenKind.BLPAREN);
+        tokens.put("}", TokenKind.BRPAREN);
+        tokens.put(",", TokenKind.COMMA);
         tokens.put(";", TokenKind.SEMICOLON);
         tokens.put("=", TokenKind.ASSIGN);
+        tokens.put("!", TokenKind.EXCLAMATION);
+        tokens.put(">", TokenKind.GREATER);
+        tokens.put("<", TokenKind.LESSER);
+        tokens.put(".", TokenKind.POINT);
+
+        keywords.put("if", TokenKind.IF);
+        keywords.put("else", TokenKind.ELSE);
+        keywords.put("var", TokenKind.VAR);
+        keywords.put("while", TokenKind.WHILE);
+        keywords.put("for", TokenKind.FOR);
+        keywords.put("function", TokenKind.FUNCTION);
     }
 
     public Lexer(String source) throws ParsingException {
         position = new Position(source);
+        peekPosition = new Position(source);
 
         this.next();
     }
@@ -63,7 +82,36 @@ public class Lexer implements ILexer {
         }
 
         if (tokens.containsKey(position.currentChar.toString())) {
-            this.makeToken(tokens.get(position.currentChar.toString()));
+            switch (position.currentChar) {
+                case '=':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.EQUAL);
+                        break;
+                    }
+                case '!':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.NOT_EQUAL);
+                        break;
+                    }
+                case '>':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.GREATER_OR_EQUAL);
+                        break;
+                    }
+                case '<':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.LESSER_OR_EQUAL);
+                        break;
+                    }
+                default:
+                    this.makeToken(tokens.get(position.currentChar.toString()));
+                    break;
+            }
+
             position.next();
             return;
         }
@@ -99,6 +147,33 @@ public class Lexer implements ILexer {
             throw new ParsingException(position, String.format("\"%s\" expected", kind));
     }
 
+    @Override
+    public char peekChar(int distance) {
+        int index = position.index + distance;
+
+        return index < position.source.length() ? position.source.charAt(index) : '\0';
+    }
+
+    @Override
+    public void beginPeek() {
+        currentPeekToken = currentToken;
+        peekPosition.index = position.index;
+        peekPosition.x = position.x;
+        peekPosition.y = position.y;
+        peekPosition.lineX = position.lineX;
+        peekPosition.currentChar = position.currentChar;
+    }
+
+    @Override
+    public void endPeek() {
+        currentToken = currentPeekToken;
+        position.index = peekPosition.index;
+        position.x = peekPosition.x;
+        position.y = peekPosition.y;
+        position.lineX = peekPosition.lineX;
+        position.currentChar = peekPosition.currentChar;
+    }
+
     private void makeNumber() throws ParsingException {
         int start = position.index;
         boolean flag = false;
@@ -122,7 +197,7 @@ public class Lexer implements ILexer {
         this.makeToken(TokenKind.VT_NUMBER, position.source.substring(start, position.index));
     }
 
-    private void makeIdentifier() throws ParsingException {
+    private void makeIdentifier() {
         int start = position.index;
 
         while (Character.isLetterOrDigit(position.currentChar)) {
@@ -131,8 +206,8 @@ public class Lexer implements ILexer {
 
         String identifier = position.source.substring(start, position.index);
 
-        if (identifier.equalsIgnoreCase(TokenKind.VAR.toString())) {
-            this.makeToken(TokenKind.VAR);
+        if (keywords.containsKey(identifier)) {
+            this.makeToken(keywords.get(identifier));
             return;
         }
 

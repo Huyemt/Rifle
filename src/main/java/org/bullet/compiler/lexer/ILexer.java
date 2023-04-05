@@ -44,4 +44,17 @@ public interface ILexer {
      * @throws ParsingException
      */
     void expectToken(TokenKind kind) throws ParsingException;
+
+    /**
+     * 读取相对于当前位置的第 distance 个字符<br><br>
+     *
+     * Read the distance character relative to the current position
+     *
+     * @param distance
+     * @return char
+     */
+    char peekChar(int distance);
+
+    void beginPeek();
+    void endPeek();
 }

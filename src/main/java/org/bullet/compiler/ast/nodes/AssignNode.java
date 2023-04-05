@@ -8,12 +8,13 @@ import org.bullet.exceptions.RuntimeException;
  * @author Huyemt
  */
 
-public class AssginNode extends Node {
+public class AssignNode extends Node {
 
     public Node left;
     public Node right;
+    public boolean createAction;
 
-    public AssginNode() {
+    public AssignNode() {
 
     }
 

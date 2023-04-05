@@ -14,5 +14,10 @@ public abstract class Visitor {
     public abstract Object goConstant(ConstantNode<?> node) throws RuntimeException;
     public abstract Object goStatement(StatementNode node) throws RuntimeException;
     public abstract Object goVariable(VariableNode node) throws RuntimeException;
-    public abstract Object goAssign(AssginNode node) throws RuntimeException;
+    public abstract Object goAssign(AssignNode node) throws RuntimeException;
+    public abstract Object goIf(IfNode node) throws RuntimeException;
+    public abstract Object goBlock(BlockNode node) throws RuntimeException;
+    public abstract Object goWhile(WhileNode node) throws RuntimeException;
+    public abstract Object goFor(ForNode node) throws RuntimeException;
+    public abstract Object goFunction(FunctionNode node) throws RuntimeException;
 }

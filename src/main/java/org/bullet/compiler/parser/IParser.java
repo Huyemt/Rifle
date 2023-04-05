@@ -9,12 +9,15 @@ import org.bullet.exceptions.ParsingException;
  */
 
 public interface IParser {
-    ProgramNode parse() throws ParsingException;
-    Node statement() throws ParsingException;
-    Node assign() throws ParsingException;
-    Node expression() throws ParsingException;
-    Node term() throws ParsingException;
-    Node factor() throws ParsingException;
-    Node unary() throws ParsingException;
-    Node prirmary() throws ParsingException;
+    ProgramNode Parse() throws ParsingException;
+    Node Function() throws ParsingException;
+    Node Statement() throws ParsingException;
+    Node Assign() throws ParsingException;
+    Node Equal() throws ParsingException;
+    Node Relational() throws ParsingException;
+    Node Expression() throws ParsingException;
+    Node Term() throws ParsingException;
+    Node Factor() throws ParsingException;
+    Node Unary() throws ParsingException;
+    Node Primary() throws ParsingException;
 }

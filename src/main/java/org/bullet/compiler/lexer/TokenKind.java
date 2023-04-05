@@ -15,7 +15,12 @@ public enum TokenKind {
     关键字
     Keyword
      */
+    IF("if"),
+    ELSE("else"),
+    WHILE("while"),
+    FOR("for"),
     VAR("var"),
+    FUNCTION("function"),
 
     /*
     运算符
@@ -25,6 +30,13 @@ public enum TokenKind {
     MINUS("-"),
     STAR("*"),
     SLASH("/"),
+    EXCLAMATION("!"),
+    EQUAL("=="),
+    NOT_EQUAL("!="),
+    GREATER(">"),
+    GREATER_OR_EQUAL(">="),
+    LESSER("<"),
+    LESSER_OR_EQUAL("<="),
 
     /*
     界限符
@@ -32,7 +44,11 @@ public enum TokenKind {
      */
     SLPAREN("("),
     SRPAREN(")"),
+    BLPAREN("{"),
+    BRPAREN("}"),
     ASSIGN("="),
+    COMMA(","),
+    POINT("."),
     SEMICOLON(";"),
 
     EOF("EOF"),
