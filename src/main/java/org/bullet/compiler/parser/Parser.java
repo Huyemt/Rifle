@@ -114,6 +114,10 @@ public class Parser implements IParser {
 
             lexer.expectToken(TokenKind.SLPAREN);
 
+            if (lexer.currentToken.kind == TokenKind.SRPAREN) {
+                throw new ParsingException(lexer.position, "If statement is missing condition");
+            }
+
             node.condition = this.Expression();
 
             lexer.expectToken(TokenKind.SRPAREN);
@@ -139,6 +143,10 @@ public class Parser implements IParser {
             lexer.next();
 
             lexer.expectToken(TokenKind.SLPAREN);
+
+            if (lexer.currentToken.kind == TokenKind.SRPAREN) {
+                throw new ParsingException(lexer.position, "While statement is missing condition");
+            }
 
             node.condition = this.Expression();
 
@@ -253,7 +261,7 @@ public class Parser implements IParser {
             createAction = true;
         }
 
-        Node left = this.Equal();
+        Node left = this.LogicTerm();
 
         if (lexer.currentToken.kind == TokenKind.ASSIGN) {
             AssignNode node = new AssignNode();
@@ -266,6 +274,44 @@ public class Parser implements IParser {
             node.right = this.Assign();
 
             return node;
+        }
+
+        return left;
+    }
+
+    @Override
+    public Node LogicTerm() throws ParsingException {
+        Node left = this.LogicFactor();
+
+        while (lexer.currentToken.kind == TokenKind.AND) {
+            BinaryNode node = new BinaryNode();
+            node.position = lexer.position.clone();
+            node.operator = BinaryNode.Operator.AND;
+            lexer.next();
+
+            node.left = left;
+            node.right = this.LogicFactor();
+
+            left = node;
+        }
+
+        return left;
+    }
+
+    @Override
+    public Node LogicFactor() throws ParsingException {
+        Node left = this.Equal();
+
+        while (lexer.currentToken.kind == TokenKind.OR) {
+            BinaryNode node = new BinaryNode();
+            node.position = lexer.position.clone();
+            node.operator = BinaryNode.Operator.OR;
+            lexer.next();
+
+            node.left = left;
+            node.right = this.Equal();
+
+            left = node;
         }
 
         return left;
@@ -329,7 +375,9 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.PLUS || lexer.currentToken.kind == TokenKind.MINUS) {
             BinaryNode node = new BinaryNode();
+
             node.operator = lexer.currentToken.kind == TokenKind.PLUS ? BinaryNode.Operator.ADD : BinaryNode.Operator.SUB;
+
             node.position = lexer.position.clone();
             lexer.next();
             node.left = left;
@@ -346,7 +394,9 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.STAR || lexer.currentToken.kind == TokenKind.SLASH) {
             BinaryNode node = new BinaryNode();
+
             node.operator = lexer.currentToken.kind == TokenKind.STAR ? BinaryNode.Operator.MUL : BinaryNode.Operator.DIV;
+
             node.position = lexer.position.clone();
             lexer.next();
             node.left = left;

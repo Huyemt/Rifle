@@ -7,7 +7,6 @@ import org.rifle.utils.Utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 /**
  * @author Huyemt
@@ -36,13 +35,17 @@ public class Lexer implements ILexer {
         tokens.put(";", TokenKind.SEMICOLON);
         tokens.put("=", TokenKind.ASSIGN);
         tokens.put("!", TokenKind.EXCLAMATION);
+        tokens.put("&", TokenKind.L_AND);
+        tokens.put("|", TokenKind.L_OR);
         tokens.put(">", TokenKind.GREATER);
         tokens.put("<", TokenKind.LESSER);
         tokens.put(".", TokenKind.POINT);
 
+        keywords.put("var", TokenKind.VAR);
         keywords.put("if", TokenKind.IF);
         keywords.put("else", TokenKind.ELSE);
-        keywords.put("var", TokenKind.VAR);
+        keywords.put("and", TokenKind.AND);
+        keywords.put("or", TokenKind.OR);
         keywords.put("while", TokenKind.WHILE);
         keywords.put("for", TokenKind.FOR);
         keywords.put("function", TokenKind.FUNCTION);
@@ -105,6 +108,18 @@ public class Lexer implements ILexer {
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.LESSER_OR_EQUAL);
+                        break;
+                    }
+                case '&':
+                    if (this.peekChar(1) == '&') {
+                        position.next();
+                        this.makeToken(TokenKind.AND);
+                        break;
+                    }
+                case '|':
+                    if (this.peekChar(1) == '|') {
+                        position.next();
+                        this.makeToken(TokenKind.OR);
                         break;
                     }
                 default:

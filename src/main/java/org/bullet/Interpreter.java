@@ -107,6 +107,15 @@ public class Interpreter extends Visitor {
                 default:
                     throw new RuntimeException(node.position, "Unsupported binary operator");
             }
+        } else if (left instanceof Boolean && right instanceof Boolean) {
+            switch (node.operator) {
+                case OR:
+                    return ((Boolean) left) || ((Boolean) right);
+                case AND:
+                    return ((Boolean) left) && ((Boolean) right);
+                default:
+                    throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
+            }
         }
 
         throw new RuntimeException(node.position, "Unsupported type operation");
@@ -148,9 +157,7 @@ public class Interpreter extends Visitor {
     public Object goVariable(VariableNode node) throws RuntimeException {
         if (nowBlock != null) {
             try {
-                Object r = nowBlock.findVariable(node.name);
-                System.out.println(r);
-                return r;
+                return nowBlock.findVariable(node.name);
             } catch (UnderfineException e) {
                 // ignore
             }
@@ -208,7 +215,17 @@ public class Interpreter extends Visitor {
     public Object goIf(IfNode node) throws RuntimeException {
         Object condition = node.condition.accept(this);
 
-        if (condition instanceof Boolean && (Boolean) condition) {
+        boolean flag = false;
+
+        if (condition instanceof BigDecimal) {
+            flag = ((BigDecimal) condition).intValue() != 0;
+        }
+
+        if (condition instanceof Boolean) {
+            flag = (Boolean) condition;
+        }
+
+        if (flag) {
             if (node.body != null) {
                 return node.body.accept(this);
             }
@@ -221,7 +238,7 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goBlock(BlockNode node) throws RuntimeException {
-        if (nowBlock != null) {
+        if (nowBlock != null && nowBlock != node) {
             node.lastBlock = nowBlock;
         }
 
@@ -244,7 +261,6 @@ public class Interpreter extends Visitor {
         while (condition) {
             if (node.body != null) {
                 result = node.body.accept(this);
-                System.out.println(result);
             }
 
             condition = (Boolean) node.condition.accept(this);

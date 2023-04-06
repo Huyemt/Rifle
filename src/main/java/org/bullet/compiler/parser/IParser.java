@@ -13,6 +13,8 @@ public interface IParser {
     Node Function() throws ParsingException;
     Node Statement() throws ParsingException;
     Node Assign() throws ParsingException;
+    Node LogicTerm() throws ParsingException;
+    Node LogicFactor() throws ParsingException;
     Node Equal() throws ParsingException;
     Node Relational() throws ParsingException;
     Node Expression() throws ParsingException;

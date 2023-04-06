@@ -19,7 +19,9 @@ public class BinaryNode extends Node {
         GREATER,
         GREATER_OR_EQUAL,
         LESSER,
-        LESSER_OR_EQUAL
+        LESSER_OR_EQUAL,
+        AND,
+        OR
     }
 
     public Operator operator;

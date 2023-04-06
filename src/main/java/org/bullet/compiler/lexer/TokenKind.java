@@ -20,6 +20,8 @@ public enum TokenKind {
     WHILE("while"),
     FOR("for"),
     VAR("var"),
+    AND("and"),
+    OR("or"),
     FUNCTION("function"),
 
     /*
@@ -31,6 +33,8 @@ public enum TokenKind {
     STAR("*"),
     SLASH("/"),
     EXCLAMATION("!"),
+    L_AND("&"),
+    L_OR("|"),
     EQUAL("=="),
     NOT_EQUAL("!="),
     GREATER(">"),
