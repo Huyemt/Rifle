@@ -14,46 +14,47 @@ import java.util.HashMap;
 
 public class BlockNode extends Node {
 
-    public BlockNode lastBlock;
+    public BlockNode from;
     public ArrayList<Node> statements;
     public HashMap<String, Object> variables;
+    public int level;
 
     public BlockNode() {
-        lastBlock = null;
+        from = null;
         statements = new ArrayList<>();
         variables = new HashMap<>();
     }
 
     public boolean existsVariable(String name) {
-        BlockNode block = lastBlock;
+        BlockNode block = this;
 
         while (block != null) {
             if (block.variables.containsKey(name)) {
                 return true;
             }
 
-            block = block.lastBlock;
+            block = block.from;
         }
 
         return false;
     }
 
-    public Object findVariable(String name) throws UnderfineException {
-        BlockNode block = lastBlock;
+    public Object findVariable(String name) throws RuntimeException {
+        BlockNode block = this;
 
         while (block != null) {
             if (block.variables.containsKey(name)) {
                 return block.variables.get(name);
             }
 
-            block = block.lastBlock;
+            block = block.from;
         }
 
         throw new UnderfineException(position, UnderfineException.UnderfineType.VARIABLE, name);
     }
 
     public Object changeVariable(String name, Object value) throws UnderfineException {
-        BlockNode block = lastBlock;
+        BlockNode block = this;
 
         while (block != null) {
             if (block.variables.containsKey(name)) {
@@ -61,7 +62,7 @@ public class BlockNode extends Node {
                 return value;
             }
 
-            block = block.lastBlock;
+            block = block.from;
         }
 
         throw new UnderfineException(position, UnderfineException.UnderfineType.VARIABLE, name);

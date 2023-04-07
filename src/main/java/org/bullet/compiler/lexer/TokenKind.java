@@ -19,9 +19,11 @@ public enum TokenKind {
     ELSE("else"),
     WHILE("while"),
     FOR("for"),
+    UNTIL("until"),
     VAR("var"),
     AND("and"),
     OR("or"),
+    NOT("not"),
     FUNCTION("function"),
 
     /*

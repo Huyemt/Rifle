@@ -46,8 +46,10 @@ public class Lexer implements ILexer {
         keywords.put("else", TokenKind.ELSE);
         keywords.put("and", TokenKind.AND);
         keywords.put("or", TokenKind.OR);
+        keywords.put("not", TokenKind.NOT);
         keywords.put("while", TokenKind.WHILE);
         keywords.put("for", TokenKind.FOR);
+        keywords.put("until", TokenKind.UNTIL);
         keywords.put("function", TokenKind.FUNCTION);
     }
 

@@ -16,9 +16,11 @@ import java.math.BigDecimal;
 public class Parser implements IParser {
 
     private final Lexer lexer;
+    private int blockLevel;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
+        blockLevel = 1;
     }
 
     @Override
@@ -201,6 +203,36 @@ public class Parser implements IParser {
         }
 
         /*
+        解析 until 循环体
+         */
+        if (lexer.currentToken.kind == TokenKind.UNTIL) {
+            UntilNode node = new UntilNode();
+            node.position = lexer.position.clone();
+
+            lexer.next();
+
+            lexer.expectToken(TokenKind.SLPAREN);
+
+            if (lexer.currentToken.kind == TokenKind.SRPAREN) {
+                throw new ParsingException(lexer.position, "Until statement is missing purpose");
+            }
+
+            node.purpose = this.Expression();
+
+            lexer.expectToken(TokenKind.SRPAREN);
+
+            node.body = this.Statement();
+
+            if (lexer.currentToken.kind == TokenKind.ELSE) {
+                lexer.next();
+
+                node.elseBody = this.Statement();
+            }
+
+            return node;
+        }
+
+        /*
         解析函数
          */
         if (lexer.currentToken.kind == TokenKind.FUNCTION) {
@@ -225,6 +257,9 @@ public class Parser implements IParser {
 
             lexer.next();
 
+            node.level = blockLevel;
+            blockLevel++;
+
             /*
             解析代码块，直到当前词法单元是右花括号
              */
@@ -233,6 +268,8 @@ public class Parser implements IParser {
             }
 
             lexer.expectToken(TokenKind.BRPAREN);
+            blockLevel--;
+
             return node;
         }
 
@@ -409,9 +446,16 @@ public class Parser implements IParser {
 
     @Override
     public Node Unary() throws ParsingException {
-        if (lexer.currentToken.kind == TokenKind.PLUS || lexer.currentToken.kind == TokenKind.MINUS) {
+        if (lexer.currentToken.kind == TokenKind.PLUS || lexer.currentToken.kind == TokenKind.MINUS || lexer.currentToken.kind == TokenKind.NOT || lexer.currentToken.kind == TokenKind.EXCLAMATION) {
             UnaryNode node = new UnaryNode();
-            node.operator = lexer.currentToken.kind == TokenKind.PLUS ? UnaryNode.Operator.PLUS : UnaryNode.Operator.MINUS;
+
+            if (lexer.currentToken.kind == TokenKind.PLUS)
+                node.operator = UnaryNode.Operator.PLUS;
+            else if (lexer.currentToken.kind == TokenKind.MINUS)
+                node.operator = UnaryNode.Operator.MINUS;
+            else
+                node.operator = UnaryNode.Operator.NOT;
+
             node.position = lexer.position.clone();
             lexer.next();
             node.left = this.Unary();

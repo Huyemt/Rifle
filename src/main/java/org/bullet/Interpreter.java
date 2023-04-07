@@ -7,7 +7,6 @@ import org.bullet.compiler.lexer.Lexer;
 import org.bullet.compiler.parser.Parser;
 import org.bullet.exceptions.ParsingException;
 import org.bullet.exceptions.RuntimeException;
-import org.bullet.exceptions.UnderfineException;
 import org.rifle.utils.Utils;
 
 import java.io.File;
@@ -22,8 +21,6 @@ import java.util.HashMap;
 
 public class Interpreter extends Visitor {
 
-    private final ProgramNode programNode;
-    private final HashMap<String, Object> variables;
     private final HashMap<String, FunctionNode> functions;
     private BlockNode nowBlock;
 
@@ -31,10 +28,12 @@ public class Interpreter extends Visitor {
     public Interpreter(String source) throws ParsingException {
         Lexer lexer = new Lexer(source);
         Parser parser = new Parser(lexer);
-        programNode = parser.Parse();
-        variables = new HashMap<>();
+        ProgramNode programNode = parser.Parse();
         functions = new HashMap<>();
-        nowBlock = null;
+        nowBlock = new BlockNode();
+        nowBlock.level = 0;
+        nowBlock.position = programNode.position;
+        nowBlock.statements = programNode.statements;
     }
 
     public Interpreter(File file) throws ParsingException, IOException {
@@ -42,7 +41,7 @@ public class Interpreter extends Visitor {
     }
 
     public Object eval() throws RuntimeException {
-        return programNode.accept(this);
+        return nowBlock.accept(this);
     }
 
     @Override
@@ -136,6 +135,14 @@ public class Interpreter extends Visitor {
             }
         }
 
+        if (left instanceof Boolean) {
+            if (node.operator == UnaryNode.Operator.NOT) {
+                return !((Boolean) left);
+            }
+
+            throw new RuntimeException(node.position, "Boolean values can only be inverted unary");
+        }
+
         throw new RuntimeException(node.left.position, String.format("Data type of operation is not supported:  \"%s\"", left.toString()));
     }
 
@@ -155,19 +162,7 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goVariable(VariableNode node) throws RuntimeException {
-        if (nowBlock != null) {
-            try {
-                return nowBlock.findVariable(node.name);
-            } catch (UnderfineException e) {
-                // ignore
-            }
-        }
-
-        if (variables.containsKey(node.name)) {
-            return variables.get(node.name);
-        }
-
-        throw new RuntimeException(node.position, String.format("Undefined variable \"%s\"", node.name));
+        return nowBlock.findVariable(node.name);
     }
 
     @Override
@@ -178,34 +173,15 @@ public class Interpreter extends Visitor {
             Object result = node.right.accept(this);
 
             if (node.createAction) {
-                if (nowBlock != null) {
-                    if (!nowBlock.existsVariable(variable.name)) {
-                        nowBlock.variables.put(variable.name, result);
-                        return result;
-                    }
-                } else {
-                    if (!variables.containsKey(variable.name)) {
-                        variables.put(variable.name, result);
-                        return result;
-                    }
-                }
-                throw new RuntimeException(node.position, String.format("The variable \"%s\" has already been declared", variable.name));
-            } else {
-                if (nowBlock != null) {
-                    try {
-                        return nowBlock.changeVariable(variable.name, result);
-                    } catch (UnderfineException e) {
-                        // ignore
-                    }
-                }
-
-                if (variables.containsKey(variable.name)) {
-                    variables.put(variable.name, result);
+                if (!nowBlock.existsVariable(variable.name)) {
+                    nowBlock.variables.put(variable.name, result);
                     return result;
                 }
+
+                throw new RuntimeException(node.position, String.format("The variable \"%s\" has already been declared", variable.name));
             }
 
-            throw new RuntimeException(node.position, String.format("Undefined variable \"%s\"", variable.name));
+            return nowBlock.changeVariable(variable.name, result);
         }
 
         throw new RuntimeException(node.position, "Only variables can be assigned values");
@@ -238,17 +214,18 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goBlock(BlockNode node) throws RuntimeException {
-        if (nowBlock != null && nowBlock != node) {
-            node.lastBlock = nowBlock;
+        if (nowBlock != node && node.level > nowBlock.level) {
+            node.from = nowBlock;
+            nowBlock = node;
         }
-
-        nowBlock = node;
 
         Object result = null;
 
         for (Node node1 : node.statements) {
             result = node1.accept(this);
         }
+
+        nowBlock = nowBlock.from;
 
         return result;
     }
@@ -295,6 +272,29 @@ public class Interpreter extends Visitor {
             }
 
             condition = (Boolean) node.condition.accept(this);
+        }
+
+        /*
+        运行到这里说明已经跳出循环了
+         */
+        if (node.elseBody != null) {
+            result = node.elseBody.accept(this);
+        }
+
+        return result;
+    }
+
+    @Override
+    public Object goUntil(UntilNode node) throws RuntimeException {
+        Boolean purpose = (Boolean) node.purpose.accept(this);
+        Object result = null;
+
+        while (!purpose) {
+            if (node.body != null) {
+                result = node.body.accept(this);
+            }
+
+            purpose = (Boolean) node.purpose.accept(this);
         }
 
         /*

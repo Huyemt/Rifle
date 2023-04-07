@@ -1,10 +1,9 @@
 package org.bullet;
 
-import org.bullet.compiler.ast.nodes.AssignNode;
 import org.bullet.exceptions.ParsingException;
 import org.bullet.exceptions.RuntimeException;
-import org.rifle.utils.Utils;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -14,8 +13,7 @@ import java.io.IOException;
 public class Shell {
     public static void main(String[] args) {
         try {
-            String script = Utils.readFile("E:\\AMyCode\\Projects\\Java\\Rifle\\Rifle\\docs\\chinese\\bullet\\test.bt");
-            Interpreter interpreter = new Interpreter(script);
+            Interpreter interpreter = new Interpreter(new File("E:\\AMyCode\\Projects\\Java\\Rifle\\Rifle\\docs\\chinese\\bullet\\test.bt"));
             System.out.println(interpreter.eval());
         } catch (ParsingException e) {
             Reporter.report(e.position, e.getMessage());
