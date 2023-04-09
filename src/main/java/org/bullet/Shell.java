@@ -2,6 +2,7 @@ package org.bullet;
 
 import org.bullet.exceptions.ParsingException;
 import org.bullet.exceptions.RuntimeException;
+import org.bullet.interpreter.Interpreter;
 
 import java.io.File;
 import java.io.IOException;

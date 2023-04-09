@@ -41,6 +41,8 @@ public class Lexer implements ILexer {
         tokens.put("<", TokenKind.LESSER);
         tokens.put(".", TokenKind.POINT);
 
+        keywords.put("true", TokenKind.TRUE);
+        keywords.put("false", TokenKind.FALSE);
         keywords.put("var", TokenKind.VAR);
         keywords.put("if", TokenKind.IF);
         keywords.put("else", TokenKind.ELSE);
@@ -51,6 +53,7 @@ public class Lexer implements ILexer {
         keywords.put("for", TokenKind.FOR);
         keywords.put("until", TokenKind.UNTIL);
         keywords.put("function", TokenKind.FUNCTION);
+        keywords.put("return", TokenKind.RETURN);
     }
 
     public Lexer(String source) throws ParsingException {
@@ -122,6 +125,12 @@ public class Lexer implements ILexer {
                     if (this.peekChar(1) == '|') {
                         position.next();
                         this.makeToken(TokenKind.OR);
+                        break;
+                    }
+                case '*':
+                    if (this.peekChar(1) == '*') {
+                        position.next();
+                        this.makeToken(TokenKind.POW);
                         break;
                     }
                 default:

@@ -11,6 +11,7 @@ import org.bullet.exceptions.ParsingException;
 public interface IParser {
     ProgramNode Parse() throws ParsingException;
     Node Function() throws ParsingException;
+    Node FunctionCall() throws ParsingException;
     Node Statement() throws ParsingException;
     Node Assign() throws ParsingException;
     Node LogicTerm() throws ParsingException;
@@ -21,5 +22,6 @@ public interface IParser {
     Node Term() throws ParsingException;
     Node Factor() throws ParsingException;
     Node Unary() throws ParsingException;
+    Node Involution() throws ParsingException;
     Node Primary() throws ParsingException;
 }

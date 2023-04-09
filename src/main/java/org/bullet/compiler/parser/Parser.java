@@ -17,10 +17,12 @@ public class Parser implements IParser {
 
     private final Lexer lexer;
     private int blockLevel;
+    private boolean functionParsing;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
         blockLevel = 1;
+        functionParsing = false;
     }
 
     @Override
@@ -38,6 +40,10 @@ public class Parser implements IParser {
     @Override
     public Node Function() throws ParsingException {
         if (lexer.currentToken.kind == TokenKind.FUNCTION) {
+            if (functionParsing) {
+                throw new ParsingException(lexer.position, "Embedded functions are not supported");
+            }
+
             FunctionNode node = new FunctionNode();
             node.position = lexer.position.clone();
 
@@ -72,7 +78,7 @@ public class Parser implements IParser {
                         String paramName = ((VToken) lexer.currentToken).value;
 
                         if (node.params.contains(paramName)) {
-                            throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in this function", paramName));
+                            throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in the function\"%s\"", paramName, node.name));
                         }
 
                         node.params.add(paramName);
@@ -92,15 +98,41 @@ public class Parser implements IParser {
             lexer.expectToken(TokenKind.SRPAREN);
 
             if (lexer.currentToken.kind != TokenKind.BLPAREN) {
-                throw new ParsingException(lexer.position, "The statement of the function must be written between '{' and '}'");
+                throw new ParsingException(lexer.position, "The statements of the function must be written between '{' and '}'");
             }
 
+            functionParsing = true;
             node.blockNode = (BlockNode) this.Statement();
+            functionParsing = false;
 
             return node;
         }
 
         return this.Statement();
+    }
+
+    @Override
+    public Node FunctionCall() throws ParsingException {
+        FunctionCallNode node = new FunctionCallNode();
+
+        node.position = lexer.position.clone();
+        node.name = ((VToken) lexer.currentToken).value;
+
+        lexer.expectToken(TokenKind.IDENTIFIER);
+        lexer.expectToken(TokenKind.SLPAREN);
+
+        if (lexer.currentToken.kind != TokenKind.SRPAREN) {
+            node.args.add(this.Assign());
+
+            while (lexer.currentToken.kind == TokenKind.COMMA) {
+                lexer.next();
+                node.args.add(this.Assign());
+            }
+        }
+
+        lexer.expectToken(TokenKind.SRPAREN);
+
+        return node;
     }
 
     @Override
@@ -130,6 +162,10 @@ public class Parser implements IParser {
                 lexer.next();
 
                 node.elseBody = this.Statement();
+
+                if (lexer.currentToken.kind == TokenKind.ELSE) {
+                    throw new ParsingException(lexer.position, "There can only be one else scope");
+                }
             }
 
             return node;
@@ -160,6 +196,10 @@ public class Parser implements IParser {
                 lexer.next();
 
                 node.elseBody = this.Statement();
+
+                if (lexer.currentToken.kind == TokenKind.ELSE) {
+                    throw new ParsingException(lexer.position, "There can only be one else scope");
+                }
             }
 
             return node;
@@ -197,6 +237,10 @@ public class Parser implements IParser {
                 lexer.next();
 
                 node.elseBody = this.Statement();
+
+                if (lexer.currentToken.kind == TokenKind.ELSE) {
+                    throw new ParsingException(lexer.position, "There can only be one else scope");
+                }
             }
 
             return node;
@@ -227,6 +271,10 @@ public class Parser implements IParser {
                 lexer.next();
 
                 node.elseBody = this.Statement();
+
+                if (lexer.currentToken.kind == TokenKind.ELSE) {
+                    throw new ParsingException(lexer.position, "There can only be one else scope");
+                }
             }
 
             return node;
@@ -246,6 +294,16 @@ public class Parser implements IParser {
         if (lexer.currentToken.kind == TokenKind.VAR) {
             // Bullet规定变量声明必须使用var关键字
             return this.Assign();
+        }
+
+        if (lexer.currentToken.kind == TokenKind.RETURN) {
+            ReturnNode node = new ReturnNode();
+            node.position = lexer.position.clone();
+            lexer.next();
+            node.left = this.Expression();
+            lexer.expectToken(TokenKind.SEMICOLON);
+
+            return node;
         }
 
         /*
@@ -463,14 +521,41 @@ public class Parser implements IParser {
             return node;
         }
 
-        return this.Primary();
+        return this.Involution();
     }
+
+    @Override
+    public Node Involution() throws ParsingException {
+        Node left = this.Primary();
+
+        while (lexer.currentToken.kind == TokenKind.POW) {
+            BinaryNode node = new BinaryNode();
+            node.operator = BinaryNode.Operator.POW;
+            node.position = lexer.position.clone();
+            lexer.next();
+            node.left = left;
+            node.right = this.Primary();
+            left = node;
+        }
+
+        return left;
+    }
+
 
     @Override
     public Node Primary() throws ParsingException {
         if (lexer.currentToken.kind == TokenKind.VT_NUMBER) {
             ConstantNode<BigDecimal> node = new ConstantNode<>();
             node.value = new BigDecimal(((VToken)lexer.currentToken).value);
+            node.position = lexer.position.clone();
+            lexer.next();
+
+            return node;
+        }
+
+        if (lexer.currentToken.kind == TokenKind.TRUE || lexer.currentToken.kind == TokenKind.FALSE) {
+            ConstantNode<Boolean> node = new ConstantNode<>();
+            node.value = lexer.currentToken.kind == TokenKind.TRUE;
             node.position = lexer.position.clone();
             lexer.next();
 
@@ -486,6 +571,17 @@ public class Parser implements IParser {
         }
 
         if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
+
+            lexer.beginPeek();
+            lexer.next();
+
+            if (lexer.currentToken.kind == TokenKind.SLPAREN) {
+                lexer.endPeek();
+                return this.FunctionCall();
+            }
+
+            lexer.endPeek();
+
             VariableNode node = new VariableNode();
             node.name = ((VToken) lexer.currentToken).value;
 

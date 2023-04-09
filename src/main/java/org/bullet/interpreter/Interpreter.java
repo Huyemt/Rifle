@@ -1,12 +1,14 @@
-package org.bullet;
+package org.bullet.interpreter;
 
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.compiler.ast.nodes.*;
 import org.bullet.compiler.lexer.Lexer;
 import org.bullet.compiler.parser.Parser;
+import org.bullet.exceptions.BulletException;
 import org.bullet.exceptions.ParsingException;
 import org.bullet.exceptions.RuntimeException;
+import org.bullet.exceptions.UnderfineException;
 import org.rifle.utils.Utils;
 
 import java.io.File;
@@ -14,15 +16,19 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.Stack;
 
 /**
  * @author Huyemt
  */
 
 public class Interpreter extends Visitor {
-
+    private Scope scope;
+    private FunctionEnvironment environment;
     private final HashMap<String, FunctionNode> functions;
-    private BlockNode nowBlock;
+    private final Stack<FunctionEnvironment> environments;
+    private Object returnValue;
+
 
 
     public Interpreter(String source) throws ParsingException {
@@ -30,10 +36,15 @@ public class Interpreter extends Visitor {
         Parser parser = new Parser(lexer);
         ProgramNode programNode = parser.Parse();
         functions = new HashMap<>();
-        nowBlock = new BlockNode();
-        nowBlock.level = 0;
-        nowBlock.position = programNode.position;
-        nowBlock.statements = programNode.statements;
+        returnValue = null;
+        environments = new Stack<>();
+        environment = null;
+        scope = new Scope();
+        scope.position = programNode.position;
+        scope.node = new BlockNode();
+        scope.node.statements = programNode.statements;
+        scope.node.level = 0;
+        scope.node.position = scope.position;
     }
 
     public Interpreter(File file) throws ParsingException, IOException {
@@ -41,7 +52,7 @@ public class Interpreter extends Visitor {
     }
 
     public Object eval() throws RuntimeException {
-        return nowBlock.accept(this);
+        return scope.node.accept(this);
     }
 
     @Override
@@ -73,7 +84,9 @@ public class Interpreter extends Visitor {
                         throw new RuntimeException(node.position, "Cannot divide by zero");
                     }
 
-                    return ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.FLOOR);
+                    return ((BigDecimal) left).divide((BigDecimal) right, 14, RoundingMode.HALF_UP);
+                case POW:
+                    return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
                 case EQUAL:
                 case NOT_EQUAL:
                 case GREATER:
@@ -148,7 +161,7 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goConstant(ConstantNode<?> node) throws RuntimeException {
-        if (node.value instanceof BigDecimal) {
+        if (node.value instanceof BigDecimal || node.value instanceof Boolean) {
             return node.value;
         }
 
@@ -162,26 +175,33 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goVariable(VariableNode node) throws RuntimeException {
-        return nowBlock.findVariable(node.name);
+        try {
+            if (environment != null && environment.params.containsKey(node.name)) {
+                return environment.params.get(node.name);
+            }
+
+            return scope.findVariable(node.name).value;
+        } catch (BulletException e) {
+            throw new RuntimeException(node.position, e.getMessage());
+        }
     }
 
     @Override
     public Object goAssign(AssignNode node) throws RuntimeException {
         if (node.left instanceof VariableNode) {
             VariableNode variable = (VariableNode) node.left;
-
             Object result = node.right.accept(this);
 
-            if (node.createAction) {
-                if (!nowBlock.existsVariable(variable.name)) {
-                    nowBlock.variables.put(variable.name, result);
+            try {
+                if (environment != null && environment.params.containsKey(variable.name)) {
+                    environment.params.put(variable.name, result);
                     return result;
                 }
 
-                throw new RuntimeException(node.position, String.format("The variable \"%s\" has already been declared", variable.name));
+                return node.createAction ? scope.createVariable(variable.name, result).value : scope.changeVariable(variable.name, result).value;
+            } catch (BulletException e) {
+                throw new RuntimeException(node.position, e.getMessage());
             }
-
-            return nowBlock.changeVariable(variable.name, result);
         }
 
         throw new RuntimeException(node.position, "Only variables can be assigned values");
@@ -214,30 +234,39 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goBlock(BlockNode node) throws RuntimeException {
-        if (nowBlock != node && node.level > nowBlock.level) {
-            node.from = nowBlock;
-            nowBlock = node;
+        if (scope.node != node && node.level > scope.node.level) {
+            scope = this.createScope(node);
         }
 
-        Object result = null;
+        Object r = null;
 
-        for (Node node1 : node.statements) {
-            result = node1.accept(this);
+        for (Node statement : scope.node.statements) {
+            statement.accept(this);
+
+            if (returnValue != null) {
+                r = returnValue;
+                break;
+            }
         }
 
-        nowBlock = nowBlock.from;
+        scope = environment != null ? environment.from : scope.from;
 
-        return result;
+        return r;
     }
 
     @Override
     public Object goWhile(WhileNode node) throws RuntimeException {
-        Boolean condition = (Boolean) node.condition.accept(this);
+        boolean condition = (Boolean) node.condition.accept(this);
+        boolean flag = condition;
         Object result = null;
 
         while (condition) {
             if (node.body != null) {
                 result = node.body.accept(this);
+            }
+
+            if (returnValue != null) {
+                return returnValue;
             }
 
             condition = (Boolean) node.condition.accept(this);
@@ -246,7 +275,7 @@ public class Interpreter extends Visitor {
         /*
         运行到这里说明已经跳出循环了
          */
-        if (node.elseBody != null) {
+        if (node.elseBody != null && flag) {
             result = node.elseBody.accept(this);
         }
 
@@ -259,12 +288,17 @@ public class Interpreter extends Visitor {
             node.init.accept(this);
         }
 
-        Boolean condition = (Boolean) node.condition.accept(this);
+        boolean condition = (Boolean) node.condition.accept(this);
+        boolean flag = condition;
         Object result = null;
 
         while (condition) {
             if (node.body != null) {
                 result = node.body.accept(this);
+            }
+
+            if (returnValue != null) {
+                return returnValue;
             }
 
             if (node.increase != null) {
@@ -277,7 +311,7 @@ public class Interpreter extends Visitor {
         /*
         运行到这里说明已经跳出循环了
          */
-        if (node.elseBody != null) {
+        if (node.elseBody != null && flag) {
             result = node.elseBody.accept(this);
         }
 
@@ -286,12 +320,17 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goUntil(UntilNode node) throws RuntimeException {
-        Boolean purpose = (Boolean) node.purpose.accept(this);
+        boolean purpose = (Boolean) node.purpose.accept(this);
+        boolean flag = purpose;
         Object result = null;
 
         while (!purpose) {
             if (node.body != null) {
                 result = node.body.accept(this);
+            }
+
+            if (returnValue != null) {
+                return returnValue;
             }
 
             purpose = (Boolean) node.purpose.accept(this);
@@ -300,7 +339,7 @@ public class Interpreter extends Visitor {
         /*
         运行到这里说明已经跳出循环了
          */
-        if (node.elseBody != null) {
+        if (node.elseBody != null && !flag) {
             result = node.elseBody.accept(this);
         }
 
@@ -316,5 +355,72 @@ public class Interpreter extends Visitor {
         functions.put(node.name, node);
 
         return null;
+    }
+
+    @Override
+    public Object goFunctionCall(FunctionCallNode node) throws RuntimeException {
+        try {
+            FunctionNode function = this.findFunction(node.name);
+
+            if (node.args.size() > function.params.size()) {
+                throw new RuntimeException(node.position, String.format("Too many parameters -> %d", node.args.size() - function.params.size()));
+            } else if (node.args.size() < function.params.size()) {
+                throw new RuntimeException(node.position, String.format("Missing parameters -> %d", function.params.size() - node.args.size()));
+            }
+
+            FunctionEnvironment environment = new FunctionEnvironment();
+            environment.body = function.blockNode;
+            environment.from = scope;
+
+            for (int i = 0; i < function.params.size(); i++) {
+                environment.params.put(function.params.get(i), node.args.get(i).accept(this));
+            }
+
+            if (this.environment != null) {
+                environments.push(this.environment);
+            }
+
+            this.environment = environment;
+
+            Object r = this.environment.body.accept(this);
+            returnValue = null;
+
+            this.environment = (environments.size() > 0) ? environments.pop() : null;
+
+            return r;
+        } catch (UnderfineException e) {
+            throw new RuntimeException(node.position, e.getMessage());
+        }
+    }
+
+    @Override
+    public Object goReturn(ReturnNode node) throws RuntimeException {
+        if (returnValue != null) {
+            return returnValue;
+        }
+
+        // 如果不是在函数里面用 return 关键字
+//        if (this.environment == null) {
+//            throw new RuntimeException(node.position, "The keyword \"return\" can only be defined inside a function");
+//        }
+
+        return returnValue = node.left.accept(this);
+    }
+
+    private Scope createScope(BlockNode node) {
+        Scope scope = new Scope();
+        scope.position = node.position;
+        scope.node = node;
+        scope.from = this.scope;
+
+        return scope;
+    }
+
+    private FunctionNode findFunction(String name) throws UnderfineException {
+        if (!functions.containsKey(name)) {
+            throw new UnderfineException(UnderfineException.UnderfineType.FUNCTION, name);
+        }
+
+        return functions.get(name);
     }
 }

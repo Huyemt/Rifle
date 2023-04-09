@@ -15,6 +15,8 @@ public enum TokenKind {
     关键字
     Keyword
      */
+    TRUE("true"),
+    FALSE("false"),
     IF("if"),
     ELSE("else"),
     WHILE("while"),
@@ -25,6 +27,7 @@ public enum TokenKind {
     OR("or"),
     NOT("not"),
     FUNCTION("function"),
+    RETURN("return"),
 
     /*
     运算符
@@ -34,6 +37,7 @@ public enum TokenKind {
     MINUS("-"),
     STAR("*"),
     SLASH("/"),
+    POW("**"),
     EXCLAMATION("!"),
     L_AND("&"),
     L_OR("|"),

@@ -4,24 +4,20 @@ import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.exceptions.RuntimeException;
 
-import java.util.ArrayList;
-
 /**
  * @author Huyemt
  */
 
-public class BlockNode extends Node {
+public class ReturnNode extends Node {
 
-    public ArrayList<Node> statements;
-    public int level;
+    public Node left;
 
-    public BlockNode() {
-        statements = new ArrayList<>();
-        level = 0;
+    public ReturnNode() {
+
     }
 
     @Override
     public Object accept(Visitor visitor) throws RuntimeException {
-        return visitor.goBlock(this);
+        return visitor.goReturn(this);
     }
 }

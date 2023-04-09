@@ -10,20 +10,18 @@ import java.util.ArrayList;
  * @author Huyemt
  */
 
-public class FunctionNode extends Node {
+public class FunctionCallNode extends Node {
 
     public String name;
-    public ArrayList<String> params;
-    public BlockNode blockNode;
+    public ArrayList<Node> args;
 
-    public FunctionNode() {
-        name = null;
-        params = new ArrayList<>();
-        blockNode = null;
+    public FunctionCallNode() {
+        name = "";
+        args = new ArrayList<>();
     }
 
     @Override
     public Object accept(Visitor visitor) throws RuntimeException {
-        return visitor.goFunction(this);
+        return visitor.goFunctionCall(this);
     }
 }

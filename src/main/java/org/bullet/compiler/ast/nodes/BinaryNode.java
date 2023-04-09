@@ -14,6 +14,7 @@ public class BinaryNode extends Node {
         SUB,
         MUL,
         DIV,
+        POW,
         EQUAL,
         NOT_EQUAL,
         GREATER,
