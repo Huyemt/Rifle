@@ -1,12 +1,13 @@
-package org.bullet.interpreter;
+package org.bullet.base;
 
 import org.bullet.compiler.ast.nodes.BlockNode;
 
 import java.util.HashMap;
 
 /**
- * 函数执行的过程对象<br><br>
- *
+ * 函数执行的环境
+ * <br><br>
+ * Function execution environment
  * @author Huyemt
  */
 

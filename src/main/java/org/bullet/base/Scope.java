@@ -1,4 +1,4 @@
-package org.bullet.interpreter;
+package org.bullet.base;
 
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.compiler.lexer.Position;

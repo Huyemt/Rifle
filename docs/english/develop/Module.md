@@ -19,7 +19,7 @@ public class SimpleModule extends Module {
 
     @Override
     protected String getModuleVersion() {
-        // Module version number
+        // Module version VTNumber
         return "1.0.0";
     }
 

@@ -54,6 +54,8 @@ public class Lexer implements ILexer {
         keywords.put("until", TokenKind.UNTIL);
         keywords.put("function", TokenKind.FUNCTION);
         keywords.put("return", TokenKind.RETURN);
+        keywords.put("break", TokenKind.BREAK);
+        keywords.put("continue", TokenKind.CONTINUE);
     }
 
     public Lexer(String source) throws ParsingException {
@@ -127,10 +129,40 @@ public class Lexer implements ILexer {
                         this.makeToken(TokenKind.OR);
                         break;
                     }
+                case '+':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.ASSIGN_ADD);
+                        break;
+                    }
+                case '-':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.ASSIGN_SUB);
+                        break;
+                    }
                 case '*':
                     if (this.peekChar(1) == '*') {
                         position.next();
+
+                        if (this.peekChar(1) == '=') {
+                            position.next();
+                            this.makeToken(TokenKind.ASSIGN_POW);
+                            break;
+                        }
+
                         this.makeToken(TokenKind.POW);
+                        break;
+                    }
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.ASSIGN_MUL);
+                        break;
+                    }
+                case '/':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.ASSIGN_DIV);
                         break;
                     }
                 default:

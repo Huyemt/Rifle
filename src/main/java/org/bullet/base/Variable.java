@@ -1,4 +1,4 @@
-package org.bullet.interpreter;
+package org.bullet.base;
 
 /**
  * @author Huyemt

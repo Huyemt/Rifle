@@ -28,6 +28,8 @@ public enum TokenKind {
     NOT("not"),
     FUNCTION("function"),
     RETURN("return"),
+    BREAK("break"),
+    CONTINUE("continue"),
 
     /*
     运算符
@@ -47,6 +49,12 @@ public enum TokenKind {
     GREATER_OR_EQUAL(">="),
     LESSER("<"),
     LESSER_OR_EQUAL("<="),
+    ASSIGN_ADD("+="),
+    ASSIGN_SUB("-="),
+    ASSIGN_MUL("*="),
+    ASSIGN_DIV("/="),
+    ASSIGN_POW("**="),
+
 
     /*
     界限符

@@ -1,5 +1,7 @@
 package org.bullet.interpreter;
 
+import org.bullet.base.FunctionEnvironment;
+import org.bullet.base.Scope;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.compiler.ast.nodes.*;
@@ -28,7 +30,6 @@ public class Interpreter extends Visitor {
     private final HashMap<String, FunctionNode> functions;
     private final Stack<FunctionEnvironment> environments;
     private Object returnValue;
-
 
 
     public Interpreter(String source) throws ParsingException {
@@ -84,7 +85,7 @@ public class Interpreter extends Visitor {
                         throw new RuntimeException(node.position, "Cannot divide by zero");
                     }
 
-                    return ((BigDecimal) left).divide((BigDecimal) right, 14, RoundingMode.HALF_UP);
+                    return ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN);
                 case POW:
                     return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
                 case EQUAL:
@@ -360,34 +361,55 @@ public class Interpreter extends Visitor {
     @Override
     public Object goFunctionCall(FunctionCallNode node) throws RuntimeException {
         try {
-            FunctionNode function = this.findFunction(node.name);
+            switch (node.name) {
+                case "print":
+                case "println": {
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = 0; i < node.args.size(); i++) {
+                        builder.append(node.args.get(i).accept(this));
 
-            if (node.args.size() > function.params.size()) {
-                throw new RuntimeException(node.position, String.format("Too many parameters -> %d", node.args.size() - function.params.size()));
-            } else if (node.args.size() < function.params.size()) {
-                throw new RuntimeException(node.position, String.format("Missing parameters -> %d", function.params.size() - node.args.size()));
+                        if (i + 1 < node.args.size())
+                            builder.append("\t");
+                    }
+
+                    if (node.name.equals("print"))
+                        System.out.print(builder);
+                    else
+                        System.out.println(builder);
+                    return null;
+                }
+
+                default: {
+                    FunctionNode function = this.findFunction(node.name);
+
+                    if (node.args.size() > function.params.size()) {
+                        throw new RuntimeException(node.position, String.format("Too many parameters -> %d", node.args.size() - function.params.size()));
+                    } else if (node.args.size() < function.params.size()) {
+                        throw new RuntimeException(node.position, String.format("Missing parameters -> %d", function.params.size() - node.args.size()));
+                    }
+
+                    FunctionEnvironment environment = new FunctionEnvironment();
+                    environment.body = function.blockNode;
+                    environment.from = scope;
+
+                    for (int i = 0; i < function.params.size(); i++) {
+                        environment.params.put(function.params.get(i), node.args.get(i).accept(this));
+                    }
+
+                    if (this.environment != null) {
+                        environments.push(this.environment);
+                    }
+
+                    this.environment = environment;
+
+                    Object r = this.environment.body.accept(this);
+                    returnValue = null;
+
+                    this.environment = (environments.size() > 0) ? environments.pop() : null;
+
+                    return r;
+                }
             }
-
-            FunctionEnvironment environment = new FunctionEnvironment();
-            environment.body = function.blockNode;
-            environment.from = scope;
-
-            for (int i = 0; i < function.params.size(); i++) {
-                environment.params.put(function.params.get(i), node.args.get(i).accept(this));
-            }
-
-            if (this.environment != null) {
-                environments.push(this.environment);
-            }
-
-            this.environment = environment;
-
-            Object r = this.environment.body.accept(this);
-            returnValue = null;
-
-            this.environment = (environments.size() > 0) ? environments.pop() : null;
-
-            return r;
         } catch (UnderfineException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
@@ -398,11 +420,6 @@ public class Interpreter extends Visitor {
         if (returnValue != null) {
             return returnValue;
         }
-
-        // 如果不是在函数里面用 return 关键字
-//        if (this.environment == null) {
-//            throw new RuntimeException(node.position, "The keyword \"return\" can only be defined inside a function");
-//        }
 
         return returnValue = node.left.accept(this);
     }
