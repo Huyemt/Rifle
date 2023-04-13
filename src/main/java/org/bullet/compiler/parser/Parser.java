@@ -392,6 +392,7 @@ public class Parser implements IParser {
 
         BreakNode node = new BreakNode();
         node.position = lexer.position.clone();
+        lexer.next();
         lexer.expectToken(TokenKind.SEMICOLON);
         return node;
     }
@@ -404,6 +405,7 @@ public class Parser implements IParser {
 
         ContinueNode node = new ContinueNode();
         node.position = lexer.position.clone();
+        lexer.next();
         lexer.expectToken(TokenKind.SEMICOLON);
         return node;
     }
