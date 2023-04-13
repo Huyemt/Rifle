@@ -18,6 +18,8 @@ public interface IParser {
     WhileNode While() throws ParsingException;
     ForNode For() throws ParsingException;
     UntilNode Until() throws ParsingException;
+    BreakNode Break() throws ParsingException;
+    ContinueNode Continue() throws ParsingException;
     BlockNode Block() throws ParsingException;
     Node Assign() throws ParsingException;
     Node LogicTerm() throws ParsingException;

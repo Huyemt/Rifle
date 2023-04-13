@@ -30,6 +30,7 @@ public enum TokenKind {
     RETURN("return"),
     BREAK("break"),
     CONTINUE("continue"),
+    PROVIDE("provide"),
 
     /*
     运算符

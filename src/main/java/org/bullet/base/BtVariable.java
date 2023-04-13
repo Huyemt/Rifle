@@ -4,12 +4,12 @@ package org.bullet.base;
  * @author Huyemt
  */
 
-public class Variable {
+public class BtVariable {
     public String name;
     public boolean canChange;
     public Object value;
 
-    public Variable() {
+    public BtVariable() {
         name = null;
         canChange = true;
         value = null;

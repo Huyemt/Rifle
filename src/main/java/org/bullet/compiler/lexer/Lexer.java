@@ -56,6 +56,7 @@ public class Lexer implements ILexer {
         keywords.put("return", TokenKind.RETURN);
         keywords.put("break", TokenKind.BREAK);
         keywords.put("continue", TokenKind.CONTINUE);
+        keywords.put("provide", TokenKind.PROVIDE);
     }
 
     public Lexer(String source) throws ParsingException {

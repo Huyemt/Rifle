@@ -1,7 +1,7 @@
 package org.bullet.interpreter;
 
 import org.bullet.base.FunctionEnvironment;
-import org.bullet.base.Scope;
+import org.bullet.base.BtScope;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.compiler.ast.nodes.*;
@@ -25,11 +25,12 @@ import java.util.Stack;
  */
 
 public class Interpreter extends Visitor {
-    private Scope scope;
+    private BtScope scope;
     private FunctionEnvironment environment;
     private final HashMap<String, FunctionNode> functions;
     private final Stack<FunctionEnvironment> environments;
     private Object returnValue;
+    private LoopStatus loopStatus;
 
 
     public Interpreter(String source) throws ParsingException {
@@ -40,12 +41,13 @@ public class Interpreter extends Visitor {
         returnValue = null;
         environments = new Stack<>();
         environment = null;
-        scope = new Scope();
+        scope = new BtScope();
         scope.position = programNode.position;
         scope.node = new BlockNode();
         scope.node.statements = programNode.statements;
         scope.node.level = 0;
         scope.node.position = scope.position;
+        loopStatus = LoopStatus.NONE;
     }
 
     public Interpreter(File file) throws ParsingException, IOException {
@@ -206,6 +208,35 @@ public class Interpreter extends Visitor {
         }
 
         throw new RuntimeException(node.position, "Only variables can be assigned values");
+    }
+
+    @Override
+    public Object goComplexAssign(ComplexAssignNode node) throws RuntimeException {
+        try {
+            Object left = node.left.accept(this);
+            Object right = node.right.accept(this);
+
+            switch (node.operator) {
+                case ADD:
+                    return scope.changeVariable(node.left.name, ((BigDecimal) left).add((BigDecimal) right)).value;
+                case SUB:
+                    return scope.changeVariable(node.left.name, ((BigDecimal) left).subtract((BigDecimal) right)).value;
+                case MUL:
+                    return scope.changeVariable(node.left.name, ((BigDecimal) left).multiply((BigDecimal) right)).value;
+                case DIV:
+                    if (((BigDecimal) right).intValue() == 0) {
+                        throw new RuntimeException(node.position, "Cannot divide by zero");
+                    }
+
+                    return scope.changeVariable(node.left.name, ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN)).value;
+                case POW:
+                    return scope.changeVariable(node.left.name, ((BigDecimal) left).pow(((BigDecimal) right).intValueExact())).value;
+                default:
+                    throw new RuntimeException(node.position, "Unsupported complex assignment operator");
+            }
+        } catch (BulletException e) {
+            throw new RuntimeException(node.position, e.getMessage());
+        }
     }
 
     @Override
@@ -424,13 +455,29 @@ public class Interpreter extends Visitor {
         return returnValue = node.left.accept(this);
     }
 
-    private Scope createScope(BlockNode node) {
-        Scope scope = new Scope();
-        scope.position = node.position;
-        scope.node = node;
-        scope.from = this.scope;
+    @Override
+    public Object goBreak(BreakNode node) throws RuntimeException {
+        loopStatus = LoopStatus.BREAK;
+        return null;
+    }
 
-        return scope;
+    @Override
+    public Object goContinue(ContinueNode node) throws RuntimeException {
+        loopStatus = LoopStatus.CONTINUE;
+        return null;
+    }
+
+    //////////////////////////////////////
+    //////////////////////////////////////
+    //////////////////////////////////////
+
+    private BtScope createScope(BlockNode node) {
+        BtScope btScope = new BtScope();
+        btScope.position = node.position;
+        btScope.node = node;
+        btScope.from = this.scope;
+
+        return btScope;
     }
 
     private FunctionNode findFunction(String name) throws UnderfineException {

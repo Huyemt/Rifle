@@ -17,11 +17,13 @@ public class Parser implements IParser {
 
     private final Lexer lexer;
     private int blockLevel;
+    private int loopLevel;
     private boolean functionParsing;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
         blockLevel = 1;
+        loopLevel = 0;
         functionParsing = false;
     }
 
@@ -192,9 +194,25 @@ public class Parser implements IParser {
             return this.Assign();
         }
 
-
+        /*
+        解析 return 返回值
+         */
         if (lexer.currentToken.kind == TokenKind.RETURN) {
             return this.Return();
+        }
+
+        /*
+        解析 break 跳出循环
+         */
+        if (lexer.currentToken.kind == TokenKind.BREAK) {
+            return this.Break();
+        }
+
+        /*
+        解析 continue 跳过本次循环
+         */
+        if (lexer.currentToken.kind == TokenKind.CONTINUE) {
+            return this.Continue();
         }
 
         /*
@@ -268,6 +286,8 @@ public class Parser implements IParser {
 
         lexer.expectToken(TokenKind.SRPAREN);
 
+        loopLevel++;
+
         node.body = this.Statement();
 
         if (lexer.currentToken.kind == TokenKind.ELSE) {
@@ -279,6 +299,8 @@ public class Parser implements IParser {
                 throw new ParsingException(lexer.position, "There can only be one else scope");
             }
         }
+
+        loopLevel--;
 
         return node;
     }
@@ -307,6 +329,8 @@ public class Parser implements IParser {
         }
         lexer.expectToken(TokenKind.SRPAREN);
 
+        loopLevel++;
+
         node.body = this.Statement();
 
         if (lexer.currentToken.kind == TokenKind.ELSE) {
@@ -318,6 +342,8 @@ public class Parser implements IParser {
                 throw new ParsingException(lexer.position, "There can only be one else scope");
             }
         }
+
+        loopLevel--;
 
         return node;
     }
@@ -335,6 +361,8 @@ public class Parser implements IParser {
             throw new ParsingException(lexer.position, "Until statement is missing purpose");
         }
 
+        loopLevel++;
+
         node.purpose = this.Expression();
 
         lexer.expectToken(TokenKind.SRPAREN);
@@ -351,6 +379,32 @@ public class Parser implements IParser {
             }
         }
 
+        loopLevel--;
+
+        return node;
+    }
+
+    @Override
+    public BreakNode Break() throws ParsingException {
+        if (loopLevel == 0) {
+            throw new ParsingException(lexer.position, "Syntax error, it must be used in a circulating body");
+        }
+
+        BreakNode node = new BreakNode();
+        node.position = lexer.position.clone();
+        lexer.expectToken(TokenKind.SEMICOLON);
+        return node;
+    }
+
+    @Override
+    public ContinueNode Continue() throws ParsingException {
+        if (loopLevel == 0) {
+            throw new ParsingException(lexer.position, "Syntax error, it must be used in a circulating body");
+        }
+
+        ContinueNode node = new ContinueNode();
+        node.position = lexer.position.clone();
+        lexer.expectToken(TokenKind.SEMICOLON);
         return node;
     }
 
@@ -364,9 +418,9 @@ public class Parser implements IParser {
         node.level = blockLevel;
         blockLevel++;
 
-            /*
-            解析代码块，直到当前词法单元是右花括号
-             */
+        /*
+        解析代码块，直到当前词法单元是右花括号
+         */
         while (lexer.currentToken.kind != TokenKind.BRPAREN) {
             node.statements.add(this.Statement());
         }
@@ -415,34 +469,27 @@ public class Parser implements IParser {
                 throw new ParsingException(lexer.position, "It is not allowed to use compound assignment when declaring variables");
             }
 
-            AssignNode node = new AssignNode();
+            ComplexAssignNode node = new ComplexAssignNode();
+
             node.position = lexer.position.clone();
-
-            node.left = left;
-
-            BinaryNode binaryNode = new BinaryNode();
-
-            node.right = binaryNode;
-
-            binaryNode.position = node.position;
-            binaryNode.left = left;
+            node.left = (VariableNode) left;
 
             if (lexer.currentToken.kind == TokenKind.ASSIGN_ADD)
-                binaryNode.operator = BinaryNode.Operator.ADD;
+                node.operator = BinaryNode.Operator.ADD;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_SUB)
-                binaryNode.operator = BinaryNode.Operator.SUB;
+                node.operator = BinaryNode.Operator.SUB;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_MUL)
-                binaryNode.operator = BinaryNode.Operator.MUL;
+                node.operator = BinaryNode.Operator.MUL;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_DIV)
-                binaryNode.operator = BinaryNode.Operator.DIV;
+                node.operator = BinaryNode.Operator.DIV;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_POW)
-                binaryNode.operator = BinaryNode.Operator.POW;
+                node.operator = BinaryNode.Operator.POW;
             else
-                throw new ParsingException(node.position, "Unsupported complex assignment operator");
+                throw new ParsingException(node.position, "Syntax error");
 
             lexer.next();
 
-            binaryNode.right = this.Assign();
+            node.right = this.Assign();
 
             return node;
         }
@@ -524,7 +571,7 @@ public class Parser implements IParser {
             else if (lexer.currentToken.kind == TokenKind.LESSER_OR_EQUAL)
                 node.operator = BinaryNode.Operator.LESSER_OR_EQUAL;
             else
-                throw new ParsingException(node.position, "Unsupported relational operator");
+                throw new ParsingException(node.position, "Syntax error");
 
             lexer.next();
 

@@ -14,7 +14,7 @@ import java.util.HashMap;
 public class FunctionEnvironment {
     public final HashMap<String, Object> params;
     public BlockNode body;
-    public Scope from;
+    public BtScope from;
 
     public FunctionEnvironment() {
         params = new HashMap<>();

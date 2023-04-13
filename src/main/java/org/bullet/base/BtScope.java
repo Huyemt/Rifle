@@ -12,13 +12,13 @@ import java.util.HashMap;
  * @author Huyemt
  */
 
-public class Scope {
-    public final HashMap<String, Variable> variables;
+public class BtScope {
+    public final HashMap<String, BtVariable> variables;
     public BlockNode node;
-    public Scope from;
+    public BtScope from;
     public Position position;
 
-    public Scope() {
+    public BtScope() {
         variables = new HashMap<>();
         node = null;
         from = null;
@@ -26,7 +26,7 @@ public class Scope {
     }
 
     public boolean existsVariable(String name) {
-        Scope block = this;
+        BtScope block = this;
 
         while (block != null) {
             if (block.variables.containsKey(name)) {
@@ -39,8 +39,8 @@ public class Scope {
         return false;
     }
 
-    public Variable findVariable(String name) throws UnderfineException {
-        Scope block = this;
+    public BtVariable findVariable(String name) throws UnderfineException {
+        BtScope block = this;
 
         while (block != null) {
             if (block.variables.containsKey(name)) {
@@ -54,15 +54,15 @@ public class Scope {
     }
 
 
-    public Variable changeVariable(String name, Object value) throws BulletException {
-        Scope block = this;
+    public BtVariable changeVariable(String name, Object value) throws BulletException {
+        BtScope block = this;
 
         while (block != null) {
             if (block.variables.containsKey(name)) {
-                Variable variable = block.variables.get(name);
-                if (variable.canChange) {
-                    variable.value = value;
-                    return variable;
+                BtVariable btVariable = block.variables.get(name);
+                if (btVariable.canChange) {
+                    btVariable.value = value;
+                    return btVariable;
                 }
 
                 throw new BulletException(String.format("Cannot modify variable \"%s\" of immutable type", name));
@@ -74,22 +74,22 @@ public class Scope {
         throw new UnderfineException(UnderfineException.UnderfineType.VARIABLE, name);
     }
 
-    public Variable createVariable(String name, Object value, boolean canChange) throws DefinedException {
+    public BtVariable createVariable(String name, Object value, boolean canChange) throws DefinedException {
         if (this.existsVariable(name)) {
             throw new DefinedException(DefinedException.DerfinedType.VARIABLE, name);
         }
 
-        Variable variable = new Variable();
-        variable.name = name;
-        variable.value = value;
-        variable.canChange = canChange;
+        BtVariable btVariable = new BtVariable();
+        btVariable.name = name;
+        btVariable.value = value;
+        btVariable.canChange = canChange;
 
-        variables.put(name, variable);
+        variables.put(name, btVariable);
 
-        return variable;
+        return btVariable;
     }
 
-    public Variable createVariable(String name, Object value) throws DefinedException {
+    public BtVariable createVariable(String name, Object value) throws DefinedException {
         return this.createVariable(name, value, true);
     }
 }

@@ -11,12 +11,12 @@ import java.util.ArrayList;
  * @author Huyemt
  */
 
-public class VTNumber {
+public class BtNumber {
     public final ArrayList<Integer> left;
     public final ArrayList<Integer> right;
     public boolean positive;
 
-    public VTNumber(String value) throws BulletException {
+    public BtNumber(String value) throws BulletException {
         left = new ArrayList<>();
         right = new ArrayList<>();
         positive = true;
@@ -63,6 +63,6 @@ public class VTNumber {
     }
 
     public static void main(String[] args) throws BulletException {
-        VTNumber VTNumber = new VTNumber("1.1");
+        BtNumber BtNumber = new BtNumber("1.1");
     }
 }
