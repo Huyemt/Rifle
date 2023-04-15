@@ -8,7 +8,9 @@ public class UnderfineException extends BulletException {
 
     public enum UnderfineType {
         VARIABLE("variable"),
-        FUNCTION("function");
+        FUNCTION("function"),
+        PROVIDE_ATTRIBUTE("provide_attribute"),
+        PROVIDE_INTERFACE("provide_interface");
 
         public final String value;
 
@@ -24,7 +26,7 @@ public class UnderfineException extends BulletException {
     public final UnderfineType type;
 
     public UnderfineException(UnderfineType type, String message) {
-        super(String.format("Undefine %s \"%s\"", type.value, message));
+        super(String.format("%s \"%s\" is not define", type.value, message));
         this.type = type;
     }
 

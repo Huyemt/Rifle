@@ -26,4 +26,5 @@ public abstract class Visitor {
     public abstract Object goReturn(ReturnNode node) throws RuntimeException;
     public abstract Object goBreak(BreakNode node) throws RuntimeException;
     public abstract Object goContinue(ContinueNode node) throws RuntimeException;
+    public abstract Object goProvide(ProvideNode node) throws RuntimeException;
 }

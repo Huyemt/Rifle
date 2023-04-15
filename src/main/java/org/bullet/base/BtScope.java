@@ -60,12 +60,12 @@ public class BtScope {
         while (block != null) {
             if (block.variables.containsKey(name)) {
                 BtVariable btVariable = block.variables.get(name);
-                if (btVariable.canChange) {
-                    btVariable.value = value;
-                    return btVariable;
+                if (!btVariable.canChange) {
+                    throw new BulletException(String.format("Cannot modify variable \"%s\" of immutable type", name));
                 }
 
-                throw new BulletException(String.format("Cannot modify variable \"%s\" of immutable type", name));
+                btVariable.value = value;
+                return btVariable;
             }
 
             block = block.from;

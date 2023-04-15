@@ -7,7 +7,9 @@ package org.bullet.exceptions;
 public class DefinedException extends BulletException {
     public enum DerfinedType {
         VARIABLE("variable"),
-        FUNCTION("function");
+        FUNCTION("function"),
+        PROVIDE_ATTRIBUTE("provide_attribute"),
+        PROVIDE_INTERFACE("provide_interface");
 
         public final String value;
 

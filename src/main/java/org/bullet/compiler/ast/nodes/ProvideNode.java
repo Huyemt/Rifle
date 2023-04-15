@@ -8,20 +8,16 @@ import org.bullet.exceptions.RuntimeException;
  * @author Huyemt
  */
 
-public class AssignNode extends Node {
+public class ProvideNode extends Node {
+    public String name;
+    public BlockNode node;
 
-    public Node left;
-    public Node right;
-    public boolean createAction;
-    public boolean canChange;
-    public boolean isProvide;
-
-    public AssignNode() {
+    public ProvideNode() {
 
     }
 
     @Override
     public Object accept(Visitor visitor) throws RuntimeException {
-        return visitor.goAssign(this);
+        return visitor.goProvide(this);
     }
 }

@@ -40,6 +40,8 @@ public class Lexer implements ILexer {
         tokens.put(">", TokenKind.GREATER);
         tokens.put("<", TokenKind.LESSER);
         tokens.put(".", TokenKind.POINT);
+        tokens.put("@", TokenKind.AT);
+        tokens.put(":", TokenKind.COLON);
 
         keywords.put("true", TokenKind.TRUE);
         keywords.put("false", TokenKind.FALSE);
@@ -56,7 +58,6 @@ public class Lexer implements ILexer {
         keywords.put("return", TokenKind.RETURN);
         keywords.put("break", TokenKind.BREAK);
         keywords.put("continue", TokenKind.CONTINUE);
-        keywords.put("provide", TokenKind.PROVIDE);
     }
 
     public Lexer(String source) throws ParsingException {
@@ -166,6 +167,12 @@ public class Lexer implements ILexer {
                         this.makeToken(TokenKind.ASSIGN_DIV);
                         break;
                     }
+                case ':':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.C_ASSIGN);
+                        break;
+                    }
                 default:
                     this.makeToken(tokens.get(position.currentChar.toString()));
                     break;
@@ -185,7 +192,18 @@ public class Lexer implements ILexer {
             return;
         }
 
+        if (position.currentChar == '\"') {
+            this.makeString();
+            return;
+        }
+
         throw new ParsingException(position, String.format("Current char '%c' is illegal", position.currentChar));
+    }
+
+    public void next(int times) throws ParsingException {
+        for (int i = 0; i < times; i++) {
+            this.next();
+        }
     }
 
     @Override
@@ -271,5 +289,44 @@ public class Lexer implements ILexer {
         }
 
         this.makeToken(TokenKind.IDENTIFIER, identifier);
+    }
+
+    private void makeString() {
+        position.next();
+
+        StringBuilder builder = new StringBuilder();
+
+        while (position.currentChar != '\"') {
+            if (position.currentChar == '\\') {
+                char c = this.peekChar(1);
+                if (c == 'b') {
+                    builder.append('\b');
+                    position.next();
+                } else if (c == 'n') {
+                    builder.append('\n');
+                    position.next();
+                } else if (c == 't') {
+                    builder.append('\t');
+                    position.next();
+                } else if (c == 'r') {
+                    builder.append('\r');
+                    position.next();
+                } else if (c == '\'') {
+                    builder.append('\'');
+                    position.next();
+                } else if (c == '\"') {
+                    builder.append('\"');
+                    position.next();
+                } else builder.append(position.currentChar);
+            } else {
+                builder.append(position.currentChar);
+            }
+
+            position.next();
+        }
+
+        position.next();
+
+        this.makeToken(TokenKind.VT_STRING, builder.toString());
     }
 }

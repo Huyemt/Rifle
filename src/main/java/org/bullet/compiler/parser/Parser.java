@@ -3,6 +3,7 @@ package org.bullet.compiler.parser;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.*;
 import org.bullet.compiler.lexer.Lexer;
+import org.bullet.compiler.lexer.Position;
 import org.bullet.compiler.lexer.TokenKind;
 import org.bullet.compiler.lexer.VToken;
 import org.bullet.exceptions.ParsingException;
@@ -14,17 +15,18 @@ import java.math.BigDecimal;
  */
 
 public class Parser implements IParser {
-
     private final Lexer lexer;
     private int blockLevel;
     private int loopLevel;
     private boolean functionParsing;
+    private boolean provideParsing;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
         blockLevel = 1;
         loopLevel = 0;
         functionParsing = false;
+        provideParsing = false;
     }
 
     @Override
@@ -42,8 +44,16 @@ public class Parser implements IParser {
     @Override
     public Node Function() throws ParsingException {
         if (lexer.currentToken.kind == TokenKind.FUNCTION) {
+            if (provideParsing) {
+                throw new ParsingException(lexer.position, "The keyword \"provide\" can only be used globally");
+            }
+
             if (functionParsing) {
                 throw new ParsingException(lexer.position, "Embedded functions are not supported");
+            }
+
+            if (loopLevel > 0) {
+                throw new ParsingException(lexer.position, "Functions cannot be declared in the body of a loop");
             }
 
             FunctionNode node = new FunctionNode();
@@ -115,6 +125,9 @@ public class Parser implements IParser {
 
     @Override
     public ReturnNode Return() throws ParsingException {
+        if (!functionParsing && loopLevel > 0) {
+            throw new ParsingException(lexer.position, "The \"return\" keyword can only be used in functions and loop bodies of functions");
+        }
         ReturnNode node = new ReturnNode();
         node.position = lexer.position.clone();
         lexer.next();
@@ -213,6 +226,13 @@ public class Parser implements IParser {
          */
         if (lexer.currentToken.kind == TokenKind.CONTINUE) {
             return this.Continue();
+        }
+
+        /*
+        解析 @
+         */
+        if (lexer.currentToken.kind == TokenKind.AT) {
+            return this.Provide();
         }
 
         /*
@@ -411,6 +431,50 @@ public class Parser implements IParser {
     }
 
     @Override
+    public Node Provide() throws ParsingException {
+        if (provideParsing) {
+            throw new ParsingException(lexer.position, "The keyword \"@\" does not support nesting");
+        }
+
+        if (functionParsing) {
+            throw new ParsingException(lexer.position, "The keyword \"@\" is not supported within a function");
+        }
+
+        lexer.beginPeek();
+        lexer.next();
+
+        lexer.expectToken(TokenKind.IDENTIFIER);
+
+        if (lexer.currentToken.kind == TokenKind.ASSIGN) {
+            lexer.endPeek();
+            return this.Assign();
+        }
+
+        lexer.endPeek();
+        Position p = lexer.position.clone();
+        lexer.next();
+
+        String name = ((VToken) lexer.currentToken).value;
+
+        lexer.next();
+
+        if (lexer.currentToken.kind == TokenKind.BLPAREN) {
+            ProvideNode node = new ProvideNode();
+            node.name = name;
+            node.position = p;
+
+            provideParsing = true;
+
+            node.node = this.Block();
+
+            provideParsing = false;
+            return node;
+        }
+
+        throw new ParsingException(lexer.position, "Syntax error");
+    }
+
+    @Override
     public BlockNode Block() throws ParsingException {
         BlockNode node = new BlockNode();
         node.position = lexer.position.clone();
@@ -436,6 +500,8 @@ public class Parser implements IParser {
     @Override
     public Node Assign() throws ParsingException {
         boolean createAction = false;
+        boolean canChange = true;
+        boolean provide = false;
 
         if (lexer.currentToken.kind == TokenKind.VAR) {
             lexer.next();
@@ -443,7 +509,38 @@ public class Parser implements IParser {
             createAction = true;
         }
 
+        if (lexer.currentToken.kind == TokenKind.AT) {
+            lexer.next();
+
+            createAction = true;
+            canChange = false;
+            provide = true;
+        }
+
         Node left = this.LogicTerm();
+
+        if (lexer.currentToken.kind == TokenKind.C_ASSIGN) {
+            if (!(left instanceof VariableNode)) {
+                throw new ParsingException(lexer.position, "Only variables can be assigned values");
+            }
+
+            if (provide) {
+                throw new ParsingException(lexer.position, "Variable decorated with \"@\" cannot be assigned with \":=\"");
+            }
+
+            AssignNode node = new AssignNode();
+            node.createAction = true;
+            node.canChange = true;
+            node.isProvide = false;
+            node.position = lexer.position.clone();
+
+            lexer.next();
+
+            node.left = left;
+            node.right = this.Assign();
+
+            return node;
+        }
 
         if (lexer.currentToken.kind == TokenKind.ASSIGN) {
             if (!(left instanceof VariableNode)) {
@@ -452,12 +549,14 @@ public class Parser implements IParser {
 
             AssignNode node = new AssignNode();
             node.createAction = createAction;
+            node.canChange = canChange;
+            node.isProvide = provide;
             node.position = lexer.position.clone();
 
             lexer.next();
 
             node.left = left;
-            node.right = this.Assign();
+            node.right = provide ? this.Primary() : this.Assign();
 
             return node;
         }
@@ -668,12 +767,20 @@ public class Parser implements IParser {
         return left;
     }
 
-
     @Override
     public Node Primary() throws ParsingException {
         if (lexer.currentToken.kind == TokenKind.VT_NUMBER) {
             ConstantNode<BigDecimal> node = new ConstantNode<>();
             node.value = new BigDecimal(((VToken)lexer.currentToken).value);
+            node.position = lexer.position.clone();
+            lexer.next();
+
+            return node;
+        }
+
+        if (lexer.currentToken.kind == TokenKind.VT_STRING) {
+            ConstantNode<String> node = new ConstantNode<>();
+            node.value = ((VToken)lexer.currentToken).value;
             node.position = lexer.position.clone();
             lexer.next();
 
@@ -698,7 +805,6 @@ public class Parser implements IParser {
         }
 
         if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
-
             lexer.beginPeek();
             lexer.next();
 

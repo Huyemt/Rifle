@@ -1,3 +1,14 @@
-var i = 1;
-i += i += i += 1;
-print(i);
+name := "Bullet";
+age := 0;
+var author = "Huyemt";
+
+until (age == 1) {
+    age += 1;
+}
+
+function information() {
+    println("我是 " + name + " 语言，今年 " + age + " 岁");
+    println("我的作者是 " + author);
+}
+
+information();

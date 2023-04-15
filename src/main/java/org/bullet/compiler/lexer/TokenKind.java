@@ -30,7 +30,6 @@ public enum TokenKind {
     RETURN("return"),
     BREAK("break"),
     CONTINUE("continue"),
-    PROVIDE("provide"),
 
     /*
     运算符
@@ -66,9 +65,12 @@ public enum TokenKind {
     BLPAREN("{"),
     BRPAREN("}"),
     ASSIGN("="),
+    C_ASSIGN(":="),
     COMMA(","),
     POINT("."),
     SEMICOLON(";"),
+    AT("@"),
+    COLON(":"),
 
     EOF("EOF"),
 
@@ -76,7 +78,8 @@ public enum TokenKind {
     Const
     常量类型
      */
-    VT_NUMBER("NUMBER")
+    VT_NUMBER("NUMBER"),
+    VT_STRING("STRING"),
     ;
 
     private final String value;
