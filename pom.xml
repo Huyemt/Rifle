@@ -23,42 +23,42 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <version>5.9.2</version>
-            <btScope>test</btScope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.0.0-M4</version>
-            <btScope>test</btScope>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline-terminal</artifactId>
             <version>${jline.version}</version>
-            <btScope>compile</btScope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline-terminal-jna</artifactId>
             <version>${jline.version}</version>
-            <btScope>compile</btScope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline-reader</artifactId>
             <version>${jline.version}</version>
-            <btScope>compile</btScope>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
-            <btScope>compile</btScope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

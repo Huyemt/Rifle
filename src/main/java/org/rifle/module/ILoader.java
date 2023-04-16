@@ -7,7 +7,7 @@ import java.io.File;
  */
 
 public interface ILoader {
-    IModule loadModule(File file);
+    IModule loadModule(File file) throws Exception;
 
     boolean unloadModule(IModule module);
 }

@@ -1,4 +1,4 @@
-package org.bullet.base;
+package org.bullet.base.components;
 
 
 import org.bullet.compiler.ast.nodes.FunctionNode;
@@ -34,8 +34,8 @@ public class BtFunction {
      * @param args
      * @throws BulletException
      */
-    public void call(Object ... args) throws BulletException {
-        this.callFV(args);
+    public void invoke(Object ... args) throws BulletException {
+        this.invokeFV(args);
     }
 
     /**
@@ -47,7 +47,7 @@ public class BtFunction {
      * @return Object
      * @throws BulletException
      */
-    public Object callFV(Object ... args) throws BulletException {
+    public Object invokeFV(Object ... args) throws BulletException {
         if (args.length > node.params.size()) {
             throw new BulletException(String.format("Too many parameters -> %d", args.length - node.params.size()));
         } else if (args.length < node.params.size()) {
@@ -56,7 +56,7 @@ public class BtFunction {
 
         FunctionEnvironment environment = new FunctionEnvironment();
         environment.body = node.blockNode;
-        environment.from = interpreter.scope;
+        environment.from = interpreter.runtime.scope;
 
         for (int i = 0; i < node.params.size(); i++) {
             if (args[i] instanceof Integer || args[i] instanceof Float || args[i] instanceof Double) {
@@ -66,14 +66,14 @@ public class BtFunction {
             environment.params.put(node.params.get(i), args[i]);
         }
 
-        if (interpreter.environment != null) {
-            interpreter.environments.push(interpreter.environment);
+        if (interpreter.runtime.environment != null) {
+            interpreter.runtime.environments.push(interpreter.runtime.environment);
         }
 
-        interpreter.environment = environment;
-        Object r = interpreter.environment.body.accept(interpreter);
-        interpreter.returnValue = null;
-        interpreter.environment = (interpreter.environments.size() > 0) ? interpreter.environments.pop() : null;
+        interpreter.runtime.environment = environment;
+        Object r = interpreter.runtime.environment.body.accept(interpreter);
+        interpreter.runtime.returnValue = null;
+        interpreter.runtime.environment = (interpreter.runtime.environments.size() > 0) ? interpreter.runtime.environments.pop() : null;
 
         return r;
     }

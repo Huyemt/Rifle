@@ -1,9 +1,9 @@
 package org.bullet.interpreter;
 
-import org.bullet.base.BtFunction;
-import org.bullet.base.BtVariable;
-import org.bullet.base.FunctionEnvironment;
-import org.bullet.base.BtScope;
+import org.bullet.base.components.BtFunction;
+import org.bullet.base.components.BtInterface;
+import org.bullet.base.components.BtVariable;
+import org.bullet.base.components.BtScope;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.compiler.ast.nodes.*;
@@ -18,54 +18,40 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Stack;
 
 /**
  * @author Huyemt
  */
 
 public class Interpreter extends Visitor {
-    public BtScope scope;
-    public FunctionEnvironment environment;
-    public final HashMap<String, BtFunction> functions;
-    private final HashMap<String, Object> provideAttributes;
-    private final HashMap<String, BlockNode> provideInterfaces;
-    public final Stack<FunctionEnvironment> environments;
-    public Object returnValue;
-    protected LoopStatus loopStatus;
-    protected int loopLevel;
-    private final Object result;
+    public final BulletRuntime runtime;
 
-
-    public Interpreter(String source) throws ParsingException, RuntimeException {
+    public Interpreter(String source, BulletRuntime runtime) throws ParsingException {
         Lexer lexer = new Lexer(source);
         Parser parser = new Parser(lexer);
         ProgramNode programNode = parser.Parse();
-        functions = new HashMap<>();
-        provideAttributes = new HashMap<>();
-        provideInterfaces = new HashMap<>();
-        returnValue = null;
-        environments = new Stack<>();
-        environment = null;
-        scope = new BtScope();
+
+        BlockNode blockNode = new BlockNode();
+        blockNode.position = programNode.position;
+        blockNode.statements = programNode.statements;
+        blockNode.level = 0;
+
+        BtScope scope = new BtScope();
         scope.position = programNode.position;
-        scope.node = new BlockNode();
-        scope.node.statements = programNode.statements;
-        scope.node.level = 0;
-        scope.node.position = scope.position;
-        loopStatus = LoopStatus.NONE;
-        loopLevel = 0;
+        scope.from = null;
+        scope.node = blockNode;
 
-        result = scope.node.accept(this);
+        runtime.scope = scope;
+
+        this.runtime = runtime;
     }
 
-    public Interpreter(File file) throws ParsingException, IOException, RuntimeException {
-        this(Utils.readFile(file));
+    public Interpreter(File file, BulletRuntime runtime) throws ParsingException, IOException {
+        this(Utils.readFile(file), runtime);
     }
 
-    public Object getResult() {
-        return result;
+    public Object eval() throws RuntimeException {
+        return runtime.scope.node.accept(this);
     }
 
     @Override
@@ -84,22 +70,46 @@ public class Interpreter extends Visitor {
         Object right = node.right.accept(this);
         Object left = node.left.accept(this);
 
-        if (left instanceof BigDecimal && right instanceof BigDecimal) {
+        if (left instanceof BigDecimal) {
             switch (node.operator) {
                 case ADD:
-                    return ((BigDecimal) left).add((BigDecimal) right);
-                case SUB:
-                    return ((BigDecimal) left).subtract((BigDecimal) right);
-                case MUL:
-                    return ((BigDecimal) left).multiply((BigDecimal) right);
-                case DIV:
-                    if (((BigDecimal) right).intValue() == 0) {
-                        throw new RuntimeException(node.position, "Cannot divide by zero");
+                    if (right instanceof BigDecimal) {
+                        return ((BigDecimal) left).add((BigDecimal) right);
+                    } else if (right instanceof String) {
+                        return String.valueOf(left) + right;
                     }
 
-                    return ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN);
+                    throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                case SUB:
+                    if (right instanceof BigDecimal) {
+                        return ((BigDecimal) left).subtract((BigDecimal) right);
+                    }
+
+                    throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                case MUL:
+                    if (right instanceof BigDecimal) {
+                        return ((BigDecimal) left).multiply((BigDecimal) right);
+                    } else if (right instanceof String) {
+                        return ((String) right).repeat(((BigDecimal) left).intValue());
+                    }
+
+                    throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                case DIV:
+                    if (right instanceof BigDecimal) {
+                        if (((BigDecimal) right).intValue() == 0) {
+                            throw new RuntimeException(node.position, "Cannot divide by zero");
+                        }
+
+                        return ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN);
+                    }
+
+                    throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getName()));
                 case POW:
-                    return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
+                    if (right instanceof BigDecimal) {
+                        return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
+                    }
+
+                    throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getName()));
                 case EQUAL:
                 case NOT_EQUAL:
                 case GREATER:
@@ -143,9 +153,14 @@ public class Interpreter extends Visitor {
             }
         } else if (left instanceof String) {
             if (node.operator == BinaryNode.Operator.ADD) {
-                return String.valueOf(left) + String.valueOf(right);
+                return left + String.valueOf(right);
             }
-            throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\"");
+
+            if (node.operator == BinaryNode.Operator.MUL && right instanceof BigDecimal) {
+                return ((String) left).repeat(((BigDecimal) right).intValueExact());
+            }
+
+            throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\" and \"*\"");
         }
 
         throw new RuntimeException(node.position, "Unsupported type operation");
@@ -194,11 +209,11 @@ public class Interpreter extends Visitor {
     @Override
     public Object goVariable(VariableNode node) throws RuntimeException {
         try {
-            if (environment != null && environment.params.containsKey(node.name)) {
-                return environment.params.get(node.name);
+            if (runtime.environment != null && runtime.environment.params.containsKey(node.name)) {
+                return runtime.environment.params.get(node.name);
             }
 
-            return scope.findVariable(node.name).value;
+            return runtime.scope.findVariable(node.name).getValue();
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
@@ -211,27 +226,27 @@ public class Interpreter extends Visitor {
             Object result = node.right.accept(this);
 
             try {
-                if (environment != null && environment.params.containsKey(name)) {
-                    environment.params.put(name, result);
+                if (runtime.environment != null && runtime.environment.params.containsKey(name)) {
+                    runtime.environment.params.put(name, result);
                     return result;
                 }
 
                 if (node.isProvide) {
-                    if (provideAttributes.containsKey(name)) {
+                    if (runtime.provideAttributes.containsKey(name)) {
                         throw new DefinedException(DefinedException.DerfinedType.PROVIDE_ATTRIBUTE, name);
                     }
 
-                    provideAttributes.put(name, result);
+                    runtime.provideAttributes.put(name, result);
                     return result;
                 }
 
-                BtVariable variable = node.createAction ? scope.createVariable(name, result) : scope.changeVariable(name, result);
+                BtVariable variable = node.createAction ? runtime.scope.createVariable(name, result) : runtime.scope.changeVariable(name, result);
 
                 if (node.createAction) {
                     variable.canChange = node.canChange;
                 }
 
-                return variable.value;
+                return variable.getValue();
             } catch (BulletException e) {
                 throw new RuntimeException(node.position, e.getMessage());
             }
@@ -248,19 +263,19 @@ public class Interpreter extends Visitor {
 
             switch (node.operator) {
                 case ADD:
-                    return scope.changeVariable(node.left.name, ((BigDecimal) left).add((BigDecimal) right)).value;
+                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).add((BigDecimal) right)).getValue();
                 case SUB:
-                    return scope.changeVariable(node.left.name, ((BigDecimal) left).subtract((BigDecimal) right)).value;
+                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).subtract((BigDecimal) right)).getValue();
                 case MUL:
-                    return scope.changeVariable(node.left.name, ((BigDecimal) left).multiply((BigDecimal) right)).value;
+                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).multiply((BigDecimal) right)).getValue();
                 case DIV:
                     if (((BigDecimal) right).intValue() == 0) {
                         throw new RuntimeException(node.position, "Cannot divide by zero");
                     }
 
-                    return scope.changeVariable(node.left.name, ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN)).value;
+                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN)).getValue();
                 case POW:
-                    return scope.changeVariable(node.left.name, ((BigDecimal) left).pow(((BigDecimal) right).intValueExact())).value;
+                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).pow(((BigDecimal) right).intValueExact())).getValue();
                 default:
                     throw new RuntimeException(node.position, "Unsupported complex assignment operator");
             }
@@ -296,34 +311,34 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goBlock(BlockNode node) throws RuntimeException {
-        if (scope.node != node && node.level > scope.node.level) {
-            scope = this.createScope(node);
+        if (runtime.scope.node != node && node.level > runtime.scope.node.level) {
+            runtime.scope = runtime.createScope(node);
         }
 
         for (Node statement : node.statements) {
             statement.accept(this);
 
-            if (returnValue != null) {
+            if (runtime.returnValue != null) {
                 break;
             }
 
-            if (loopStatus == LoopStatus.BREAK || loopStatus == LoopStatus.CONTINUE) {
+            if (runtime.loopStatus == LoopStatus.BREAK || runtime.loopStatus == LoopStatus.CONTINUE) {
                 break;
             }
         }
 
-        if (environment != null && environment.from != null) {
-            scope = environment.from;
-        } else if (scope.from != null) {
-            scope = scope.from;
+        if (runtime.environment != null && runtime.environment.from != null && runtime.loopLevel == 0) {
+            runtime.scope = runtime.environment.from;
+        } else if (runtime.scope.from != null) {
+            runtime.scope = runtime.scope.from;
         }
 
-        return returnValue;
+        return runtime.returnValue;
     }
 
     @Override
     public Object goWhile(WhileNode node) throws RuntimeException {
-        loopLevel++;
+        runtime.loopLevel++;
 
         boolean condition = (Boolean) node.condition.accept(this);
         boolean flag = condition;
@@ -336,25 +351,25 @@ public class Interpreter extends Visitor {
                 break;
             }
 
-            if (returnValue != null) {
-                loopLevel--;
-                loopStatus = LoopStatus.NONE;
-                return returnValue;
+            if (runtime.returnValue != null) {
+                runtime.loopLevel--;
+                runtime.loopStatus = LoopStatus.NONE;
+                return runtime.returnValue;
             }
 
-            if (loopStatus == LoopStatus.BREAK) {
+            if (runtime.loopStatus == LoopStatus.BREAK) {
                 break;
             }
 
-            if (loopStatus == LoopStatus.CONTINUE) {
-                loopStatus = LoopStatus.NONE;
+            if (runtime.loopStatus == LoopStatus.CONTINUE) {
+                runtime.loopStatus = LoopStatus.NONE;
                 continue;
             }
 
             condition = (Boolean) node.condition.accept(this);
         }
 
-        loopStatus = LoopStatus.NONE;
+        runtime.loopStatus = LoopStatus.NONE;
 
         /*
         运行到这里说明已经跳出循环了
@@ -363,14 +378,14 @@ public class Interpreter extends Visitor {
             result = node.elseBody.accept(this);
         }
 
-        loopLevel--;
+        runtime.loopLevel--;
 
         return result;
     }
 
     @Override
     public Object goFor(ForNode node) throws RuntimeException {
-        loopLevel++;
+        runtime.loopLevel++;
 
         if (node.init != null) {
             node.init.accept(this);
@@ -387,18 +402,18 @@ public class Interpreter extends Visitor {
                 break;
             }
 
-            if (returnValue != null) {
-                loopLevel--;
-                loopStatus = LoopStatus.NONE;
-                return returnValue;
+            if (runtime.returnValue != null) {
+                runtime.loopLevel--;
+                runtime.loopStatus = LoopStatus.NONE;
+                return runtime.returnValue;
             }
 
-            if (loopStatus == LoopStatus.BREAK) {
+            if (runtime.loopStatus == LoopStatus.BREAK) {
                 break;
             }
 
-            if (loopStatus == LoopStatus.CONTINUE) {
-                loopStatus = LoopStatus.NONE;
+            if (runtime.loopStatus == LoopStatus.CONTINUE) {
+                runtime.loopStatus = LoopStatus.NONE;
                 continue;
             }
 
@@ -409,7 +424,7 @@ public class Interpreter extends Visitor {
             condition = (Boolean) node.condition.accept(this);
         }
 
-        loopStatus = LoopStatus.NONE;
+        runtime.loopStatus = LoopStatus.NONE;
 
         /*
         运行到这里说明已经跳出循环了
@@ -418,14 +433,14 @@ public class Interpreter extends Visitor {
             result = node.elseBody.accept(this);
         }
 
-        loopLevel--;
+        runtime.loopLevel--;
 
         return result;
     }
 
     @Override
     public Object goUntil(UntilNode node) throws RuntimeException {
-        loopLevel++;
+        runtime.loopLevel++;
 
         boolean purpose = (Boolean) node.purpose.accept(this);
         boolean flag = purpose;
@@ -438,25 +453,25 @@ public class Interpreter extends Visitor {
                 break;
             }
 
-            if (returnValue != null) {
-                loopLevel--;
-                loopStatus = LoopStatus.NONE;
-                return returnValue;
+            if (runtime.returnValue != null) {
+                runtime.loopLevel--;
+                runtime.loopStatus = LoopStatus.NONE;
+                return runtime.returnValue;
             }
 
-            if (loopStatus == LoopStatus.BREAK) {
+            if (runtime.loopStatus == LoopStatus.BREAK) {
                 break;
             }
 
-            if (loopStatus == LoopStatus.CONTINUE) {
-                loopStatus = LoopStatus.NONE;
+            if (runtime.loopStatus == LoopStatus.CONTINUE) {
+                runtime.loopStatus = LoopStatus.NONE;
                 continue;
             }
 
             purpose = (Boolean) node.purpose.accept(this);
         }
 
-        loopStatus = LoopStatus.NONE;
+        runtime.loopStatus = LoopStatus.NONE;
 
         /*
         运行到这里说明已经跳出循环了
@@ -465,18 +480,18 @@ public class Interpreter extends Visitor {
             result = node.elseBody.accept(this);
         }
 
-        loopLevel--;
+        runtime.loopLevel--;
 
         return result;
     }
 
     @Override
     public Object goFunction(FunctionNode node) throws RuntimeException {
-        if (functions.containsKey(node.name)) {
+        if (runtime.functions.containsKey(node.name)) {
             throw new RuntimeException(node.position, String.format("The function \"%s\" has already been declared", node.name));
         }
 
-        functions.put(node.name, new BtFunction(this, node));
+        runtime.functions.put(node.name, new BtFunction(this, node));
 
         return null;
     }
@@ -494,23 +509,30 @@ public class Interpreter extends Visitor {
                         builder.append("\t");
                 }
 
-                if (node.name.equals("print"))
-                    System.out.print(builder);
-                else
-                    System.out.println(builder);
+                if (node.name.equals("print")) {
+                    if (runtime.logger == null)
+                        System.out.print(builder);
+                    else
+                        runtime.logger.info(builder);
+                } else {
+                    if (runtime.logger == null)
+                        System.out.println(builder);
+                    else
+                        runtime.logger.info(builder);
+                }
                 return null;
             }
 
             default: {
                 try {
-                    BtFunction function = this.findFunction(node.name);
+                    BtFunction function = runtime.findFunction(node.name);
                     ArrayList<Object> args = new ArrayList<>();
 
                     for (int i = 0; i < node.args.size(); i++) {
                         args.add(node.args.get(i).accept(this));
                     }
 
-                    return function.callFV(args.toArray());
+                    return function.invokeFV(args.toArray());
                 } catch (BulletException e) {
                     throw new RuntimeException(node.position, e.getMessage());
                 }
@@ -520,86 +542,40 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goReturn(ReturnNode node) throws RuntimeException {
-        if (returnValue != null) {
-            return returnValue;
+        if (runtime.returnValue != null) {
+            return runtime.returnValue;
         }
 
-        return returnValue = node.left.accept(this);
+        return runtime.returnValue = node.left.accept(this);
     }
 
     @Override
     public Object goBreak(BreakNode node) throws RuntimeException {
-        if (loopLevel == 0) {
+        if (runtime.loopLevel == 0) {
             throw new RuntimeException(node.position, "Does not match the corresponding loop body");
         }
 
-        loopStatus = LoopStatus.BREAK;
+        runtime.loopStatus = LoopStatus.BREAK;
         return null;
     }
 
     @Override
     public Object goContinue(ContinueNode node) throws RuntimeException {
-        if (loopLevel == 0) {
+        if (runtime.loopLevel == 0) {
             throw new RuntimeException(node.position, "Does not match the corresponding loop body");
         }
 
-        loopStatus = LoopStatus.CONTINUE;
+        runtime.loopStatus = LoopStatus.CONTINUE;
         return null;
     }
 
     @Override
     public Object goProvide(ProvideNode node) throws RuntimeException {
-        if (provideInterfaces.containsKey(node.name)) {
+        if (runtime.provideInterfaces.containsKey(node.name)) {
             throw new RuntimeException(node.position, String.format("Interface \"%s\" has been defined", node.name));
         }
 
-        provideInterfaces.put(node.name, node.node);
+        runtime.provideInterfaces.put(node.name, new BtInterface(this, node));
         return null;
-    }
-
-    //////////////////////////////////////
-    //////////////////////////////////////
-    //////////////////////////////////////
-
-    private BtScope createScope(BlockNode node) {
-        BtScope btScope = new BtScope();
-        btScope.position = node.position;
-        btScope.node = node;
-        btScope.from = this.scope;
-
-        return btScope;
-    }
-
-    private BtFunction findFunction(String name) throws UnderfineException {
-        if (!functions.containsKey(name)) {
-            throw new UnderfineException(UnderfineException.UnderfineType.FUNCTION, name);
-        }
-
-        return functions.get(name);
-    }
-
-    public final BtFunction getFunction(String name) {
-        try {
-            return this.findFunction(name);
-        } catch (UnderfineException e) {
-            return null;
-        }
-    }
-
-    public final boolean executeInterface(String name) throws RuntimeException {
-        if (!provideInterfaces.containsKey(name)) {
-            return false;
-        }
-
-        provideInterfaces.get(name).accept(this);
-        return true;
-    }
-
-    public final Object getAttribute(String name) throws UnderfineException {
-        if (!provideAttributes.containsKey(name)) {
-            throw new UnderfineException(UnderfineException.UnderfineType.PROVIDE_ATTRIBUTE, name);
-        }
-
-        return provideAttributes.get(name);
     }
 }

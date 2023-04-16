@@ -7,9 +7,17 @@ import org.bullet.compiler.lexer.Position;
  */
 
 public class Reporter {
-    public static void report(Position position, String ... messages) {
+    public static String report(String exName, Position position, String ... messages) {
         StringBuilder builder = new StringBuilder();
         StringBuilder builder1 = new StringBuilder();
+
+        builder.append(exName);
+
+        if (position.path != null) {
+            builder.append(" (").append(position.path).append(")");
+        }
+
+        builder.append(":\n");
 
         for (String msg : messages) {
             builder1.append(msg);
@@ -35,7 +43,7 @@ public class Reporter {
 
         builder.append(String.format(" at line %d, column %d:  %s", position.y, position.x, builder1)).append("\n");
 
-        System.out.println(builder);
+        return builder.toString();
     }
 
 

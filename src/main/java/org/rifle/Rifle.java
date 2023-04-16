@@ -22,7 +22,7 @@ public class Rifle {
     private final RifleDataFolder dataFolder;
     private static Rifle instance;
 
-    public Rifle() {
+    public Rifle() throws Exception {
         System.setProperty("nashorn.args", "--no-deprecation-warning");
 
         instance = this;
@@ -153,7 +153,7 @@ public class Rifle {
         return instance;
     }
 
-    private void onLoad() {
+    private void onLoad() throws Exception {
         init();
         getModuleManager().loadModules();
     }

@@ -1,14 +1,20 @@
-name := "Bullet";
-age := 0;
-var author = "Huyemt";
+@ name = "bulletModule"
+@ version = "-dev";
+@ authors = "Huyemt";
+@ canBeSelect = false;
 
-until (age == 1) {
-    age += 1;
+@ onLoad {
+    println("Bullet模块加载");
 }
 
-function information() {
-    println("我是 " + name + " 语言，今年 " + age + " 岁");
-    println("我的作者是 " + author);
+@ onSelected {
+    println("Bullet模块被选用");
 }
 
-information();
+@ onQuit {
+    println("Bullet模块被弃用");
+}
+
+@ onDisable {
+    println("Bullet模块卸载");
+}

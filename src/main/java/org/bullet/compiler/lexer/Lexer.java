@@ -61,8 +61,8 @@ public class Lexer implements ILexer {
     }
 
     public Lexer(String source) throws ParsingException {
-        position = new Position(source);
-        peekPosition = new Position(source);
+        position = new Position(source, null);
+        peekPosition = new Position(source, null);
 
         this.next();
     }
@@ -75,7 +75,7 @@ public class Lexer implements ILexer {
             throw new FileCorruptingExceiption("This file is corrupted");
         }
 
-        position = new Position(s);
+        position = new Position(s, source.getAbsolutePath());
 
         this.next();
     }

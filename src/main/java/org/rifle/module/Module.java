@@ -50,7 +50,7 @@ public abstract class Module implements IModule {
         return "~";
     }
 
-    public void init(String main, File jar) {
+    public void init(String main, File file) {
         if (initialized)
             return;
         String name = getModuleName().trim().replace("  ", " ").replace(" ", "_");
@@ -58,7 +58,7 @@ public abstract class Module implements IModule {
         initialized = true;
         moduleDescription = new ModuleDescription(main, name, getModuleVersion(), getModuleWebsite(), getModuleStringDescription(), getModuleAuthors());
         logger = new ModuleLogger(name);
-        dataFolder = new ModuleDataFolder(jar, getModuleDescription().getName());
+        dataFolder = new ModuleDataFolder(file, getModuleDescription().getName());
     }
 
     @Override

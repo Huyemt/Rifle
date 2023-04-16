@@ -1,4 +1,4 @@
-package org.bullet.base;
+package org.bullet.base.components;
 
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.compiler.lexer.Position;
@@ -59,13 +59,7 @@ public class BtScope {
 
         while (block != null) {
             if (block.variables.containsKey(name)) {
-                BtVariable btVariable = block.variables.get(name);
-                if (!btVariable.canChange) {
-                    throw new BulletException(String.format("Cannot modify variable \"%s\" of immutable type", name));
-                }
-
-                btVariable.value = value;
-                return btVariable;
+                return block.variables.get(name).setValue(value);
             }
 
             block = block.from;
@@ -79,11 +73,7 @@ public class BtScope {
             throw new DefinedException(DefinedException.DerfinedType.VARIABLE, name);
         }
 
-        BtVariable btVariable = new BtVariable();
-        btVariable.name = name;
-        btVariable.value = value;
-        btVariable.canChange = canChange;
-
+        BtVariable btVariable = new BtVariable(name, value, canChange);
         variables.put(name, btVariable);
 
         return btVariable;

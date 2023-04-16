@@ -45,7 +45,7 @@ public class ModuleManager {
      * @param file
      * @return boolean
      */
-    public synchronized final boolean load(File file) {
+    public synchronized final boolean load(File file) throws Exception {
         IModule module = loader.loadModule(file);
         if (module == null)
             return false;
@@ -76,7 +76,7 @@ public class ModuleManager {
         return true;
     }
 
-    public synchronized final void loadModules() {
+    public synchronized final void loadModules() throws Exception {
         File f = Rifle.getInstance().getDataFolder().getModulesDir();
         if (f.exists() && !f.isFile()) {
             File[] files = f.listFiles();

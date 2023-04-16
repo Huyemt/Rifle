@@ -6,14 +6,16 @@ package org.bullet.compiler.lexer;
 
 public class Position {
     public final String source;
+    public final String path;
     public int lineX = 0;
     public int x = -1;
     public int y = 1;
     public int index = -1;
     public Character currentChar = '\0';
 
-    public Position(String source) {
+    public Position(String source, String path) {
         this.source = source == null ? "" : source;
+        this.path = path;
 
         next();
     }
@@ -26,7 +28,7 @@ public class Position {
 
     @Override
     public Position clone() {
-        Position position = new Position(source);
+        Position position = new Position(source, path);
         position.index = index;
         position.lineX = lineX;
         position.x = x;

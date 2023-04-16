@@ -1,4 +1,4 @@
-package org.bullet.base;
+package org.bullet.base.components;
 
 import org.bullet.compiler.ast.nodes.BlockNode;
 
