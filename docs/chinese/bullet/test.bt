@@ -1,26 +1,25 @@
 @ name = "bulletModule"
-@ version = "-dev";
-@ authors = "Huyemt";
-@ canBeSelect = true;
+@ version = "0.0.1"
+@ authors = "Huyemt"
+@ canBeSelect = false
+@ description = "由Huyemt设计的Bullet语言所编写的Rifle模块"
+@ website = "http://github.com/Huyemt/Rifle"
 
 @ onLoad {
-    println("Bullet模块加载");
-    value := "\n";
-    n := 10;
-    for ( i := 1; i <= n; i += 1) {
-        value = value + " " * (n - i) + "*" * (2 * i - 1) + "\n";
+    println("\n计算n为20的斐波那契数列值 -> " + fibonacci(20) + "\n画高为10的三角形 -> \n" + angle(10))
+}
+
+function angle ( n ) {
+    angle := "\n"
+    for (var i = 1; i <= 10; i += 1) {
+        angle += " " * (10 - i) + "*" * (2 * i - 1) + "\n"
     }
-    println(value);
+
+    return angle
 }
 
-@ onSelected {
-    println("Bullet模块被选用");
-}
+function fibonacci (n) {
+    if (n <= 2) return 1
 
-@ onQuit {
-    println("Bullet模块被弃用");
-}
-
-@ onDisable {
-    println("Bullet模块卸载");
+    return fibonacci(n - 1) + fibonacci(n - 2)
 }
