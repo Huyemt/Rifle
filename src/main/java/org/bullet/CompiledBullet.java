@@ -3,10 +3,8 @@ package org.bullet;
 import org.bullet.base.components.BtFunction;
 import org.bullet.base.components.BtInterface;
 import org.bullet.base.components.BtVariable;
-import org.bullet.exceptions.BulletException;
-import org.bullet.exceptions.ParsingException;
+import org.bullet.exceptions.*;
 import org.bullet.exceptions.RuntimeException;
-import org.bullet.exceptions.UnderfineException;
 import org.bullet.interpreter.BulletRuntime;
 import org.bullet.interpreter.Interpreter;
 
@@ -30,7 +28,7 @@ public class CompiledBullet {
         evaled = false;
     }
 
-    public CompiledBullet(File file, BulletRuntime runtime) throws ParsingException, IOException, RuntimeException {
+    public CompiledBullet(File file, BulletRuntime runtime) throws ParsingException, IOException, RuntimeException, FileCorruptingExceiption {
         this.runtime = runtime;
         interpreter = new Interpreter(file, this.runtime);
         result = null;

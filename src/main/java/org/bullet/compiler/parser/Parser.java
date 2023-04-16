@@ -45,7 +45,7 @@ public class Parser implements IParser {
     public Node Function() throws ParsingException {
         if (lexer.currentToken.kind == TokenKind.FUNCTION) {
             if (provideParsing) {
-                throw new ParsingException(lexer.position, "The keyword \"provide\" can only be used globally");
+                throw new ParsingException(lexer.position, "The keyword \"@\" can only be used globally");
             }
 
             if (functionParsing) {
@@ -132,7 +132,10 @@ public class Parser implements IParser {
         node.position = lexer.position.clone();
         lexer.next();
         node.left = this.Expression();
-        lexer.expectToken(TokenKind.SEMICOLON);
+
+        while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
+            lexer.next();
+        }
 
         return node;
     }
@@ -150,9 +153,15 @@ public class Parser implements IParser {
         if (lexer.currentToken.kind != TokenKind.SRPAREN) {
             node.args.add(this.Assign());
 
-            while (lexer.currentToken.kind == TokenKind.COMMA) {
-                lexer.next();
-                node.args.add(this.Assign());
+            if (lexer.currentToken.kind == TokenKind.COMMA) {
+                while (lexer.currentToken.kind == TokenKind.COMMA) {
+                    lexer.next();
+                    node.args.add(this.Assign());
+
+                    if (lexer.currentToken.kind == TokenKind.SRPAREN) {
+                        break;
+                    }
+                }
             }
         }
 
@@ -252,7 +261,9 @@ public class Parser implements IParser {
             node.left = this.Expression();
         }
 
-        lexer.expectToken(TokenKind.SEMICOLON);
+        while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
+            lexer.next();
+        }
 
         return node;
     }
@@ -413,7 +424,11 @@ public class Parser implements IParser {
         BreakNode node = new BreakNode();
         node.position = lexer.position.clone();
         lexer.next();
-        lexer.expectToken(TokenKind.SEMICOLON);
+
+        while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
+            lexer.next();
+        }
+
         return node;
     }
 
@@ -426,7 +441,10 @@ public class Parser implements IParser {
         ContinueNode node = new ContinueNode();
         node.position = lexer.position.clone();
         lexer.next();
-        lexer.expectToken(TokenKind.SEMICOLON);
+
+        while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
+            lexer.next();
+        }
         return node;
     }
 

@@ -1,8 +1,12 @@
 package org.rifle.manager;
 
+import org.bullet.Reporter;
+import org.bullet.exceptions.BulletException;
+import org.bullet.exceptions.ParsingException;
 import org.rifle.Rifle;
 import org.rifle.module.IModule;
 import org.rifle.module.ModuleLoader;
+import org.rifle.utils.TextFormat;
 
 import java.io.File;
 import java.util.HashMap;
@@ -45,18 +49,32 @@ public class ModuleManager {
      * @param file
      * @return boolean
      */
-    public synchronized final boolean load(File file) throws Exception {
-        IModule module = loader.loadModule(file);
-        if (module == null)
-            return false;
+    public synchronized final boolean load(File file) {
+        try {
+            IModule module = loader.loadModule(file);
+            if (module == null)
+                return false;
 
-        if (exists(module.getModuleDescription().getName())) {
-            Rifle.getInstance().getLogger().error("The module is already loaded or the name of the module conflicts: " + module.getModuleDescription().getMain());
+            if (exists(module.getModuleDescription().getName())) {
+                Rifle.getInstance().getLogger().error("The module is already loaded or the name of the module conflicts: " + module.getModuleDescription().getMain());
+                return false;
+            }
+
+            modules.put(module.getModuleDescription().getName().toLowerCase(), module);
+            return true;
+        } catch (Exception e) {
+            if (e instanceof BulletException) {
+                if (e instanceof ParsingException) {
+                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((ParsingException) e).position, e.getMessage())));
+                } else {
+                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                }
+                return false;
+            }
+
+            Rifle.getInstance().getLogger().error(String.format("\n%s", e.getMessage()));
             return false;
         }
-
-        modules.put(module.getModuleDescription().getName().toLowerCase(), module);
-        return true;
     }
 
     /**
@@ -76,7 +94,7 @@ public class ModuleManager {
         return true;
     }
 
-    public synchronized final void loadModules() throws Exception {
+    public synchronized final void loadModules() {
         File f = Rifle.getInstance().getDataFolder().getModulesDir();
         if (f.exists() && !f.isFile()) {
             File[] files = f.listFiles();

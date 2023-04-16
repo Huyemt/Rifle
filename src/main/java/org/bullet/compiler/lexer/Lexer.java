@@ -76,6 +76,7 @@ public class Lexer implements ILexer {
         }
 
         position = new Position(s, source.getAbsolutePath());
+        peekPosition = new Position(s, source.getAbsolutePath());
 
         this.next();
     }

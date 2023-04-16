@@ -46,8 +46,24 @@ public class Interpreter extends Visitor {
         this.runtime = runtime;
     }
 
-    public Interpreter(File file, BulletRuntime runtime) throws ParsingException, IOException {
-        this(Utils.readFile(file), runtime);
+    public Interpreter(File file, BulletRuntime runtime) throws ParsingException, FileCorruptingExceiption {
+        Lexer lexer = new Lexer(file);
+        Parser parser = new Parser(lexer);
+        ProgramNode programNode = parser.Parse();
+
+        BlockNode blockNode = new BlockNode();
+        blockNode.position = programNode.position;
+        blockNode.statements = programNode.statements;
+        blockNode.level = 0;
+
+        BtScope scope = new BtScope();
+        scope.position = programNode.position;
+        scope.from = null;
+        scope.node = blockNode;
+
+        runtime.scope = scope;
+
+        this.runtime = runtime;
     }
 
     public Object eval() throws RuntimeException {
@@ -76,7 +92,7 @@ public class Interpreter extends Visitor {
                     if (right instanceof BigDecimal) {
                         return ((BigDecimal) left).add((BigDecimal) right);
                     } else if (right instanceof String) {
-                        return String.valueOf(left) + right;
+                        return String.valueOf(left).concat(right.toString());
                     }
 
                     throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getName()));
@@ -153,7 +169,7 @@ public class Interpreter extends Visitor {
             }
         } else if (left instanceof String) {
             if (node.operator == BinaryNode.Operator.ADD) {
-                return left + String.valueOf(right);
+                return ((String) left).concat(String.valueOf(right));
             }
 
             if (node.operator == BinaryNode.Operator.MUL && right instanceof BigDecimal) {
@@ -261,24 +277,77 @@ public class Interpreter extends Visitor {
             Object left = node.left.accept(this);
             Object right = node.right.accept(this);
 
-            switch (node.operator) {
-                case ADD:
-                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).add((BigDecimal) right)).getValue();
-                case SUB:
-                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).subtract((BigDecimal) right)).getValue();
-                case MUL:
-                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).multiply((BigDecimal) right)).getValue();
-                case DIV:
-                    if (((BigDecimal) right).intValue() == 0) {
-                        throw new RuntimeException(node.position, "Cannot divide by zero");
+            if (left instanceof BigDecimal) {
+                switch (node.operator) {
+                    case ADD: {
+                        if (right instanceof BigDecimal) {
+                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).add((BigDecimal) right)).getValue();
+                        } else if (right instanceof String) {
+                            return runtime.scope.changeVariable(node.left.name, String.valueOf(left) + right).getValue();
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getName()));
                     }
 
-                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN)).getValue();
-                case POW:
-                    return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).pow(((BigDecimal) right).intValueExact())).getValue();
-                default:
-                    throw new RuntimeException(node.position, "Unsupported complex assignment operator");
+                    case SUB: {
+                        if (right instanceof BigDecimal) {
+                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).subtract((BigDecimal) right)).getValue();
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    }
+
+                    case MUL: {
+                        if (right instanceof BigDecimal) {
+                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).multiply((BigDecimal) right)).getValue();
+                        } else if (right instanceof String) {
+                            return runtime.scope.changeVariable(node.left.name, ((String) right).repeat(((BigDecimal) left).intValueExact())).getValue();
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    }
+
+                    case DIV: {
+                        if (right instanceof BigDecimal) {
+                            if (((BigDecimal) right).intValue() == 0) {
+                                throw new RuntimeException(node.position, "Cannot divide by zero");
+                            }
+
+                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN)).getValue();
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    }
+
+                    case POW: {
+                        if (right instanceof BigDecimal) {
+                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).pow(((BigDecimal) right).intValueExact())).getValue();
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    }
+                }
+            } else if (left instanceof String) {
+                switch (node.operator) {
+                    case ADD: {
+                        if (right instanceof BigDecimal || right instanceof String) {
+                            return runtime.scope.changeVariable(node.left.name, ((String) left).concat(right.toString())).getValue();
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    }
+
+                    case MUL: {
+                        if (right instanceof BigDecimal) {
+                            return runtime.scope.changeVariable(node.left.name, ((String) left).repeat(((BigDecimal) right).intValueExact())).getValue();
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    }
+                }
             }
+
+            throw new RuntimeException(node.position, "Complex assignment operation is not supported by this type");
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }

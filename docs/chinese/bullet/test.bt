@@ -1,10 +1,16 @@
 @ name = "bulletModule"
 @ version = "-dev";
 @ authors = "Huyemt";
-@ canBeSelect = false;
+@ canBeSelect = true;
 
 @ onLoad {
     println("Bullet模块加载");
+    value := "\n";
+    n := 10;
+    for ( i := 1; i <= n; i += 1) {
+        value = value + " " * (n - i) + "*" * (2 * i - 1) + "\n";
+    }
+    println(value);
 }
 
 @ onSelected {
