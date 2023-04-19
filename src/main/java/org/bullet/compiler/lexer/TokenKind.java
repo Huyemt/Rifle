@@ -62,6 +62,8 @@ public enum TokenKind {
      */
     SLPAREN("("),
     SRPAREN(")"),
+    MLPAREN("["),
+    MRPAREN("]"),
     BLPAREN("{"),
     BRPAREN("}"),
     ASSIGN("="),

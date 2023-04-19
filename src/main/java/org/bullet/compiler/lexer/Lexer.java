@@ -2,6 +2,8 @@ package org.bullet.compiler.lexer;
 
 import org.bullet.exceptions.FileCorruptingExceiption;
 import org.bullet.exceptions.ParsingException;
+import org.huyemt.crypto4j.Crypto4J;
+import org.huyemt.crypto4j.digest.Unicode;
 import org.rifle.utils.Utils;
 
 import java.io.File;
@@ -29,6 +31,8 @@ public class Lexer implements ILexer {
         tokens.put("/", TokenKind.SLASH);
         tokens.put("(", TokenKind.SLPAREN);
         tokens.put(")", TokenKind.SRPAREN);
+        tokens.put("[", TokenKind.MLPAREN);
+        tokens.put("]", TokenKind.MRPAREN);
         tokens.put("{", TokenKind.BLPAREN);
         tokens.put("}", TokenKind.BRPAREN);
         tokens.put(",", TokenKind.COMMA);
@@ -292,7 +296,7 @@ public class Lexer implements ILexer {
         this.makeToken(TokenKind.IDENTIFIER, identifier);
     }
 
-    private void makeString() {
+    private void makeString() throws ParsingException {
         position.next();
 
         StringBuilder builder = new StringBuilder();
@@ -318,6 +322,23 @@ public class Lexer implements ILexer {
                 } else if (c == '\"') {
                     builder.append('\"');
                     position.next();
+                } else if (c == 'u') {
+                    position.next();
+
+                    for (int i = 1; i <= 4; i++) {
+                        if (!Character.isLetterOrDigit(peekChar(i))) {
+                            throw new ParsingException(position, "Wrong unicode format");
+                        }
+                    }
+
+                    position.next();
+                    int start = position.index;
+
+                    for (int i = 0; i < 3; i++) {
+                        position.next();
+                    }
+
+                    builder.append(Crypto4J.Unicode.decrypt("\\u".concat(position.source.substring(start, position.index + 1))));
                 } else builder.append(position.currentChar);
             } else {
                 builder.append(position.currentChar);

@@ -15,7 +15,10 @@ public class Shell {
     public static void main(String[] args) {
         try {
             CompiledBullet compiled = new CompiledBullet(new File("E:\\AMyCode\\Tool\\Rifle\\modules\\test.bt"), new BulletRuntime());
-            compiled.eval();
+//            compiled.eval();
+//            compiled.invokeInterface("onSelected");
+            CompiledBullet compiledBullet = new CompiledBullet("println(\"\\u6597\\u7834\\u82cd\\u7a79\\u6c38\\u8fdc\\u7684\\u795e\")", new BulletRuntime());
+            compiledBullet.eval();
         } catch (ParsingException e) {
             System.out.println(Reporter.report(e.getClass().getName(), e.position, e.getMessage()));
         } catch (RuntimeException e) {
