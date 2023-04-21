@@ -1,4 +1,6 @@
-package org.bullet.exceptions;
+package org.bullet.exceptions.common;
+
+import org.bullet.exceptions.BulletException;
 
 /**
  * @author Huyemt

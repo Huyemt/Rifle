@@ -2,7 +2,7 @@ package org.bullet.interpreter;
 
 import org.bullet.base.components.*;
 import org.bullet.compiler.ast.nodes.BlockNode;
-import org.bullet.exceptions.UnderfineException;
+import org.bullet.exceptions.common.UnderfineException;
 import org.rifle.console.logger.Logger;
 
 import java.util.HashMap;

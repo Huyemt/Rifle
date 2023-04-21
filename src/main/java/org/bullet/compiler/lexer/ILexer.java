@@ -1,6 +1,6 @@
 package org.bullet.compiler.lexer;
 
-import org.bullet.exceptions.ParsingException;
+import org.bullet.exceptions.common.ParsingException;
 
 /**
  * @author Huyemt

@@ -1,5 +1,6 @@
 package org.bullet.compiler.ast;
 
+import org.bullet.base.types.BtArray;
 import org.bullet.compiler.ast.nodes.*;
 import org.bullet.exceptions.RuntimeException;
 
@@ -27,4 +28,5 @@ public abstract class Visitor {
     public abstract Object goBreak(BreakNode node) throws RuntimeException;
     public abstract Object goContinue(ContinueNode node) throws RuntimeException;
     public abstract Object goProvide(ProvideNode node) throws RuntimeException;
+    public abstract BtArray goArray(ArrayNode node) throws RuntimeException;
 }

@@ -2,7 +2,7 @@ package org.rifle.manager;
 
 import org.bullet.Reporter;
 import org.bullet.exceptions.BulletException;
-import org.bullet.exceptions.ParsingException;
+import org.bullet.exceptions.common.ParsingException;
 import org.rifle.Rifle;
 import org.rifle.module.IModule;
 import org.rifle.module.ModuleLoader;

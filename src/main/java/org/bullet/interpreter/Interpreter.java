@@ -4,6 +4,7 @@ import org.bullet.base.components.BtFunction;
 import org.bullet.base.components.BtInterface;
 import org.bullet.base.components.BtVariable;
 import org.bullet.base.components.BtScope;
+import org.bullet.base.types.BtArray;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.compiler.ast.nodes.*;
@@ -11,10 +12,11 @@ import org.bullet.compiler.lexer.Lexer;
 import org.bullet.compiler.parser.Parser;
 import org.bullet.exceptions.*;
 import org.bullet.exceptions.RuntimeException;
-import org.rifle.utils.Utils;
+import org.bullet.exceptions.common.DefinedException;
+import org.bullet.exceptions.common.FileCorruptingExceiption;
+import org.bullet.exceptions.common.ParsingException;
 
 import java.io.File;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -167,7 +169,7 @@ public class Interpreter extends Visitor {
                 default:
                     throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
             }
-        } else if (left instanceof String) {
+        } else if (left instanceof String && !(right instanceof BtArray)) {
             if (node.operator == BinaryNode.Operator.ADD) {
                 return ((String) left).concat(String.valueOf(right));
             }
@@ -177,6 +179,13 @@ public class Interpreter extends Visitor {
             }
 
             throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\" and \"*\"");
+        } else if (left instanceof BtArray && right instanceof BtArray) {
+            if (node.operator == BinaryNode.Operator.ADD) {
+                ((BtArray) left).vector.addAll(((BtArray) right).vector);
+                return left;
+            }
+
+            throw new RuntimeException(node.position, "Arrays cannot perform operations other than \"+\"");
         }
 
         throw new RuntimeException(node.position, "Unsupported type operation");
@@ -225,11 +234,42 @@ public class Interpreter extends Visitor {
     @Override
     public Object goVariable(VariableNode node) throws RuntimeException {
         try {
-            if (runtime.environment != null && runtime.environment.params.containsKey(node.name)) {
-                return runtime.environment.params.get(node.name);
+            Object v = runtime.environment != null && runtime.environment.params.containsKey(node.name) ? runtime.environment.params.get(node.name) : runtime.scope.findVariable(node.name).getValue();
+
+            if (v instanceof BtArray) {
+                BtArray array = (BtArray) v;
+
+                if (node.index.size() == 0) {
+                    return array;
+                }
+
+                Object index;
+                Object rr;
+
+                index = node.index.get(0).accept(this);
+                if (!(index instanceof BigDecimal)) {
+                    throw new RuntimeException(node.index.get(0).position, "Array index can only be a number");
+                }
+
+                rr = array.vector.get(((BigDecimal) index).intValueExact());
+
+                for (int i = 1; i < node.index.size(); i++) {
+                    if (!(rr instanceof BtArray)) {
+                        throw new RuntimeException(node.index.get(i - 1).position, "Only arrays can use numeric indexes");
+                    }
+
+                    index = node.index.get(i).accept(this);
+                    if (!(index instanceof BigDecimal)) {
+                        throw new RuntimeException(node.index.get(i).position, "Array index can only be a number");
+                    }
+
+                    rr = ((BtArray) rr).vector.get(((BigDecimal) index).intValueExact());
+                }
+
+                return rr;
             }
 
-            return runtime.scope.findVariable(node.name).getValue();
+            return v;
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
@@ -238,31 +278,105 @@ public class Interpreter extends Visitor {
     @Override
     public Object goAssign(AssignNode node) throws RuntimeException {
         if (node.left instanceof VariableNode) {
-            String name = ((VariableNode) node.left).name;
+            VariableNode variable = (VariableNode) node.left;
             Object result = node.right.accept(this);
 
             try {
-                if (runtime.environment != null && runtime.environment.params.containsKey(name)) {
-                    runtime.environment.params.put(name, result);
+                if (runtime.environment != null && runtime.environment.params.containsKey(variable.name)) {
+                    if (variable.index.size() == 0) {
+                        runtime.environment.params.put(variable.name, result);
+                    } else {
+                        Object v = runtime.environment.params.get(variable.name);
+                        if (runtime.environment.params.get(variable.name) instanceof BtArray) {
+                            BtArray array = (BtArray) v;
+
+                            Object index = null;
+                            Object rr = null;
+
+                            for (int i = 0; i < variable.index.size() - 1; i++) {
+                                index = variable.index.get(i).accept(this);
+                                if (!(index instanceof BigDecimal)) {
+                                    throw new RuntimeException(variable.index.get(i).position, "Array index can only be a number");
+                                }
+
+                                rr = rr == null ? array.vector.get(((BigDecimal) index).intValueExact()) : ((BtArray) rr).vector.get(((BigDecimal) index).intValueExact());
+                                if (!(rr instanceof BtArray)) {
+                                    throw new RuntimeException(variable.index.get(i).position, "Only arrays can use numeric indexes");
+                                }
+                            }
+
+                            int i = ((BigDecimal) variable.index.get(variable.index.size() - 1).accept(this)).intValueExact();
+
+                            if (rr == null) {
+                                array.vector.set(i, result);
+                            } else {
+                                ((BtArray) rr).vector.set(i, result);
+                            }
+
+                            return array;
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Variable \"%s\" is not an array", variable.name));
+                    }
+
                     return result;
                 }
 
                 if (node.isProvide) {
-                    if (runtime.provideAttributes.containsKey(name)) {
-                        throw new DefinedException(DefinedException.DerfinedType.PROVIDE_ATTRIBUTE, name);
+                    if (runtime.provideAttributes.containsKey(variable.name)) {
+                        throw new DefinedException(DefinedException.DerfinedType.PROVIDE_ATTRIBUTE, variable.name);
                     }
 
-                    runtime.provideAttributes.put(name, result);
+                    runtime.provideAttributes.put(variable.name, result);
                     return result;
                 }
 
-                BtVariable variable = node.createAction ? runtime.scope.createVariable(name, result) : runtime.scope.changeVariable(name, result);
+                if (variable.index.size() == 0) {
+                    BtVariable variable1 = node.createAction ? runtime.scope.createVariable(variable.name, result) : runtime.scope.changeVariable(variable.name, result);
 
-                if (node.createAction) {
-                    variable.canChange = node.canChange;
+                    if (node.createAction) {
+                        variable1.canChange = node.canChange;
+                    }
+
+                    return variable1.getValue();
+                } else {
+                    if (node.createAction) {
+                        throw new RuntimeException(node.position, "Array access cannot be performed when variables are declared");
+                    }
+
+                    BtVariable v = runtime.scope.findVariable(variable.name);
+
+                    if (v.getValue() instanceof BtArray) {
+                        BtArray array = (BtArray) v.getValue();
+
+                        Object index;
+                        Object rr = null;
+
+                        for (int i = 0; i < variable.index.size() - 1; i++) {
+                            index = variable.index.get(i).accept(this);
+                            if (!(index instanceof BigDecimal)) {
+                                throw new RuntimeException(variable.index.get(i).position, "Array index can only be a number");
+                            }
+
+                            rr = rr == null ? array.vector.get(((BigDecimal) index).intValueExact()) : ((BtArray) rr).vector.get(((BigDecimal) index).intValueExact());
+                            if (!(rr instanceof BtArray)) {
+                                throw new RuntimeException(variable.index.get(i).position, "Only arrays can use numeric indexes");
+                            }
+                        }
+
+                        int i = ((BigDecimal) variable.index.get(variable.index.size() - 1).accept(this)).intValueExact();
+
+                        if (rr == null) {
+                            array.vector.set(i, result);
+                        } else {
+                            ((BtArray) rr).vector.set(i, result);
+                        }
+
+                        return array;
+                    }
+
+                    throw new RuntimeException(node.position, String.format("Variable \"%s\" is not an array", variable.name));
                 }
-
-                return variable.getValue();
             } catch (BulletException e) {
                 throw new RuntimeException(node.position, e.getMessage());
             }
@@ -646,5 +760,16 @@ public class Interpreter extends Visitor {
 
         runtime.provideInterfaces.put(node.name, new BtInterface(this, node));
         return null;
+    }
+
+    @Override
+    public BtArray goArray(ArrayNode node) throws RuntimeException {
+        BtArray array = new BtArray();
+
+        for (int i = 0; i < node.values.size(); i++) {
+            array.vector.add(node.values.get(i).accept(this));
+        }
+
+        return array;
     }
 }

@@ -1,25 +1,27 @@
-@ name = "bulletModule"
-@ version = "0.0.1"
-@ authors = "Huyemt"
-@ canBeSelect = false
-@ description = "由Huyemt设计的Bullet语言所编写的Rifle模块"
-@ website = "http://github.com/Huyemt/Rifle"
-
-@ onLoad {
-    println("\n计算n为20的斐波那契数列值 -> " + fibonacci(20) + "\n画高为10的三角形 -> \n" + angle(10))
+function parr( arr ) {
+    println( arr[0] + arr[1] )
 }
 
-function angle ( n ) {
-    angle := "\n"
-    for (var i = 1; i <= 10; i += 1) {
-        angle += " " * (10 - i) + "*" * (2 * i - 1) + "\n"
-    }
+arr := [
+    "Hello!",
+    "Im a array of the bullet program."
+]
 
-    return angle
-}
+// 数组索引访问
+parr(arr)
 
-function fibonacci (n) {
-    if (n <= 2) return 1
+// 数组索引修改
+arr[0] = "你好！"
+arr[1] = "我是Bullet程序的数组。"
 
-    return fibonacci(n - 1) + fibonacci(n - 2)
-}
+parr(arr)
+
+arr = [[1, 0], [2, 0], [3, 0]]
+
+// 多维数组
+arr[0][1] = 1
+arr[1][1] = 2
+arr[2][1] = 3
+
+// 数组运算
+println( arr[0] + arr[1] + arr[2] )

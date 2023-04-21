@@ -2,7 +2,7 @@ package org.bullet.compiler.parser;
 
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.*;
-import org.bullet.exceptions.ParsingException;
+import org.bullet.exceptions.common.ParsingException;
 
 /**
  * @author Huyemt
@@ -145,6 +145,8 @@ public interface IParser {
      * @throws ParsingException
      */
     Node Assign() throws ParsingException;
+
+    Node ArrayCall() throws ParsingException;
     Node LogicTerm() throws ParsingException;
     Node LogicFactor() throws ParsingException;
     Node Equal() throws ParsingException;

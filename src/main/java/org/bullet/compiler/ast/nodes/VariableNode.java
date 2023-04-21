@@ -4,6 +4,8 @@ import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.exceptions.RuntimeException;
 
+import java.util.ArrayList;
+
 /**
  * @author Huyemt
  */
@@ -11,9 +13,10 @@ import org.bullet.exceptions.RuntimeException;
 public class VariableNode extends Node {
 
     public String name;
+    public final ArrayList<Node> index;
 
     public VariableNode() {
-
+        index = new ArrayList<>();
     }
 
     @Override

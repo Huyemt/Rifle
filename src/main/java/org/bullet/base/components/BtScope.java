@@ -3,8 +3,8 @@ package org.bullet.base.components;
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.compiler.lexer.Position;
 import org.bullet.exceptions.BulletException;
-import org.bullet.exceptions.DefinedException;
-import org.bullet.exceptions.UnderfineException;
+import org.bullet.exceptions.common.DefinedException;
+import org.bullet.exceptions.common.UnderfineException;
 
 import java.util.HashMap;
 

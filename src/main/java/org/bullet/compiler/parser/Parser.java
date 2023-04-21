@@ -6,7 +6,7 @@ import org.bullet.compiler.lexer.Lexer;
 import org.bullet.compiler.lexer.Position;
 import org.bullet.compiler.lexer.TokenKind;
 import org.bullet.compiler.lexer.VToken;
-import org.bullet.exceptions.ParsingException;
+import org.bullet.exceptions.common.ParsingException;
 
 import java.math.BigDecimal;
 
@@ -565,6 +565,10 @@ public class Parser implements IParser {
                 throw new ParsingException(lexer.position, "Only variables can be assigned values");
             }
 
+            if (((VariableNode) left).index.size() > 0 && createAction) {
+                throw new ParsingException(lexer.position, String.format("Variable \"%s\" is not an array", ((VariableNode) left).name));
+            }
+
             AssignNode node = new AssignNode();
             node.createAction = createAction;
             node.canChange = canChange;
@@ -614,6 +618,23 @@ public class Parser implements IParser {
         }
 
         return left;
+    }
+
+    @Override
+    public Node ArrayCall() throws ParsingException {
+        VariableNode variable = new VariableNode();
+        variable.position = lexer.position.clone();
+        variable.name = ((VToken) lexer.currentToken).value;
+
+        lexer.next(); // identifier
+
+        while (lexer.currentToken.kind == TokenKind.MLPAREN) {
+            lexer.next();
+            variable.index.add(this.Expression());
+            lexer.expectToken(TokenKind.MRPAREN); // ]
+        }
+
+        return variable;
     }
 
     @Override
@@ -787,6 +808,7 @@ public class Parser implements IParser {
 
     @Override
     public Node Primary() throws ParsingException {
+        // 数字
         if (lexer.currentToken.kind == TokenKind.VT_NUMBER) {
             ConstantNode<BigDecimal> node = new ConstantNode<>();
             node.value = new BigDecimal(((VToken)lexer.currentToken).value);
@@ -796,6 +818,7 @@ public class Parser implements IParser {
             return node;
         }
 
+        // 字符串
         if (lexer.currentToken.kind == TokenKind.VT_STRING) {
             ConstantNode<String> node = new ConstantNode<>();
             node.value = ((VToken)lexer.currentToken).value;
@@ -805,6 +828,27 @@ public class Parser implements IParser {
             return node;
         }
 
+        // 数组 []
+        if (lexer.currentToken.kind == TokenKind.MLPAREN) {
+            ArrayNode array = new ArrayNode();
+            array.position = lexer.position.clone();
+
+            lexer.next();
+
+            while (lexer.currentToken.kind != TokenKind.MRPAREN) {
+                array.values.add(this.Assign());
+
+                if (lexer.currentToken.kind == TokenKind.COMMA) {
+                    lexer.next();
+                }
+            }
+
+            lexer.expectToken(TokenKind.MRPAREN);
+
+            return array;
+        }
+
+        // 布尔值 true 和 false
         if (lexer.currentToken.kind == TokenKind.TRUE || lexer.currentToken.kind == TokenKind.FALSE) {
             ConstantNode<Boolean> node = new ConstantNode<>();
             node.value = lexer.currentToken.kind == TokenKind.TRUE;
@@ -814,6 +858,7 @@ public class Parser implements IParser {
             return node;
         }
 
+        // (
         if (lexer.currentToken.kind == TokenKind.SLPAREN) {
             lexer.next();
             Node node = this.Expression();
@@ -822,13 +867,23 @@ public class Parser implements IParser {
             return node;
         }
 
+        // 标识符
         if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
             lexer.beginPeek();
             lexer.next();
 
+            // 函数调用
+            // IDENTIFIER ( Expression... )
             if (lexer.currentToken.kind == TokenKind.SLPAREN) {
                 lexer.endPeek();
                 return this.FunctionCall();
+            }
+
+            // 数组访问
+            // IDENTIFIER [ Expression ]
+            if (lexer.currentToken.kind == TokenKind.MLPAREN) {
+                lexer.endPeek();
+                return this.ArrayCall();
             }
 
             lexer.endPeek();
@@ -846,6 +901,6 @@ public class Parser implements IParser {
             return node;
         }
 
-        throw new ParsingException(lexer.position, String.format("Syntax error \"%s\"", lexer.currentToken));
+        throw new ParsingException(lexer.position, "Syntax error");
     }
 }

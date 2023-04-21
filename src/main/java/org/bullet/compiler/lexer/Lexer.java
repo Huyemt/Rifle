@@ -1,9 +1,8 @@
 package org.bullet.compiler.lexer;
 
-import org.bullet.exceptions.FileCorruptingExceiption;
-import org.bullet.exceptions.ParsingException;
+import org.bullet.exceptions.common.FileCorruptingExceiption;
+import org.bullet.exceptions.common.ParsingException;
 import org.huyemt.crypto4j.Crypto4J;
-import org.huyemt.crypto4j.digest.Unicode;
 import org.rifle.utils.Utils;
 
 import java.io.File;
@@ -88,11 +87,20 @@ public class Lexer implements ILexer {
 
     @Override
     public void next() throws ParsingException {
-        while (Character.isWhitespace(position.currentChar)) {
+        while (Character.isWhitespace(position.currentChar) || position.currentChar == '/') {
             if (position.currentChar == '\n') {
                 position.y++;
                 position.x = 1;
                 position.lineX = position.index + 1;
+            } else if (position.currentChar == '/' && peekChar(1) == '/') {
+                position.next();
+
+                while (position.currentChar != '\n') {
+                    if (position.currentChar == '\0') break;
+                    position.next();
+                }
+
+                continue;
             }
 
             position.next();
@@ -321,6 +329,9 @@ public class Lexer implements ILexer {
                     position.next();
                 } else if (c == '\"') {
                     builder.append('\"');
+                    position.next();
+                } else if (c == '\\') {
+                    builder.append('\\');
                     position.next();
                 } else if (c == 'u') {
                     position.next();
