@@ -1,5 +1,6 @@
 package org.bullet.base.components;
 
+import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.compiler.ast.nodes.ProvideNode;
 import org.bullet.exceptions.RuntimeException;
 import org.bullet.interpreter.Interpreter;
