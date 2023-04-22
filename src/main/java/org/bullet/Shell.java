@@ -1,7 +1,5 @@
 package org.bullet;
 
-import org.bullet.base.types.BtArray;
-import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.*;
 import org.bullet.exceptions.RuntimeException;
 import org.bullet.exceptions.common.ParsingException;

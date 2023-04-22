@@ -16,8 +16,19 @@ function geometric_progression ( i, init, d ) {
     return sequence
 }
 
+// 求和
+function sum ( array ) {
+    i := 0
+    for ( j := 0; j < len( array ); j += 1) i += array[j]
+    return i
+}
+
 // 等差数列，公差为2，第一项为2，生成前10个
-println(arithmetic_progression( 10, 2, 2 ))
+arithmetic := arithmetic_progression( 10, 2, 2 )
+println(arithmetic)
+println("和 -> ", sum(arithmetic))
 
 // 等比数列，公比为2，第一项为2，生成前10个
-println(geometric_progression( 10, 2, 2 ))
+geometric := geometric_progression( 10, 2, 2 )
+println(geometric)
+println("和 -> ", sum(geometric))
