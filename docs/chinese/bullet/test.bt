@@ -26,9 +26,9 @@ function sum ( array ) {
 // 等差数列，公差为2，第一项为2，生成前10个
 arithmetic := arithmetic_progression( 10, 2, 2 )
 println(arithmetic)
-println("和 -> ", sum(arithmetic))
+println("和 -> " + sum(arithmetic))
 
 // 等比数列，公比为2，第一项为2，生成前10个
 geometric := geometric_progression( 10, 2, 2 )
 println(geometric)
-println("和 -> ", sum(geometric))
+println("和 -> " + sum(geometric))
