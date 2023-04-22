@@ -92,15 +92,42 @@ public class Lexer implements ILexer {
                 position.y++;
                 position.x = 1;
                 position.lineX = position.index + 1;
-            } else if (position.currentChar == '/' && peekChar(1) == '/') {
-                position.next();
-
-                while (position.currentChar != '\n') {
-                    if (position.currentChar == '\0') break;
+            } else if (position.currentChar == '/') {
+                // 单行注释
+                if (peekChar(1) == '/') {
                     position.next();
+
+                    while (position.currentChar != '\n') {
+                        if (position.currentChar == '\0') break;
+                        position.next();
+                    }
+
+                    continue;
                 }
 
-                continue;
+                // 多行注释
+                if (peekChar(1) == '*') {
+                    position.next(2);
+
+                    while (position.currentChar != '\0') {
+                        if (position.currentChar == '*' && peekChar(1) == '/') {
+                            position.next(2);
+                            break;
+                        }
+
+                        if (position.currentChar == '\n') {
+                            position.y++;
+                            position.x = 1;
+                            position.lineX = position.index + 1;
+                        }
+
+                        position.next();
+                    }
+
+                    continue;
+                }
+
+                break;
             }
 
             position.next();
@@ -290,7 +317,7 @@ public class Lexer implements ILexer {
     private void makeIdentifier() {
         int start = position.index;
 
-        while (Character.isLetterOrDigit(position.currentChar)) {
+        while (Character.isLetterOrDigit(position.currentChar) || position.currentChar == '_') {
             position.next();
         }
 

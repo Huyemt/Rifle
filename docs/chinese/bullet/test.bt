@@ -1,27 +1,23 @@
-function parr( arr ) {
-    println( arr[0] + arr[1] )
+// 生成 i 个初始值为init且公差为 d 的数列
+function arithmetic_progression ( i, init, d ) {
+    sequence := [ init ]
+
+    for ( j := 1; j <= i; j += 1) sequence[j] = sequence[j - 1] + d
+
+    return sequence
 }
 
-arr := [
-    "Hello!",
-    "Im a array of the bullet program."
-]
+// 生成 i 个初始值为init且公比为 d 的数列
+function geometric_progression ( i, init, d ) {
+    sequence := []
 
-// 数组索引访问
-parr(arr)
+    for ( j := 0; j < i; j += 1 ) sequence[j] = init * d ** j
 
-// 数组索引修改
-arr[0] = "你好！"
-arr[1] = "我是Bullet程序的数组。"
+    return sequence
+}
 
-parr(arr)
+// 等差数列，公差为2，第一项为2，生成前10个
+println(arithmetic_progression( 10, 2, 2 ))
 
-arr = [[1, 0], [2, 0], [3, 0]]
-
-// 多维数组
-arr[0][1] = 1
-arr[1][1] = 2
-arr[2][1] = 3
-
-// 数组运算
-println( arr[0] + arr[1] + arr[2] )
+// 等比数列，公比为2，第一项为2，生成前10个
+println(geometric_progression( 10, 2, 2 ))

@@ -1,9 +1,8 @@
 package org.bullet.base.components;
 
-
-import org.bullet.compiler.ast.nodes.FunctionNode;
+import org.bullet.base.types.BtArray;
 import org.bullet.exceptions.BulletException;
-import org.bullet.interpreter.Interpreter;
+import org.bullet.interpreter.BulletRuntime;
 
 import java.math.BigDecimal;
 
@@ -15,15 +14,13 @@ import java.math.BigDecimal;
  * @author Huyemt
  */
 
-public class BtFunction {
-    private final FunctionNode node;
-    private final Interpreter interpreter;
-    //private static final Pattern NUMBER_PARTTERN = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+public abstract class BtFunction {
+    public final String funcName;
+    protected final BulletRuntime runtime;
 
-
-    public BtFunction(Interpreter interpreter, FunctionNode node) {
-        this.interpreter = interpreter;
-        this.node = node;
+    public BtFunction(String funcName, BulletRuntime runtime) {
+        this.funcName = funcName;
+        this.runtime = runtime;
     }
 
     /**
@@ -47,38 +44,34 @@ public class BtFunction {
      * @return Object
      * @throws BulletException
      */
-    public Object invokeFV(Object ... args) throws BulletException {
-        if (args.length > node.params.size()) {
-            throw new BulletException(String.format("Too many parameters -> %d", args.length - node.params.size()));
-        } else if (args.length < node.params.size()) {
-            throw new BulletException(String.format("Missing parameters -> %d", node.params.size() - args.length));
-        }
-
-        FunctionEnvironment environment = new FunctionEnvironment();
-        environment.body = node.blockNode;
-        environment.from = interpreter.runtime.scope;
-
-        for (int i = 0; i < node.params.size(); i++) {
-            if (args[i] instanceof Integer || args[i] instanceof Float || args[i] instanceof Double) {
-                args[i] = new BigDecimal(args[i].toString());
-            }
-
-            environment.params.put(node.params.get(i), args[i]);
-        }
-
-        if (interpreter.runtime.environment != null) {
-            interpreter.runtime.environments.push(interpreter.runtime.environment);
-        }
-
-        interpreter.runtime.environment = environment;
-        Object r = interpreter.runtime.environment.body.accept(interpreter);
-        interpreter.runtime.returnValue = null;
-        interpreter.runtime.environment = (interpreter.runtime.environments.size() > 0) ? interpreter.runtime.environments.pop() : null;
-
-        return r;
-    }
+    public abstract Object invokeFV(Object ... args) throws BulletException;
 
     public final String getName() {
-        return node.name;
+        return funcName;
+    }
+
+    protected final BtArray translateArray(Object[] arr) {
+        BtArray array = new BtArray();
+
+        for (Object v : arr) {
+            if (v instanceof Double || v instanceof Integer || v instanceof Float) {
+                array.vector.add(new BigDecimal(v.toString()));
+                continue;
+            }
+
+            if (v.getClass().isArray()) {
+                array.vector.add(translateArray((Object[]) v));
+                continue;
+            }
+
+            array.vector.add(v);
+        }
+
+        return array;
+    }
+
+    @Override
+    public String toString() {
+        return "Function:".concat(funcName);
     }
 }

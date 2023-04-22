@@ -41,4 +41,11 @@ public abstract class Logger {
         Rifle.getInstance().getConsole().getCommandReader().unstash();
         Rifle.getInstance().getConsole().getTerminal().writer().flush();
     }
+
+    public synchronized final void print(Object value) {
+        Rifle.getInstance().getConsole().getCommandReader().stash();
+        Rifle.getInstance().getConsole().getTerminal().writer().print(String.valueOf(value) + TextFormat.RESET);
+        Rifle.getInstance().getConsole().getCommandReader().unstash();
+        Rifle.getInstance().getConsole().getTerminal().writer().flush();
+    }
 }

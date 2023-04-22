@@ -56,7 +56,7 @@ public class ModuleManager {
                 return false;
 
             if (exists(module.getModuleDescription().getName())) {
-                Rifle.getInstance().getLogger().error("The module is already loaded or the name of the module conflicts: " + module.getModuleDescription().getMain());
+                Rifle.getInstance().getLogger().error(String.format("The module is already loaded or the name of the module conflicts: %s", module.getModuleDescription().getMain()));
                 return false;
             }
 
@@ -69,6 +69,7 @@ public class ModuleManager {
                 } else {
                     Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
                 }
+
                 return false;
             }
 
@@ -86,8 +87,9 @@ public class ModuleManager {
      * @return boolean
      */
     public synchronized final boolean unload(IModule module) {
-        if (!exists(module.getModuleDescription().getName()))
+        if (!exists(module.getModuleDescription().getName())) {
             return false;
+        }
 
         loader.unloadModule(module);
         modules.remove(module.getModuleDescription().getName().toLowerCase());

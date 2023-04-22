@@ -4,6 +4,7 @@ import org.bullet.base.components.BtFunction;
 import org.bullet.base.components.BtInterface;
 import org.bullet.base.components.BtVariable;
 import org.bullet.base.components.BtScope;
+import org.bullet.base.components.BtCustomFunction;
 import org.bullet.base.types.BtArray;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
@@ -181,8 +182,10 @@ public class Interpreter extends Visitor {
             throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\" and \"*\"");
         } else if (left instanceof BtArray && right instanceof BtArray) {
             if (node.operator == BinaryNode.Operator.ADD) {
-                ((BtArray) left).vector.addAll(((BtArray) right).vector);
-                return left;
+                BtArray array = new BtArray();
+                array.vector.addAll(((BtArray) left).vector);
+                array.vector.addAll(((BtArray) right).vector);
+                return array;
             }
 
             throw new RuntimeException(node.position, "Arrays cannot perform operations other than \"+\"");
@@ -290,7 +293,7 @@ public class Interpreter extends Visitor {
                         if (runtime.environment.params.get(variable.name) instanceof BtArray) {
                             BtArray array = (BtArray) v;
 
-                            Object index = null;
+                            Object index;
                             Object rr = null;
 
                             for (int i = 0; i < variable.index.size() - 1; i++) {
@@ -307,10 +310,25 @@ public class Interpreter extends Visitor {
 
                             int i = ((BigDecimal) variable.index.get(variable.index.size() - 1).accept(this)).intValueExact();
 
+                            if (result instanceof BtArray) {
+                                BtArray array1 = new BtArray();
+                                array1.vector = (ArrayList<Object>) ((BtArray) result).vector.clone();
+                                result = array1;
+                            }
+
                             if (rr == null) {
-                                array.vector.set(i, result);
+                                if (i + 1 < array.vector.size())
+                                    array.vector.set(i, result);
+                                else if (i == array.vector.size())
+                                    array.vector.add(result);
+                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", i, array.vector.size()));
                             } else {
-                                ((BtArray) rr).vector.set(i, result);
+                                BtArray array1 = ((BtArray) rr);
+                                if (i + 1 < array1.vector.size())
+                                    array1.vector.set(i, result);
+                                else if (i == array1.vector.size())
+                                    array1.vector.add(result);
+                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", i, array1.vector.size()));
                             }
 
                             return array;
@@ -366,10 +384,25 @@ public class Interpreter extends Visitor {
 
                         int i = ((BigDecimal) variable.index.get(variable.index.size() - 1).accept(this)).intValueExact();
 
+                        if (result instanceof BtArray) {
+                            BtArray array1 = new BtArray();
+                            array1.vector = (ArrayList<Object>) ((BtArray) result).vector.clone();
+                            result = array1;
+                        }
+
                         if (rr == null) {
-                            array.vector.set(i, result);
+                            if (i + 1 < array.vector.size())
+                                array.vector.set(i, result);
+                            else if (i == array.vector.size())
+                                array.vector.add(result);
+                            else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", i, array.vector.size()));
                         } else {
-                            ((BtArray) rr).vector.set(i, result);
+                            BtArray array1 = ((BtArray) rr);
+                            if (i + 1 < array1.vector.size())
+                                array1.vector.set(i, result);
+                            else if (i == array1.vector.size())
+                                array1.vector.add(result);
+                            else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", i, array1.vector.size()));
                         }
 
                         return array;
@@ -570,6 +603,12 @@ public class Interpreter extends Visitor {
     public Object goFor(ForNode node) throws RuntimeException {
         runtime.loopLevel++;
 
+        BlockNode forBlock = new BlockNode();
+        forBlock.level = runtime.scope.node.level;
+        forBlock.position = node.position;
+
+        runtime.scope = runtime.createScope(forBlock);
+
         if (node.init != null) {
             node.init.accept(this);
         }
@@ -588,6 +627,7 @@ public class Interpreter extends Visitor {
             if (runtime.returnValue != null) {
                 runtime.loopLevel--;
                 runtime.loopStatus = LoopStatus.NONE;
+                runtime.scope = runtime.scope.from;
                 return runtime.returnValue;
             }
 
@@ -616,6 +656,7 @@ public class Interpreter extends Visitor {
             result = node.elseBody.accept(this);
         }
 
+        runtime.scope = runtime.scope.from;
         runtime.loopLevel--;
 
         return result;
@@ -674,52 +715,26 @@ public class Interpreter extends Visitor {
             throw new RuntimeException(node.position, String.format("The function \"%s\" has already been declared", node.name));
         }
 
-        runtime.functions.put(node.name, new BtFunction(this, node));
+        runtime.functions.put(node.name, new BtCustomFunction(this, node));
 
         return null;
     }
 
     @Override
     public Object goFunctionCall(FunctionCallNode node) throws RuntimeException {
-        switch (node.name) {
-            case "print":
-            case "println": {
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < node.args.size(); i++) {
-                    builder.append(node.args.get(i).accept(this));
+        Node run = null;
+        try {
+            BtFunction function = runtime.findFunction(node.name);
+            ArrayList<Object> args = new ArrayList<>();
 
-                    if (i + 1 < node.args.size())
-                        builder.append("\t");
-                }
-
-                if (node.name.equals("print")) {
-                    if (runtime.logger == null)
-                        System.out.print(builder);
-                    else
-                        runtime.logger.info(builder);
-                } else {
-                    if (runtime.logger == null)
-                        System.out.println(builder);
-                    else
-                        runtime.logger.info(builder);
-                }
-                return null;
+            for (int i = 0; i < node.args.size(); i++) {
+                run = node.args.get(i);
+                args.add(run.accept(this));
             }
 
-            default: {
-                try {
-                    BtFunction function = runtime.findFunction(node.name);
-                    ArrayList<Object> args = new ArrayList<>();
-
-                    for (int i = 0; i < node.args.size(); i++) {
-                        args.add(node.args.get(i).accept(this));
-                    }
-
-                    return function.invokeFV(args.toArray());
-                } catch (BulletException e) {
-                    throw new RuntimeException(node.position, e.getMessage());
-                }
-            }
+            return function.invokeFV(args.toArray());
+        } catch (BulletException e) {
+            throw new RuntimeException(run == null ? node.position : run.position, e.getMessage());
         }
     }
 

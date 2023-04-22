@@ -26,6 +26,12 @@ public class Position {
         currentChar = index < source.length() ? source.charAt(index) : '\0';
     }
 
+    public void next(int times) {
+        for (int i = 0; i < times; i++) {
+            next();
+        }
+    }
+
     @Override
     public Position clone() {
         Position position = new Position(source, path);

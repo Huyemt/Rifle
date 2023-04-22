@@ -15,26 +15,23 @@ public class BtArray {
 
     @Override
     public final String toString() {
-        return string(this).replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n");
-    }
-
-    private String string(BtArray array) {
         StringBuilder builder = new StringBuilder();
 
         builder.append("[");
 
         int i = 0;
 
-        for (Object obj : array.vector) {
-            if (obj instanceof BtArray) {
-                builder.append(string((BtArray) obj));
-            } else if (obj instanceof String) {
-                builder.append("\"").append(obj).append("\"");
+        for (Object obj : vector) {
+            if (obj instanceof String) {
+                builder.append("\"").append(obj.toString().replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n").replace("\"", "\\\"").replace("'", "\\'")).append("\"");
             } else {
                 builder.append(obj);
             }
 
-            if (i + 1 < vector.size()) builder.append(",");
+            if (i + 1 < vector.size()) {
+                builder.append(",");
+            }
+
             i++;
         }
 

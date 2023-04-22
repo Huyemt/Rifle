@@ -20,9 +20,9 @@ public class ModuleDataFolder extends DataFolder {
     public final File jar;
     private final String moduleName;
 
-    public ModuleDataFolder(File jar, String moduleName) {
+    public ModuleDataFolder(File file, String moduleName) {
         super("modules");
-        this.jar = jar;
+        this.jar = file;
         this.moduleName = moduleName;
     }
 

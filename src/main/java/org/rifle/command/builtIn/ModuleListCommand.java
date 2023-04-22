@@ -43,7 +43,7 @@ public class ModuleListCommand extends Command {
             for (int i = 0; i < modules.length; i++) {
                 stringBuilder.append(TextFormat.FONT_GREEN).append(TextFormat.STYLE_BOLD).append(modules[i].getModuleDescription().getName()).append(" ").append("v").append(modules[i].getModuleDescription().getVersion());
                 if ((i + 1) < modules.length)
-                    stringBuilder.append(TextFormat.RESET).append(",");
+                    stringBuilder.append(TextFormat.RESET).append(", ");
             }
         }
         Rifle.getInstance().getLogger().println(stringBuilder.toString());

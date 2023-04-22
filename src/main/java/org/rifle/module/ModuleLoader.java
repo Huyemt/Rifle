@@ -1,9 +1,11 @@
 package org.rifle.module;
 
 import org.bullet.CompiledBullet;
+import org.bullet.base.types.BtArray;
 import org.bullet.interpreter.BulletRuntime;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
@@ -30,6 +32,7 @@ public class ModuleLoader implements ILoader {
         if (success == null)
             return null;
 
+
         switch (success) {
             case "jar": {
                 try (JarFile jarFile = new JarFile(file)) {
@@ -54,7 +57,8 @@ public class ModuleLoader implements ILoader {
                     loaders.put(module.getModuleName(), loader);
                     return module;
                 } catch (Exception e) {
-                    throw new Exception(String.format("The jar file with the path \"%s\" is corrupted.", file.getAbsolutePath()));
+                    e.printStackTrace();
+                    throw new Exception(String.format("The jar file with the path \"%s\" is corrupted", file.getAbsolutePath()));
                 }
             }
 
@@ -69,9 +73,10 @@ public class ModuleLoader implements ILoader {
                 String description = bullet.existsAttribute("description") ? bullet.findAttribute("description").toString() : null;
                 String website = bullet.existsAttribute("website") ? bullet.findAttribute("website").toString() : null;
 
-                module = new BulletModule(bullet.findAttribute("name").toString(), bullet.findAttribute("version").toString(), new String[]{bullet.findAttribute("authors").toString()}, description, website, (Boolean) bullet.findAttribute("canBeSelect"), bullet);
+                module = new BulletModule(bullet.findAttribute("name").toString(), bullet.findAttribute("version").toString(), makeAus(bullet.findAttribute("authors")), description, website, (Boolean) bullet.findAttribute("canBeSelect"), bullet);
                 module.init(file.getAbsolutePath(), file);
                 module.onLoad();
+                loaders.put(module.getModuleName(), null);
                 return module;
         }
     }
@@ -83,9 +88,10 @@ public class ModuleLoader implements ILoader {
 
         module.onDisable();
 
-        for (String name : loaders.get(module.getModuleDescription().getName()).getClasses().keySet())
-            removeClass(name);
-
+        if (loaders.get(module.getModuleDescription().getName()) != null) {
+            for (String name : loaders.get(module.getModuleDescription().getName()).getClasses().keySet())
+                removeClass(name);
+        }
         loaders.remove(module.getModuleDescription().getName());
         return true;
     }
@@ -104,6 +110,8 @@ public class ModuleLoader implements ILoader {
             return theClass;
         else {
             for (JavaClassLoader loader : loaders.values()) {
+                if (loader == null) continue;
+
                 try {
                     theClass = loader.findClass(name, false);
                 } catch (ClassNotFoundException e) {
@@ -129,5 +137,19 @@ public class ModuleLoader implements ILoader {
 
     public final JavaClassLoader getClassLoader(String name) {
         return loaders.getOrDefault(name, null);
+    }
+
+    private String[] makeAus(Object r) {
+        if (r instanceof BtArray) {
+            ArrayList<String> arrayList = new ArrayList<>();
+
+            for (Object rr : ((BtArray) r).vector) {
+                arrayList.add(rr.toString());
+            }
+
+            return arrayList.toArray(String[]::new);
+        }
+
+        return new String[]{r.toString()};
     }
 }
