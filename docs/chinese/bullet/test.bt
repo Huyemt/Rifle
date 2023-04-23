@@ -1,10 +1,22 @@
-a := {
-    "A": [
-        1, 2, 3, "你好"
-    ],
-    "B": {
-        "A": "B"
-    }
-}
+/**
+  * Made By Huyemt
+**/
 
-println(a["A"][3])
+var single = "单值"
+array := "数组"
+dictionary := "字典"
+complex := "复杂"
+
+dict := {}
+
+dict["A"] = single
+dict["B"] = [array, 1, 2, 3]
+dict["C"] = { "A": dictionary }
+dict["D"] = [ { "A": complex }, [ 1, 2, 3, 4 ], 1, 2, 3]
+
+println(dict)
+println(dict["A"])
+println(dict["B"][len(dict["B"]) - 4])
+println(dict["C"]["A"])
+println(dict["D"][0]["A"])
+

@@ -19,7 +19,7 @@ public class Shell {
 //            compiled.eval();
 //            compiled.invokeInterface("onSelected");
 
-            CompiledBullet compiledBullet = new CompiledBullet(new File("/home/huyemt/AMyCode/Java/Rifle/docs/chinese/bullet/test.bt"), new BulletRuntime());
+            CompiledBullet compiledBullet = new CompiledBullet(new File("E:\\AMyCode\\Projects\\Java\\Rifle\\Rifle\\docs\\chinese\\bullet\\test.bt"), new BulletRuntime());
             compiledBullet.eval();
 
 //            Integer[] a = new Integer[]{1, 2, 3, 4, 5};

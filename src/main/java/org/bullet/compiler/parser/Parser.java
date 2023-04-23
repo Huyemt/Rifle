@@ -666,6 +666,8 @@ public class Parser implements IParser {
             return node;
         }
 
+        lexer.next();
+
         return node;
     }
 
