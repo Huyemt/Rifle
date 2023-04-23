@@ -2,6 +2,7 @@ package org.bullet.base.bulitIn.function;
 
 import org.bullet.base.components.BtFunction;
 import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
@@ -26,6 +27,11 @@ public class BtLenFunction extends BtFunction {
 
             if (r instanceof BtArray) {
                 big = big.add(new BigDecimal(((BtArray) r).vector.size()));
+                continue;
+            }
+
+            if (r instanceof BtDictionary) {
+                big = big.add(new BigDecimal(((BtDictionary) r).vector.size()));
                 continue;
             }
 

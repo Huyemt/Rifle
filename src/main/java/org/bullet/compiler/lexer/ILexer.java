@@ -46,6 +46,16 @@ public interface ILexer {
     void expectToken(TokenKind kind) throws ParsingException;
 
     /**
+     * 检查当前Token类型
+     * <br><br>
+     * Check the type of the current token
+     *
+     * @param kind
+     * @throws ParsingException
+     */
+    void checkToken(TokenKind kind) throws ParsingException;
+
+    /**
      * 读取相对于当前位置的第 distance 个字符<br><br>
      *
      * Read the distance character relative to the current position

@@ -630,11 +630,43 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.MLPAREN) {
             lexer.next();
-            variable.index.add(this.Expression());
+            variable.index.add(this.Assign());
             lexer.expectToken(TokenKind.MRPAREN); // ]
         }
 
         return variable;
+    }
+
+    @Override
+    public DictionaryNode Dictionary() throws ParsingException {
+        DictionaryNode node = new DictionaryNode();
+        node.position = lexer.position.clone();
+
+        lexer.next();
+
+        if (lexer.currentToken.kind != TokenKind.BRPAREN) {
+            Node key;
+            Node value;
+
+            while (lexer.currentToken.kind != TokenKind.BRPAREN) {
+                // 字符串键
+                key = this.Assign();
+                lexer.expectToken(TokenKind.COLON);
+                value = this.Assign();
+
+                node.vector.put(key, value);
+
+                if (lexer.currentToken.kind == TokenKind.COMMA) {
+                    lexer.next();
+                }
+            }
+
+            lexer.expectToken(TokenKind.BRPAREN);
+
+            return node;
+        }
+
+        return node;
     }
 
     @Override
@@ -848,6 +880,11 @@ public class Parser implements IParser {
             return array;
         }
 
+        // 字典
+        if (lexer.currentToken.kind == TokenKind.BLPAREN) {
+            return this.Dictionary();
+        }
+
         // 布尔值 true 和 false
         if (lexer.currentToken.kind == TokenKind.TRUE || lexer.currentToken.kind == TokenKind.FALSE) {
             ConstantNode<Boolean> node = new ConstantNode<>();
@@ -879,7 +916,7 @@ public class Parser implements IParser {
                 return this.FunctionCall();
             }
 
-            // 数组访问
+            // 数组访问与字典访问
             // IDENTIFIER [ Expression ]
             if (lexer.currentToken.kind == TokenKind.MLPAREN) {
                 lexer.endPeek();

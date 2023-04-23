@@ -25,7 +25,7 @@ public class BtPrintFunction extends BtFunction {
         if (runtime.logger == null)
             System.out.print(builder);
         else
-            runtime.logger.print(builder);
+            runtime.logger.println(builder.toString());
 
         return builder.toString();
     }

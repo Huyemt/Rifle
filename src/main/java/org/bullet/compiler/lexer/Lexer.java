@@ -265,6 +265,13 @@ public class Lexer implements ILexer {
     }
 
     @Override
+    public void checkToken(TokenKind kind) throws ParsingException {
+        if (currentToken.kind != kind) {
+            throw new ParsingException(position, String.format("need \"%s\"", kind));
+        }
+    }
+
+    @Override
     public char peekChar(int distance) {
         int index = position.index + distance;
 

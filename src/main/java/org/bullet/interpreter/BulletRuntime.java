@@ -3,6 +3,7 @@ package org.bullet.interpreter;
 import org.bullet.base.bulitIn.function.BtLenFunction;
 import org.bullet.base.bulitIn.function.BtPrintFunction;
 import org.bullet.base.bulitIn.function.BtPrintlnFunction;
+import org.bullet.base.bulitIn.function.BtStrFunction;
 import org.bullet.base.components.*;
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.exceptions.common.UnderfineException;
@@ -41,6 +42,7 @@ public class BulletRuntime {
         functions.put("print", new BtPrintFunction(this));
         functions.put("println", new BtPrintlnFunction(this));
         functions.put("len", new BtLenFunction(this));
+        functions.put("str", new BtStrFunction(this));
     }
 
     public BtScope createScope(BlockNode node) {

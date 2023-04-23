@@ -1,34 +1,10 @@
-// 生成 i 个初始值为init且公差为 d 的数列
-function arithmetic_progression ( i, init, d ) {
-    sequence := [ init ]
-
-    for ( j := 1; j <= i; j += 1) sequence[j] = sequence[j - 1] + d
-
-    return sequence
+a := {
+    "A": [
+        1, 2, 3, "你好"
+    ],
+    "B": {
+        "A": "B"
+    }
 }
 
-// 生成 i 个初始值为init且公比为 d 的数列
-function geometric_progression ( i, init, d ) {
-    sequence := []
-
-    for ( j := 0; j < i; j += 1 ) sequence[j] = init * d ** j
-
-    return sequence
-}
-
-// 求和
-function sum ( array ) {
-    i := 0
-    for ( j := 0; j < len( array ); j += 1) i += array[j]
-    return i
-}
-
-// 等差数列，公差为2，第一项为2，生成前10个
-arithmetic := arithmetic_progression( 10, 2, 2 )
-println(arithmetic)
-println("和 -> " + sum(arithmetic))
-
-// 等比数列，公比为2，第一项为2，生成前10个
-geometric := geometric_progression( 10, 2, 2 )
-println(geometric)
-println("和 -> " + sum(geometric))
+println(a["A"][3])

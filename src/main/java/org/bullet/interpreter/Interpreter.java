@@ -6,6 +6,7 @@ import org.bullet.base.components.BtVariable;
 import org.bullet.base.components.BtScope;
 import org.bullet.base.components.BtCustomFunction;
 import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtDictionary;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.compiler.ast.nodes.*;
@@ -21,6 +22,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * @author Huyemt
@@ -257,16 +259,74 @@ public class Interpreter extends Visitor {
                 rr = array.vector.get(((BigDecimal) index).intValueExact());
 
                 for (int i = 1; i < node.index.size(); i++) {
-                    if (!(rr instanceof BtArray)) {
-                        throw new RuntimeException(node.index.get(i - 1).position, "Only arrays can use numeric indexes");
-                    }
+                    if (rr instanceof BtArray) {
+                        index = node.index.get(i).accept(this);
+                        if (!(index instanceof BigDecimal)) {
+                            throw new RuntimeException(node.index.get(i).position, "Array index can only be a number");
+                        }
 
-                    index = node.index.get(i).accept(this);
-                    if (!(index instanceof BigDecimal)) {
-                        throw new RuntimeException(node.index.get(i).position, "Array index can only be a number");
-                    }
+                        rr = ((BtArray) rr).vector.get(((BigDecimal) index).intValueExact());
+                    } else if (rr instanceof BtDictionary) {
+                        index = node.index.get(0).accept(this);
 
-                    rr = ((BtArray) rr).vector.get(((BigDecimal) index).intValueExact());
+                        if (!(index instanceof String)) {
+                            throw new RuntimeException(node.index.get(0).position, "Dictionary's index can only be a string");
+                        }
+
+                        if (!((BtDictionary) rr).vector.containsKey(index)) {
+                            throw new RuntimeException(node.index.get(0).position, "not exists");
+                        }
+
+                        rr = ((BtDictionary) rr).vector.get(index);
+                    }
+                }
+
+                return rr;
+            }
+
+            if (v instanceof BtDictionary) {
+                BtDictionary dictionary = (BtDictionary) v;
+
+                if (node.index.size() == 0) {
+                    return v;
+                }
+
+                Object index;
+                Object rr;
+
+                index = node.index.get(0).accept(this);
+
+                if (!(index instanceof String)) {
+                    throw new RuntimeException(node.index.get(0).position, "Dictionary's index can only be a string");
+                }
+
+                if (!dictionary.vector.containsKey(index)) {
+                    throw new RuntimeException(node.index.get(0).position, "not exists");
+                }
+
+                rr = dictionary.vector.get(index);
+
+                for (int i = 1; i < node.index.size(); i++) {
+                    if (rr instanceof BtArray) {
+                        index = node.index.get(i).accept(this);
+                        if (!(index instanceof BigDecimal)) {
+                            throw new RuntimeException(node.index.get(i).position, "Array index can only be a number");
+                        }
+
+                        rr = ((BtArray) rr).vector.get(((BigDecimal) index).intValueExact());
+                    } else if (rr instanceof BtDictionary) {
+                        index = node.index.get(0).accept(this);
+
+                        if (!(index instanceof String)) {
+                            throw new RuntimeException(node.index.get(0).position, "Dictionary's index can only be a string");
+                        }
+
+                        if (!((BtDictionary) rr).vector.containsKey(index)) {
+                            throw new RuntimeException(node.index.get(0).position, "not exists");
+                        }
+
+                        rr = ((BtDictionary) rr).vector.get(index);
+                    }
                 }
 
                 return rr;
@@ -786,5 +846,29 @@ public class Interpreter extends Visitor {
         }
 
         return array;
+    }
+
+    @Override
+    public BtDictionary goDictionary(DictionaryNode node) throws RuntimeException {
+        BtDictionary dictionary = new BtDictionary();
+
+        if (node.vector.size() > 0) {
+            Object key;
+            Object value;
+
+            for (Map.Entry<Node, Node> entry : node.vector.entrySet()) {
+                key = entry.getKey().accept(this);
+                value = entry.getValue().accept(this);
+
+                if (key instanceof String) {
+                    dictionary.vector.put(key.toString(), value);
+                } else {
+                    throw new RuntimeException(entry.getValue().position, "It is not a String");
+                }
+            }
+        }
+
+
+        return dictionary;
     }
 }
