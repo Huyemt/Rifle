@@ -1,6 +1,8 @@
 /**
   * Made By Huyemt
+  * Time: 2023.4.24
 **/
+
 
 var single = "单值"
 array := "数组"
@@ -10,13 +12,14 @@ complex := "复杂"
 dict := {}
 
 dict["A"] = single
-dict["B"] = [array, 1, 2, 3]
+dict["B"] = [ array, 1, 2, 3 ]
 dict["C"] = { "A": dictionary }
-dict["D"] = [ { "A": complex }, [ 1, 2, 3, 4 ], 1, 2, 3]
+dict["D"] = [ { "A": complex }, [ 1, 2, 3, 4 ], 1, 2, 3 ]
+
+dict["D"][0]["A"] += "的数组与字典"
 
 println(dict)
 println(dict["A"])
 println(dict["B"][len(dict["B"]) - 4])
 println(dict["C"]["A"])
 println(dict["D"][0]["A"])
-

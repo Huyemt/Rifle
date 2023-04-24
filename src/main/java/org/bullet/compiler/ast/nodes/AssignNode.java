@@ -15,9 +15,10 @@ public class AssignNode extends Node {
     public boolean createAction;
     public boolean canChange;
     public boolean isProvide;
+    public int complexLevel;
 
     public AssignNode() {
-
+        complexLevel = 0;
     }
 
     @Override

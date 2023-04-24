@@ -15,17 +15,8 @@ import java.io.IOException;
 public class Shell {
     public static void main(String[] args) {
         try {
-//            CompiledBullet compiled = new CompiledBullet(new File("E:\\AMyCode\\Tool\\Rifle\\modules\\test.bt"), new BulletRuntime());
-//            compiled.eval();
-//            compiled.invokeInterface("onSelected");
-
             CompiledBullet compiledBullet = new CompiledBullet(new File("E:\\AMyCode\\Projects\\Java\\Rifle\\Rifle\\docs\\chinese\\bullet\\test.bt"), new BulletRuntime());
             compiledBullet.eval();
-
-//            Integer[] a = new Integer[]{1, 2, 3, 4, 5};
-//            Object aa = new Object[]{a, "你好"};
-
-            //compiledBullet.invokeFunction("testFunction", aa);
         } catch (ParsingException e) {
             System.out.println(Reporter.report(e.getClass().getName(), e.position, e.getMessage()));
         } catch (RuntimeException e) {

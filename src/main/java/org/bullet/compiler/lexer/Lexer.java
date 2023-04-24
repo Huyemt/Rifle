@@ -107,11 +107,21 @@ public class Lexer implements ILexer {
 
                 // 多行注释
                 if (peekChar(1) == '*') {
+                    Position p = new Position(position.source, position.path);
+                    p.currentChar = '*';
+                    p.index = position.index + 1;
+                    p.x = position.x + 1;
+                    p.y = position.y;
+                    p.lineX = position.lineX;
+
                     position.next(2);
+
+                    boolean flag = false;
 
                     while (position.currentChar != '\0') {
                         if (position.currentChar == '*' && peekChar(1) == '/') {
                             position.next(2);
+                            flag = true;
                             break;
                         }
 
@@ -122,6 +132,10 @@ public class Lexer implements ILexer {
                         }
 
                         position.next();
+                    }
+
+                    if (!flag) {
+                        throw new ParsingException(p, "Maybe you missed the '*/'");
                     }
 
                     continue;

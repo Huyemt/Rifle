@@ -18,6 +18,7 @@ public class Parser implements IParser {
     private final Lexer lexer;
     private int blockLevel;
     private int loopLevel;
+    private int complexLevel;
     private boolean functionParsing;
     private boolean provideParsing;
 
@@ -25,6 +26,7 @@ public class Parser implements IParser {
         this.lexer = lexer;
         blockLevel = 1;
         loopLevel = 0;
+        complexLevel = 0;
         functionParsing = false;
         provideParsing = false;
     }
@@ -592,27 +594,41 @@ public class Parser implements IParser {
                 throw new ParsingException(lexer.position, "It is not allowed to use compound assignment when declaring variables");
             }
 
-            ComplexAssignNode node = new ComplexAssignNode();
+            complexLevel++;
 
+            AssignNode node = new AssignNode();
+            node.complexLevel = complexLevel;
+            node.createAction = false;
+            node.canChange = true;
+            node.isProvide = false;
             node.position = lexer.position.clone();
-            node.left = (VariableNode) left;
+            node.left = left;
+
+            BinaryNode binaryNode = new BinaryNode();
+            binaryNode.position = node.position;
 
             if (lexer.currentToken.kind == TokenKind.ASSIGN_ADD)
-                node.operator = BinaryNode.Operator.ADD;
+                binaryNode.operator = BinaryNode.Operator.ADD;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_SUB)
-                node.operator = BinaryNode.Operator.SUB;
+                binaryNode.operator = BinaryNode.Operator.SUB;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_MUL)
-                node.operator = BinaryNode.Operator.MUL;
+                binaryNode.operator = BinaryNode.Operator.MUL;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_DIV)
-                node.operator = BinaryNode.Operator.DIV;
+                binaryNode.operator = BinaryNode.Operator.DIV;
             else if (lexer.currentToken.kind == TokenKind.ASSIGN_POW)
-                node.operator = BinaryNode.Operator.POW;
+                binaryNode.operator = BinaryNode.Operator.POW;
             else
-                throw new ParsingException(node.position, "Syntax error");
+                throw new ParsingException(binaryNode.position, "Syntax error");
+
+            binaryNode.left = left;
 
             lexer.next();
 
-            node.right = this.Assign();
+            binaryNode.right = this.Assign();
+
+            node.right = binaryNode;
+
+            complexLevel--;
 
             return node;
         }

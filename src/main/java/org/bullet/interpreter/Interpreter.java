@@ -276,7 +276,7 @@ public class Interpreter extends Visitor {
 
                         jj = ((BigDecimal) index).intValueExact();
 
-                        if (((BtArray) rr).vector.size() > jj) {
+                        if (((BtArray) rr).vector.size() > jj && jj >= 0) {
                             rr = ((BtArray) rr).vector.get(jj);
                             continue;
                         }
@@ -330,7 +330,7 @@ public class Interpreter extends Visitor {
 
                         jj = ((BigDecimal) index).intValueExact();
 
-                        if (((BtArray) rr).vector.size() > jj) {
+                        if (((BtArray) rr).vector.size() > jj && jj >= 0) {
                             rr = ((BtArray) rr).vector.get(jj);
                             continue;
                         }
@@ -364,13 +364,18 @@ public class Interpreter extends Visitor {
             VariableNode variable = (VariableNode) node.left;
             Object result = node.right.accept(this);
 
+            if (node.complexLevel > 1) {
+                return result;
+            }
+
             try {
                 if (runtime.environment != null && runtime.environment.params.containsKey(variable.name)) {
                     if (variable.index.size() == 0) {
                         runtime.environment.params.put(variable.name, result);
                     } else {
                         Object v = runtime.environment.params.get(variable.name);
-                        if (runtime.environment.params.get(variable.name) instanceof BtArray) {
+
+                        if (v instanceof BtArray) {
                             BtArray array = (BtArray) v;
                             Object index;
                             Object rr = null;
@@ -386,7 +391,7 @@ public class Interpreter extends Visitor {
                                 jj = ((BigDecimal) index).intValueExact();
 
                                 if (rr == null) {
-                                    if (array.vector.size() > jj) {
+                                    if (array.vector.size() > jj && jj >= 0) {
                                         rr = array.vector.get(jj);
 
                                         if (!(rr instanceof BtArray)) {
@@ -396,7 +401,7 @@ public class Interpreter extends Visitor {
                                         continue;
                                     }
                                 } else {
-                                    if (((BtArray) rr).vector.size() > jj) {
+                                    if (((BtArray) rr).vector.size() > jj && jj >= 0) {
                                         rr = ((BtArray) rr).vector.get(jj);
 
                                         if (!(rr instanceof BtArray)) {
@@ -419,24 +424,118 @@ public class Interpreter extends Visitor {
                             }
 
                             if (rr == null) {
-                                if (jj + 1 < array.vector.size())
-                                    array.vector.set(jj, result);
-                                else if (jj == array.vector.size())
-                                    array.vector.add(result);
-                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
+                                if (jj >= 0) {
+                                    if (jj + 1 < array.vector.size())
+                                        array.vector.set(jj, result);
+                                    else if (jj == array.vector.size())
+                                        array.vector.add(result);
+                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
+
+                                    return array;
+                                }
                             } else {
-                                BtArray array1 = ((BtArray) rr);
-                                if (jj + 1 < array1.vector.size())
-                                    array1.vector.set(jj, result);
-                                else if (jj == array1.vector.size())
-                                    array1.vector.add(result);
-                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+                                if (jj >= 0) {
+                                    BtArray array1 = ((BtArray) rr);
+                                    if (jj + 1 < array1.vector.size())
+                                        array1.vector.set(jj, result);
+                                    else if (jj == array1.vector.size())
+                                        array1.vector.add(result);
+                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+
+                                    return array;
+                                }
                             }
 
-                            return array;
+                            throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
                         }
 
-                        throw new RuntimeException(node.position, String.format("Variable \"%s\" is not an array", variable.name));
+                        if (v instanceof BtDictionary) {
+                            BtDictionary dictionary = (BtDictionary) v;
+                            Object index;
+                            Object rr = null;
+                            int jj;
+
+                            for (int i = 0; i < variable.index.size() - 1; i++) {
+                                index = variable.index.get(i).accept(this);
+
+                                if (rr == null) {
+                                    if (!(index instanceof String)) {
+                                        throw new RuntimeException(variable.index.get(i).position, "Dictionary's index can only be a string");
+                                    }
+
+                                    if (!dictionary.vector.containsKey(index)) {
+                                        throw new RuntimeException(variable.index.get(i).position, String.format("The key \"%s\" is not exists", index));
+                                    }
+
+                                    rr = dictionary.vector.get(index);
+                                } else {
+                                    if (rr instanceof BtArray) {
+                                        if (!(index instanceof BigDecimal)) {
+                                            throw new RuntimeException(variable.index.get(i).position, "Array's index can only be a number");
+                                        }
+
+                                        jj = ((BigDecimal) index).intValueExact();
+
+                                        if (((BtArray) rr).vector.size() > jj && jj >= 0) {
+                                            rr = ((BtArray) rr).vector.get(jj);
+                                            continue;
+                                        }
+
+                                        throw new RuntimeException(variable.index.get(i).position, String.format("Index %d out of bounds for length %d", jj, ((BtArray) rr).vector.size()));
+                                    } else if (rr instanceof BtDictionary) {
+                                        if (!(index instanceof String)) {
+                                            throw new RuntimeException(variable.index.get(i).position, "Dictionary's index can only be a string");
+                                        }
+
+                                        if (!((BtDictionary) rr).vector.containsKey(index)) {
+                                            throw new RuntimeException(variable.index.get(i).position, String.format("The key \"%s\" is not exists", index));
+                                        }
+
+                                        rr = ((BtDictionary) rr).vector.get(index);
+                                    }
+                                }
+                            }
+
+                            index = variable.index.get(variable.index.size() - 1).accept(this);
+
+                            if (result instanceof BtDictionary) {
+                                BtDictionary btDictionary = new BtDictionary();
+                                btDictionary.vector.putAll((Map<? extends String, ?>) ((BtDictionary) result).vector.clone());
+                                result = btDictionary;
+                            }
+
+                            if (rr == null) {
+                                dictionary.vector.put(index.toString(), result);
+                            } else {
+                                if (rr instanceof BtDictionary) {
+                                    ((BtDictionary) rr).vector.put(index.toString(), result);
+                                } else if (rr instanceof BtArray) {
+                                    if (!(index instanceof BigDecimal)) {
+                                        throw new RuntimeException(variable.index.get(variable.index.size() - 1).position, "Array's index can only be a number");
+                                    }
+
+                                    jj = ((BigDecimal) index).intValueExact();
+
+                                    BtArray array1 = ((BtArray) rr);
+
+                                    if (jj >= 0) {
+                                        if (jj < array1.vector.size())
+                                            array1.vector.set(jj, result);
+                                        else if (jj == array1.vector.size())
+                                            array1.vector.add(result);
+                                        else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+
+                                        return dictionary;
+                                    }
+
+                                    throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+                                }
+                            }
+
+                            return dictionary;
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Variable \"%s\" is not an array or a dictionary", variable.name));
                     }
 
                     return result;
@@ -470,7 +569,7 @@ public class Interpreter extends Visitor {
                         BtArray array = (BtArray) v.getValue();
                         Object index;
                         Object rr = null;
-                        int jj;
+                        int jj = -1;
 
                         for (int i = 0; i < variable.index.size() - 1; i++) {
                             index = variable.index.get(i).accept(this);
@@ -482,7 +581,7 @@ public class Interpreter extends Visitor {
 
                                 jj = ((BigDecimal) index).intValueExact();
 
-                                if (array.vector.size() > jj) {
+                                if (array.vector.size() > jj && jj >= 0) {
                                     rr = array.vector.get(jj);
 
                                     if (!(rr instanceof BtArray)) {
@@ -499,7 +598,7 @@ public class Interpreter extends Visitor {
 
                                     jj = ((BigDecimal) index).intValueExact();
 
-                                    if (((BtArray) rr).vector.size() > jj) {
+                                    if (((BtArray) rr).vector.size() > jj && jj >= 0) {
                                         rr = ((BtArray) rr).vector.get(jj);
                                         continue;
                                     }
@@ -537,11 +636,15 @@ public class Interpreter extends Visitor {
 
                             jj = ((BigDecimal) index).intValueExact();
 
-                            if (jj + 1 < array.vector.size())
-                                array.vector.set(jj, result);
-                            else if (jj == array.vector.size())
-                                array.vector.add(result);
-                            else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
+                            if (jj >= 0) {
+                                if (jj + 1 < array.vector.size())
+                                    array.vector.set(jj, result);
+                                else if (jj == array.vector.size())
+                                    array.vector.add(result);
+                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
+                            }
+
+                            return array;
                         } else {
                             if (rr instanceof BtDictionary) {
                                 ((BtDictionary) rr).vector.put(index.toString(), result);
@@ -552,16 +655,20 @@ public class Interpreter extends Visitor {
 
                                 jj = ((BigDecimal) index).intValueExact();
 
-                                BtArray array1 = ((BtArray) rr);
-                                if (jj + 1 < array1.vector.size())
-                                    array1.vector.set(jj, result);
-                                else if (jj == array1.vector.size())
-                                    array1.vector.add(result);
-                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+                                if (jj >= 0) {
+                                    BtArray array1 = ((BtArray) rr);
+                                    if (jj < array1.vector.size())
+                                        array1.vector.set(jj, result);
+                                    else if (jj == array1.vector.size())
+                                        array1.vector.add(result);
+                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+                                }
+
+                                return array;
                             }
                         }
 
-                        return array;
+                        throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
                     }
 
                     if (v.getValue() instanceof BtDictionary) {
@@ -591,7 +698,7 @@ public class Interpreter extends Visitor {
 
                                     jj = ((BigDecimal) index).intValueExact();
 
-                                    if (((BtArray) rr).vector.size() > jj) {
+                                    if (((BtArray) rr).vector.size() > jj && jj >= 0) {
                                         rr = ((BtArray) rr).vector.get(jj);
                                         continue;
                                     }
@@ -632,11 +739,18 @@ public class Interpreter extends Visitor {
                                 jj = ((BigDecimal) index).intValueExact();
 
                                 BtArray array1 = ((BtArray) rr);
-                                if (jj + 1 < array1.vector.size())
-                                    array1.vector.set(jj, result);
-                                else if (jj == array1.vector.size())
-                                    array1.vector.add(result);
-                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+
+                                if (jj >= 0) {
+                                    if (jj < array1.vector.size())
+                                        array1.vector.set(jj, result);
+                                    else if (jj == array1.vector.size())
+                                        array1.vector.add(result);
+                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
+
+                                    return dictionary;
+                                }
+
+                                throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
                             }
                         }
 
@@ -651,88 +765,6 @@ public class Interpreter extends Visitor {
         }
 
         throw new RuntimeException(node.position, "Only variables can be assigned values");
-    }
-
-    @Override
-    public Object goComplexAssign(ComplexAssignNode node) throws RuntimeException {
-        try {
-            Object left = node.left.accept(this);
-            Object right = node.right.accept(this);
-
-            if (left instanceof BigDecimal) {
-                switch (node.operator) {
-                    case ADD: {
-                        if (right instanceof BigDecimal) {
-                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).add((BigDecimal) right)).getValue();
-                        } else if (right instanceof String) {
-                            return runtime.scope.changeVariable(node.left.name, String.valueOf(left) + right).getValue();
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getName()));
-                    }
-
-                    case SUB: {
-                        if (right instanceof BigDecimal) {
-                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).subtract((BigDecimal) right)).getValue();
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getName()));
-                    }
-
-                    case MUL: {
-                        if (right instanceof BigDecimal) {
-                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).multiply((BigDecimal) right)).getValue();
-                        } else if (right instanceof String) {
-                            return runtime.scope.changeVariable(node.left.name, ((String) right).repeat(((BigDecimal) left).intValueExact())).getValue();
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getName()));
-                    }
-
-                    case DIV: {
-                        if (right instanceof BigDecimal) {
-                            if (((BigDecimal) right).intValue() == 0) {
-                                throw new RuntimeException(node.position, "Cannot divide by zero");
-                            }
-
-                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN)).getValue();
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getName()));
-                    }
-
-                    case POW: {
-                        if (right instanceof BigDecimal) {
-                            return runtime.scope.changeVariable(node.left.name, ((BigDecimal) left).pow(((BigDecimal) right).intValueExact())).getValue();
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getName()));
-                    }
-                }
-            } else if (left instanceof String) {
-                switch (node.operator) {
-                    case ADD: {
-                        if (right instanceof BigDecimal || right instanceof String) {
-                            return runtime.scope.changeVariable(node.left.name, ((String) left).concat(right.toString())).getValue();
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getName()));
-                    }
-
-                    case MUL: {
-                        if (right instanceof BigDecimal) {
-                            return runtime.scope.changeVariable(node.left.name, ((String) left).repeat(((BigDecimal) right).intValueExact())).getValue();
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getName()));
-                    }
-                }
-            }
-
-            throw new RuntimeException(node.position, "Complex assignment operation is not supported by this type");
-        } catch (BulletException e) {
-            throw new RuntimeException(node.position, e.getMessage());
-        }
     }
 
     @Override
