@@ -2,7 +2,6 @@ package org.bullet.base.bulitIn.function;
 
 import org.bullet.base.components.BtFunction;
 import org.bullet.base.types.BtArray;
-import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
 /**
@@ -15,7 +14,7 @@ public class BtStrFunction extends BtFunction {
     }
 
     @Override
-    public Object invokeFV(Object... args) throws BulletException {
+    public Object invokeFV(Object... args) {
         Object result = null;
 
         if (args.length == 1) {

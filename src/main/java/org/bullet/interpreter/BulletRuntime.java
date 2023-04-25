@@ -21,7 +21,6 @@ public class BulletRuntime {
     public FunctionEnvironment environment;
     public final HashMap<String, BtFunction> functions;
     public final HashMap<String, Object> provideAttributes;
-    public final HashMap<String, BtInterface> provideInterfaces;
     public final Stack<FunctionEnvironment> environments;
     public Object returnValue;
     public LoopStatus loopStatus;
@@ -31,7 +30,6 @@ public class BulletRuntime {
     public BulletRuntime() {
         functions = new HashMap<>();
         provideAttributes = new HashMap<>();
-        provideInterfaces = new HashMap<>();
         returnValue = null;
         environments = new Stack<>();
         environment = null;
@@ -84,17 +82,5 @@ public class BulletRuntime {
         }
 
         return provideAttributes.get(name);
-    }
-
-    public boolean existsInterface(String name) {
-        return provideInterfaces.containsKey(name);
-    }
-
-    public BtInterface findInterface(String name) throws UnderfineException {
-        if (!existsInterface(name)) {
-            throw new UnderfineException(UnderfineException.UnderfineType.PROVIDE_INTERFACE, name);
-        }
-
-        return provideInterfaces.get(name);
     }
 }

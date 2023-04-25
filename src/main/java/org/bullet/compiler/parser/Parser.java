@@ -3,7 +3,6 @@ package org.bullet.compiler.parser;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.*;
 import org.bullet.compiler.lexer.Lexer;
-import org.bullet.compiler.lexer.Position;
 import org.bullet.compiler.lexer.TokenKind;
 import org.bullet.compiler.lexer.VToken;
 import org.bullet.exceptions.common.ParsingException;
@@ -47,7 +46,7 @@ public class Parser implements IParser {
     public Node Function() throws ParsingException {
         if (lexer.currentToken.kind == TokenKind.FUNCTION) {
             if (provideParsing) {
-                throw new ParsingException(lexer.position, "The keyword \"@\" can only be used globally");
+                throw new ParsingException(lexer.position, "The keyword \"#\" can only be used globally");
             }
 
             if (functionParsing) {
@@ -84,32 +83,35 @@ public class Parser implements IParser {
 
             node.name = ((VToken) lexer.currentToken).value;
             lexer.expectToken(TokenKind.IDENTIFIER);
-            lexer.expectToken(TokenKind.SLPAREN);
 
-            if (lexer.currentToken.kind != TokenKind.SRPAREN) {
-                while (lexer.currentToken.kind != TokenKind.SRPAREN) {
-                    if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
-                        String paramName = ((VToken) lexer.currentToken).value;
+            if (lexer.currentToken.kind == TokenKind.SLPAREN) {
+                lexer.expectToken(TokenKind.SLPAREN);
 
-                        if (node.params.contains(paramName)) {
-                            throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in the function\"%s\"", paramName, node.name));
+                if (lexer.currentToken.kind != TokenKind.SRPAREN) {
+                    while (lexer.currentToken.kind != TokenKind.SRPAREN) {
+                        if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
+                            String paramName = ((VToken) lexer.currentToken).value;
+
+                            if (node.params.contains(paramName)) {
+                                throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in the function\"%s\"", paramName, node.name));
+                            }
+
+                            node.params.add(paramName);
+                            lexer.expectToken(TokenKind.IDENTIFIER);
+                            continue;
                         }
 
-                        node.params.add(paramName);
-                        lexer.expectToken(TokenKind.IDENTIFIER);
-                        continue;
-                    }
+                        if (lexer.currentToken.kind == TokenKind.COMMA) {
+                            lexer.next();
+                            continue;
+                        }
 
-                    if (lexer.currentToken.kind == TokenKind.COMMA) {
-                        lexer.next();
-                        continue;
+                        throw new ParsingException(lexer.position, "Incorrect function parameter definition behavior");
                     }
-
-                    throw new ParsingException(lexer.position, "Incorrect function parameter definition behavior");
                 }
-            }
 
-            lexer.expectToken(TokenKind.SRPAREN);
+                lexer.expectToken(TokenKind.SRPAREN);
+            }
 
             if (lexer.currentToken.kind != TokenKind.BLPAREN) {
                 throw new ParsingException(lexer.position, "The statements of the function must be written between '{' and '}'");
@@ -240,9 +242,9 @@ public class Parser implements IParser {
         }
 
         /*
-        解析 @
+        解析 #
          */
-        if (lexer.currentToken.kind == TokenKind.AT) {
+        if (lexer.currentToken.kind == TokenKind.SHARP) {
             return this.Provide();
         }
 
@@ -453,11 +455,11 @@ public class Parser implements IParser {
     @Override
     public Node Provide() throws ParsingException {
         if (provideParsing) {
-            throw new ParsingException(lexer.position, "The keyword \"@\" does not support nesting");
+            throw new ParsingException(lexer.position, "The keyword \"#\" does not support nesting");
         }
 
         if (functionParsing) {
-            throw new ParsingException(lexer.position, "The keyword \"@\" is not supported within a function");
+            throw new ParsingException(lexer.position, "The keyword \"#\" is not supported within a function");
         }
 
         lexer.beginPeek();
@@ -468,27 +470,6 @@ public class Parser implements IParser {
         if (lexer.currentToken.kind == TokenKind.ASSIGN) {
             lexer.endPeek();
             return this.Assign();
-        }
-
-        lexer.endPeek();
-        Position p = lexer.position.clone();
-        lexer.next();
-
-        String name = ((VToken) lexer.currentToken).value;
-
-        lexer.next();
-
-        if (lexer.currentToken.kind == TokenKind.BLPAREN) {
-            ProvideNode node = new ProvideNode();
-            node.name = name;
-            node.position = p;
-
-            provideParsing = true;
-
-            node.node = this.Block();
-
-            provideParsing = false;
-            return node;
         }
 
         throw new ParsingException(lexer.position, "Syntax error");
@@ -529,7 +510,7 @@ public class Parser implements IParser {
             createAction = true;
         }
 
-        if (lexer.currentToken.kind == TokenKind.AT) {
+        if (lexer.currentToken.kind == TokenKind.SHARP) {
             lexer.next();
 
             createAction = true;
@@ -545,7 +526,7 @@ public class Parser implements IParser {
             }
 
             if (provide) {
-                throw new ParsingException(lexer.position, "Variable decorated with \"@\" cannot be assigned with \":=\"");
+                throw new ParsingException(lexer.position, "Variable decorated with \"#\" cannot be assigned with \":=\"");
             }
 
             AssignNode node = new AssignNode();

@@ -72,6 +72,7 @@ public enum TokenKind {
     POINT("."),
     SEMICOLON(";"),
     AT("@"),
+    SHARP("#"),
     COLON(":"),
 
     EOF("EOF"),

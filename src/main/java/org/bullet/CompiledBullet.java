@@ -1,7 +1,6 @@
 package org.bullet;
 
 import org.bullet.base.components.BtFunction;
-import org.bullet.base.components.BtInterface;
 import org.bullet.base.components.BtVariable;
 import org.bullet.exceptions.*;
 import org.bullet.exceptions.RuntimeException;
@@ -46,18 +45,6 @@ public class CompiledBullet {
         evaled = true;
 
         return (result = interpreter.eval());
-    }
-
-    public final boolean existsInterface(String name) {
-        return runtime.existsInterface(name);
-    }
-
-    public final BtInterface findInterface(String name) throws UnderfineException {
-        return runtime.findInterface(name);
-    }
-
-    public final void invokeInterface(String name) throws RuntimeException, UnderfineException {
-        runtime.findInterface(name).invoke();
     }
 
     public final boolean existsFunction(String name) {

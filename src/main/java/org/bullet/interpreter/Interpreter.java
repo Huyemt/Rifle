@@ -1,7 +1,6 @@
 package org.bullet.interpreter;
 
 import org.bullet.base.components.BtFunction;
-import org.bullet.base.components.BtInterface;
 import org.bullet.base.components.BtVariable;
 import org.bullet.base.components.BtScope;
 import org.bullet.base.components.BtCustomFunction;
@@ -796,6 +795,13 @@ public class Interpreter extends Visitor {
     public Object goBlock(BlockNode node) throws RuntimeException {
         if (runtime.scope.node != node && node.level > runtime.scope.node.level) {
             runtime.scope = runtime.createScope(node);
+        } else if (runtime.environment != null && runtime.environment.body.level == node.level) {
+            BlockNode blockNode = new BlockNode();
+            blockNode.level = node.level + 1;
+            blockNode.position = node.position;
+            blockNode.statements = node.statements;
+
+            runtime.scope = runtime.createScope(blockNode);
         }
 
         for (Node statement : node.statements) {
@@ -1031,16 +1037,6 @@ public class Interpreter extends Visitor {
         }
 
         runtime.loopStatus = LoopStatus.CONTINUE;
-        return null;
-    }
-
-    @Override
-    public Object goProvide(ProvideNode node) throws RuntimeException {
-        if (runtime.provideInterfaces.containsKey(node.name)) {
-            throw new RuntimeException(node.position, String.format("Interface \"%s\" has been defined", node.name));
-        }
-
-        runtime.provideInterfaces.put(node.name, new BtInterface(this, node));
         return null;
     }
 

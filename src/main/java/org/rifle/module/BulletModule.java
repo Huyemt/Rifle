@@ -62,8 +62,8 @@ public class BulletModule extends Module {
     @Override
     public void onLoad() {
         try {
-            if (bullet.existsInterface("onLoad")) {
-                bullet.invokeInterface("onLoad");
+            if (bullet.existsFunction("onLoad")) {
+                bullet.invokeFunction("onLoad");
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {
@@ -82,8 +82,8 @@ public class BulletModule extends Module {
     @Override
     public void onDisable() {
         try {
-            if (bullet.existsInterface("onDisable")) {
-                bullet.invokeInterface("onDisable");
+            if (bullet.existsFunction("onDisable")) {
+                bullet.invokeFunction("onDisable");
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {
@@ -102,8 +102,8 @@ public class BulletModule extends Module {
     @Override
     public void onQuit() {
         try {
-            if (bullet.existsInterface("onQuit")) {
-                bullet.invokeInterface("onQuit");
+            if (bullet.existsFunction("onQuit")) {
+                bullet.invokeFunction("onQuit");
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {
@@ -122,8 +122,8 @@ public class BulletModule extends Module {
     @Override
     public void onSelected() {
         try {
-            if (bullet.existsInterface("onSelected")) {
-                bullet.invokeInterface("onSelected");
+            if (bullet.existsFunction("onSelected")) {
+                bullet.invokeFunction("onSelected");
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {

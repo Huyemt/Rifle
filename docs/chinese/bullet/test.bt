@@ -1,25 +1,22 @@
-/**
-  * Made By Huyemt
-  * Time: 2023.4.24
-**/
+# name = "MyFirstBtModule"
+# version = "0.0.1"
+# authors = ["Huyemt", "Kevin", "Teaclon"]
+# canBeSelect = false
+# description = "由Huyemt设计的Bullet语言所编写的Rifle模块"
+# website = "http://github.com/Huyemt/Rifle"
 
+function onLoad {
+    println("Rifle\u548cBullet\u642d\u914d\u662f\u6c38\u8fdc\u7684\u795e")
 
-var single = "单值"
-array := "数组"
-dictionary := "字典"
-complex := "复杂"
+    i := 1
 
-dict := {}
+    until (i == 0) {
+        i -= 1
+    }
 
-dict["A"] = single
-dict["B"] = [ array, 1, 2, 3 ]
-dict["C"] = { "A": dictionary }
-dict["D"] = [ { "A": complex }, [ 1, 2, 3, 4 ], 1, 2, 3 ]
+    println(i)
+}
 
-dict["D"][0]["A"] += "的数组与字典"
-
-println(dict)
-println(dict["A"])
-println(dict["B"][len(dict["B"]) - 4])
-println(dict["C"]["A"])
-println(dict["D"][0]["A"])
+function onDisable {
+    println("感谢您对Bullet的大力支持")
+}

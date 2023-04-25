@@ -44,6 +44,7 @@ public class Lexer implements ILexer {
         tokens.put("<", TokenKind.LESSER);
         tokens.put(".", TokenKind.POINT);
         tokens.put("@", TokenKind.AT);
+        tokens.put("#", TokenKind.SHARP);
         tokens.put(":", TokenKind.COLON);
 
         keywords.put("true", TokenKind.TRUE);
