@@ -12,7 +12,6 @@ public abstract class Command {
     private final String[] usages;
     private final boolean canBeTask;
 
-
     public Command(String name, String description, String[] usages, boolean canBeTask) {
         this.name = name;
         this.description = description;

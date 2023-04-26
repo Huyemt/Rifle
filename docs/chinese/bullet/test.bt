@@ -4,19 +4,16 @@
 # canBeSelect = false
 # description = "由Huyemt设计的Bullet语言所编写的Rifle模块"
 # website = "http://github.com/Huyemt/Rifle"
+# commands = {"test": ["command_test", "it is a test command of the Bullet module", ["test", "test <arg...>"]]}
 
 function onLoad {
     println("Rifle\u548cBullet\u642d\u914d\u662f\u6c38\u8fdc\u7684\u795e")
-
-    i := 1
-
-    until (i == 0) {
-        i -= 1
-    }
-
-    println(i)
 }
 
 function onDisable {
     println("感谢您对Bullet的大力支持")
+}
+
+function command_test( args ) {
+    println( num(args[0]) + num(args[1]) )
 }

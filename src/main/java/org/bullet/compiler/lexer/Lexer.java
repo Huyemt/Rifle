@@ -47,6 +47,7 @@ public class Lexer implements ILexer {
         tokens.put("#", TokenKind.SHARP);
         tokens.put(":", TokenKind.COLON);
 
+        keywords.put("instanceof", TokenKind.INSTANCEOF);
         keywords.put("true", TokenKind.TRUE);
         keywords.put("false", TokenKind.FALSE);
         keywords.put("var", TokenKind.VAR);
@@ -55,13 +56,12 @@ public class Lexer implements ILexer {
         keywords.put("and", TokenKind.AND);
         keywords.put("or", TokenKind.OR);
         keywords.put("not", TokenKind.NOT);
-        keywords.put("while", TokenKind.WHILE);
         keywords.put("for", TokenKind.FOR);
         keywords.put("until", TokenKind.UNTIL);
-        keywords.put("function", TokenKind.FUNCTION);
-        keywords.put("return", TokenKind.RETURN);
         keywords.put("break", TokenKind.BREAK);
         keywords.put("continue", TokenKind.CONTINUE);
+        keywords.put("function", TokenKind.FUNCTION);
+        keywords.put("return", TokenKind.RETURN);
     }
 
     public Lexer(String source) throws ParsingException {

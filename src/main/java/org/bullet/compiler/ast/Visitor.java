@@ -19,7 +19,6 @@ public abstract class Visitor {
     public abstract Object goAssign(AssignNode node) throws RuntimeException;
     public abstract Object goIf(IfNode node) throws RuntimeException;
     public abstract Object goBlock(BlockNode node) throws RuntimeException;
-    public abstract Object goWhile(WhileNode node) throws RuntimeException;
     public abstract Object goFor(ForNode node) throws RuntimeException;
     public abstract Object goUntil(UntilNode node) throws RuntimeException;
     public abstract Object goFunction(FunctionNode node) throws RuntimeException;

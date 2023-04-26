@@ -120,7 +120,7 @@ public class Interpreter extends Visitor {
                             throw new RuntimeException(node.position, "Cannot divide by zero");
                         }
 
-                        return ((BigDecimal) left).divide((BigDecimal) right, RoundingMode.HALF_EVEN);
+                        return ((BigDecimal) left).divide((BigDecimal) right, 1, RoundingMode.HALF_EVEN);
                     }
 
                     throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getName()));
@@ -826,53 +826,6 @@ public class Interpreter extends Visitor {
     }
 
     @Override
-    public Object goWhile(WhileNode node) throws RuntimeException {
-        runtime.loopLevel++;
-
-        boolean condition = (Boolean) node.condition.accept(this);
-        boolean flag = condition;
-        Object result = null;
-
-        while (condition) {
-            if (node.body != null) {
-                result = node.body.accept(this);
-            } else {
-                break;
-            }
-
-            if (runtime.returnValue != null) {
-                runtime.loopLevel--;
-                runtime.loopStatus = LoopStatus.NONE;
-                return runtime.returnValue;
-            }
-
-            if (runtime.loopStatus == LoopStatus.BREAK) {
-                break;
-            }
-
-            if (runtime.loopStatus == LoopStatus.CONTINUE) {
-                runtime.loopStatus = LoopStatus.NONE;
-                continue;
-            }
-
-            condition = (Boolean) node.condition.accept(this);
-        }
-
-        runtime.loopStatus = LoopStatus.NONE;
-
-        /*
-        运行到这里说明已经跳出循环了
-         */
-        if (node.elseBody != null && flag) {
-            result = node.elseBody.accept(this);
-        }
-
-        runtime.loopLevel--;
-
-        return result;
-    }
-
-    @Override
     public Object goFor(ForNode node) throws RuntimeException {
         runtime.loopLevel++;
 
@@ -1017,7 +970,7 @@ public class Interpreter extends Visitor {
             return runtime.returnValue;
         }
 
-        return runtime.returnValue = node.left.accept(this);
+        return runtime.returnValue = (node.left == null ? false : node.left.accept(this));
     }
 
     @Override

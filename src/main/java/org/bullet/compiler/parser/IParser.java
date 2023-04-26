@@ -70,16 +70,6 @@ public interface IParser {
     IfNode If() throws ParsingException;
 
     /**
-     * 解析 while 循环语句
-     * <br><br>
-     * Parsing while statement node
-     *
-     * @return WhileNode
-     * @throws ParsingException
-     */
-    WhileNode While() throws ParsingException;
-
-    /**
      * 解析 for 语句
      * <br><br>
      * Parsing for statement node
@@ -118,13 +108,6 @@ public interface IParser {
      * @throws ParsingException
      */
     ContinueNode Continue() throws ParsingException;
-
-    /**
-     * 解析 @ 语句
-     * @return Node
-     * @throws ParsingException
-     */
-    Node Provide() throws ParsingException;
 
     /**
      * 解析代码块

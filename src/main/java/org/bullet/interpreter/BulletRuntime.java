@@ -1,9 +1,6 @@
 package org.bullet.interpreter;
 
-import org.bullet.base.bulitIn.function.BtLenFunction;
-import org.bullet.base.bulitIn.function.BtPrintFunction;
-import org.bullet.base.bulitIn.function.BtPrintlnFunction;
-import org.bullet.base.bulitIn.function.BtStrFunction;
+import org.bullet.base.bulitIn.function.*;
 import org.bullet.base.components.*;
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.exceptions.common.UnderfineException;
@@ -37,10 +34,11 @@ public class BulletRuntime {
         loopLevel = 0;
         logger = null;
 
-        functions.put("print", new BtPrintFunction(this));
-        functions.put("println", new BtPrintlnFunction(this));
-        functions.put("len", new BtLenFunction(this));
-        functions.put("str", new BtStrFunction(this));
+        builtInFunction(new BtPrintFunction(this));
+        builtInFunction(new BtPrintlnFunction(this));
+        builtInFunction(new BtLenFunction(this));
+        builtInFunction(new BtStrFunction(this));
+        builtInFunction(new BtNumFunction(this));
     }
 
     public BtScope createScope(BlockNode node) {
@@ -82,5 +80,9 @@ public class BulletRuntime {
         }
 
         return provideAttributes.get(name);
+    }
+
+    private void builtInFunction(BtFunction function) {
+        functions.put(function.getName(), function);
     }
 }

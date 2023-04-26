@@ -19,7 +19,6 @@ public enum TokenKind {
     FALSE("false"),
     IF("if"),
     ELSE("else"),
-    WHILE("while"),
     FOR("for"),
     UNTIL("until"),
     VAR("var"),
@@ -30,6 +29,7 @@ public enum TokenKind {
     RETURN("return"),
     BREAK("break"),
     CONTINUE("continue"),
+    INSTANCEOF("instanceof"),
 
     /*
     运算符

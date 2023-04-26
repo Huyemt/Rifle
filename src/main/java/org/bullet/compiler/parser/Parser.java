@@ -19,7 +19,6 @@ public class Parser implements IParser {
     private int loopLevel;
     private int complexLevel;
     private boolean functionParsing;
-    private boolean provideParsing;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
@@ -27,7 +26,6 @@ public class Parser implements IParser {
         loopLevel = 0;
         complexLevel = 0;
         functionParsing = false;
-        provideParsing = false;
     }
 
     @Override
@@ -45,10 +43,6 @@ public class Parser implements IParser {
     @Override
     public Node Function() throws ParsingException {
         if (lexer.currentToken.kind == TokenKind.FUNCTION) {
-            if (provideParsing) {
-                throw new ParsingException(lexer.position, "The keyword \"#\" can only be used globally");
-            }
-
             if (functionParsing) {
                 throw new ParsingException(lexer.position, "Embedded functions are not supported");
             }
@@ -135,9 +129,15 @@ public class Parser implements IParser {
         ReturnNode node = new ReturnNode();
         node.position = lexer.position.clone();
         lexer.next();
-        node.left = this.Expression();
 
-        while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
+        if (lexer.currentToken.kind != TokenKind.SEMICOLON) {
+            node.left = this.Expression();
+
+            while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
+                lexer.next();
+            }
+        } else {
+            node.left = null;
             lexer.next();
         }
 
@@ -181,13 +181,6 @@ public class Parser implements IParser {
          */
         if (lexer.currentToken.kind == TokenKind.IF) {
             return this.If();
-        }
-
-        /*
-        解析 while 循环体
-         */
-        if (lexer.currentToken.kind == TokenKind.WHILE) {
-            return this.While();
         }
 
         /*
@@ -245,7 +238,7 @@ public class Parser implements IParser {
         解析 #
          */
         if (lexer.currentToken.kind == TokenKind.SHARP) {
-            return this.Provide();
+            return this.Assign();
         }
 
         /*
@@ -300,42 +293,6 @@ public class Parser implements IParser {
                 throw new ParsingException(lexer.position, "There can only be one else scope");
             }
         }
-
-        return node;
-    }
-
-    @Override
-    public WhileNode While() throws ParsingException {
-        WhileNode node = new WhileNode();
-        node.position = lexer.position.clone();
-
-        lexer.next();
-
-        lexer.expectToken(TokenKind.SLPAREN);
-
-        if (lexer.currentToken.kind == TokenKind.SRPAREN) {
-            throw new ParsingException(lexer.position, "While statement is missing condition");
-        }
-
-        node.condition = this.Expression();
-
-        lexer.expectToken(TokenKind.SRPAREN);
-
-        loopLevel++;
-
-        node.body = this.Statement();
-
-        if (lexer.currentToken.kind == TokenKind.ELSE) {
-            lexer.next();
-
-            node.elseBody = this.Statement();
-
-            if (lexer.currentToken.kind == TokenKind.ELSE) {
-                throw new ParsingException(lexer.position, "There can only be one else scope");
-            }
-        }
-
-        loopLevel--;
 
         return node;
     }
@@ -450,29 +407,6 @@ public class Parser implements IParser {
             lexer.next();
         }
         return node;
-    }
-
-    @Override
-    public Node Provide() throws ParsingException {
-        if (provideParsing) {
-            throw new ParsingException(lexer.position, "The keyword \"#\" does not support nesting");
-        }
-
-        if (functionParsing) {
-            throw new ParsingException(lexer.position, "The keyword \"#\" is not supported within a function");
-        }
-
-        lexer.beginPeek();
-        lexer.next();
-
-        lexer.expectToken(TokenKind.IDENTIFIER);
-
-        if (lexer.currentToken.kind == TokenKind.ASSIGN) {
-            lexer.endPeek();
-            return this.Assign();
-        }
-
-        throw new ParsingException(lexer.position, "Syntax error");
     }
 
     @Override

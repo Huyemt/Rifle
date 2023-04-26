@@ -11,8 +11,7 @@ public class UnderfineException extends BulletException {
     public enum UnderfineType {
         VARIABLE("variable"),
         FUNCTION("function"),
-        PROVIDE_ATTRIBUTE("provide_attribute"),
-        PROVIDE_INTERFACE("provide_interface");
+        PROVIDE_ATTRIBUTE("provide_attribute");
 
         public final String value;
 

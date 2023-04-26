@@ -12,9 +12,10 @@ Your support for this project is the biggest financial support for Rifle develop
 3. When you edit a module, please first understand [the internal concept of Rifle](rifle_flow.md).
 ***
 # Module Development
-* [Module foundation](develop/Module.md)
+* [Module Foundation](develop/Module.md)
 * [Custom Commands](develop/Command.md)
 * [Custom Tasks](develop/Task.md)
+* [Bullet Language]()
 # Built-in Support Library
 * [JavaScript running](lib/JavaScript4J.md)
 * [Network request](https://github.com/Huyemt/Http4J/blob/main/docs/english/develop.md)

@@ -15,6 +15,7 @@
 * [模块基础](develop/Module.md)
 * [自定义命令](develop/Command.md)
 * [自定义任务](develop/Task.md)
+* [Bullet语言](bullet)
 # 内置支持库
 * [调用JavaScript](lib/JavaScript4J.md)
 * [网络请求](https://github.com/Huyemt/Http4J/blob/main/docs/chinese/develop.md)
