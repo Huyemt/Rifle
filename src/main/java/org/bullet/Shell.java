@@ -17,8 +17,6 @@ public class Shell {
         try {
             CompiledBullet compiledBullet = new CompiledBullet(new File("E:\\AMyCode\\Projects\\Java\\Rifle\\Rifle\\docs\\chinese\\bullet\\test.bt"), new BulletRuntime());
             compiledBullet.eval();
-
-            compiledBullet.invokeFunction("onLoad");
         } catch (ParsingException e) {
             System.out.println(Reporter.report(e.getClass().getName(), e.position, e.getMessage()));
         } catch (RuntimeException e) {

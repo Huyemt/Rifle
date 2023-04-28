@@ -1,6 +1,7 @@
 package org.bullet.interpreter;
 
 import org.bullet.base.bulitIn.function.*;
+import org.bullet.base.bulitIn.function.security.*;
 import org.bullet.base.components.*;
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.exceptions.common.UnderfineException;
@@ -39,6 +40,14 @@ public class BulletRuntime {
         builtInFunction(new BtLenFunction(this));
         builtInFunction(new BtStrFunction(this));
         builtInFunction(new BtNumFunction(this));
+        builtInFunction(new BtMd5Function(this));
+        builtInFunction(new BtSha1Function(this));
+        builtInFunction(new BtEncBase64Function(this));
+        builtInFunction(new BtDecBase64Function(this));
+        builtInFunction(new BtSha256Function(this));
+        builtInFunction(new BtSha512Function(this));
+        builtInFunction(new BtEncAESFunction(this));
+        builtInFunction(new BtDecAESFunction(this));
     }
 
     public BtScope createScope(BlockNode node) {

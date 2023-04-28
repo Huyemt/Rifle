@@ -155,17 +155,13 @@ public class Parser implements IParser {
         lexer.expectToken(TokenKind.SLPAREN);
 
         if (lexer.currentToken.kind != TokenKind.SRPAREN) {
-            node.args.add(this.Assign());
+            while (lexer.currentToken.kind != TokenKind.SRPAREN) {
+                node.args.add(this.Assign());
 
-            if (lexer.currentToken.kind == TokenKind.COMMA) {
-                while (lexer.currentToken.kind == TokenKind.COMMA) {
-                    lexer.next();
-                    node.args.add(this.Assign());
-
-                    if (lexer.currentToken.kind == TokenKind.SRPAREN) {
-                        break;
-                    }
+                if (lexer.currentToken.kind != TokenKind.SRPAREN) {
+                    lexer.expectToken(TokenKind.COMMA);
                 }
+
             }
         }
 
@@ -587,8 +583,8 @@ public class Parser implements IParser {
 
                 node.vector.put(key, value);
 
-                if (lexer.currentToken.kind == TokenKind.COMMA) {
-                    lexer.next();
+                if (lexer.currentToken.kind != TokenKind.BRPAREN) {
+                    lexer.expectToken(TokenKind.COMMA);
                 }
             }
 
@@ -803,8 +799,8 @@ public class Parser implements IParser {
             while (lexer.currentToken.kind != TokenKind.MRPAREN) {
                 array.values.add(this.Assign());
 
-                if (lexer.currentToken.kind == TokenKind.COMMA) {
-                    lexer.next();
+                if (lexer.currentToken.kind != TokenKind.MRPAREN) {
+                    lexer.expectToken(TokenKind.COMMA);
                 }
             }
 
