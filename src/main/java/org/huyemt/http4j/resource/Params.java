@@ -61,6 +61,11 @@ public class Params extends Resource {
         return builder.toString();
     }
 
+    public Params setAll(Map<String, Object> map) {
+        sources = map;
+        return this;
+    }
+
     @Override
     public final String toString() {
         return this.toString(false);

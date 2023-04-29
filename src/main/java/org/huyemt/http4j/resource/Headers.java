@@ -81,4 +81,9 @@ public class Headers extends Resource {
 
         return builder.toString();
     }
+
+    public Headers setAll(Map<String, Object> map) {
+        sources = map;
+        return this;
+    }
 }

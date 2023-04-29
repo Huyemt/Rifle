@@ -36,7 +36,7 @@ public class BtLenFunction extends BtFunction {
             }
 
             if (r.getClass().isArray()) {
-                big = big.add(new BigDecimal(translateArray((Object[]) r).vector.size()));
+                big = big.add(new BigDecimal(BtArray.parse((Object[]) r).vector.size()));
                 continue;
             }
 

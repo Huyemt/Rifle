@@ -1,1 +1,12 @@
-println(rsaE("你好"))
+url := "https://v.api.aa1.cn/api/api-md5/go.php"
+params := {
+    "act": "加密",
+    "md5": "你好"
+}
+
+// npost -> http post
+// nget -> http get
+rsp := nget(url, params)
+
+println(rsp["content"])
+println(md5("你好"))

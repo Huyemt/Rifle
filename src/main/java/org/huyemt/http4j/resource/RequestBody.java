@@ -68,7 +68,10 @@ public class RequestBody extends Resource {
         return builder.toString();
     }
 
-
+    public RequestBody setAll(Map<String, Object> map) {
+        sources = map;
+        return this;
+    }
 
     public String toString() {
         return this.toString(null);

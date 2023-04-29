@@ -1,6 +1,8 @@
 package org.bullet.interpreter;
 
 import org.bullet.base.bulitIn.function.*;
+import org.bullet.base.bulitIn.function.net.BtNGetFunction;
+import org.bullet.base.bulitIn.function.net.BtNPostFunction;
 import org.bullet.base.bulitIn.function.security.*;
 import org.bullet.base.components.*;
 import org.bullet.compiler.ast.nodes.BlockNode;
@@ -50,6 +52,10 @@ public class BulletRuntime {
         builtInFunction(new BtDecAESFunction(this));
         builtInFunction(new BtEncRSAFunction(this));
         builtInFunction(new BtDecRSAFunction(this));
+        builtInFunction(new BtNGetFunction(this));
+        builtInFunction(new BtNPostFunction(this));
+        builtInFunction(new BtEncURLFunction(this));
+        builtInFunction(new BtDecURLFunction(this));
     }
 
     public BtScope createScope(BlockNode node) {
