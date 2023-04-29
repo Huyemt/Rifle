@@ -1,7 +1,6 @@
 package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtFunction;
-import org.bullet.base.types.BtArray;
 import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;

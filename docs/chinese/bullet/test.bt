@@ -1,18 +1,22 @@
-aStr := "abcdefghijklmnopqrstuvwxyz"
+aDict := {
+    "a": 1,
+    "b": 1.1,
+    "c": "str",
+    "d": [1, 2, 3],
+    "e": false,
+    "f": {
+        "a": 1
+    }
+}
 
-println( aStr[5:10] )
-println( aStr[:10] )
-println( aStr[10:5] )
+// {"a":1,"b":1.1,"c":"str","d":[1,2,3],"e":false,"f":{"a":1}}
+println(aDict)
 
-aList := [1, 2, 3, 4, 5, 6, 7]
+// str
+println(aDict["c"])
 
-println( aList[5:2] )
+// 3
+println(aDict["d"][])
 
-// 取最后的元素
-println( aList )
-println( aList[] )
-
-// 自增索引赋值
-aList[] = 8
-println( aList )
-println( aList[] )
+// 1
+println(aDict["f"]["a"])

@@ -589,20 +589,21 @@ public class Interpreter extends Visitor {
                 if (v instanceof String) {
                     String str = (String) v;
                     len = str.length();
+                    boolean flag = false;
 
                     if (start > end) {
                         int temp = end;
                         end = start;
                         start = temp;
-
-                        str = new StringBuffer(str).reverse().toString();
+                        flag = true;
                     }
 
                     if (end > len) {
                         throw new RuntimeException(node.position, String.format("String index %d is out of range %d", end, len));
                     }
 
-                    v = str.substring(start, end);
+                    str = str.substring(start, end);
+                    v = flag ? new StringBuffer(str).reverse() : str;
                 } else {
                     BtArray btArray1 = ((BtArray) v);
                     len = btArray1.vector.size();
@@ -611,12 +612,6 @@ public class Interpreter extends Visitor {
                         int temp = end;
                         end = start;
                         start = temp;
-
-                        BtArray array = btArray1.clone();
-
-                        Collections.reverse(array.vector);
-
-                        btArray1 = array;
                     }
 
                     if (end > len) {
@@ -635,6 +630,7 @@ public class Interpreter extends Visitor {
                         btArray.vector.add(a);
                     }
 
+                    Collections.reverse(btArray.vector);
                     v = btArray;
                 }
             } else {

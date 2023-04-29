@@ -4,8 +4,6 @@ import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.exceptions.RuntimeException;
 
-import java.util.ArrayList;
-
 /**
  * @author Huyemt
  */
