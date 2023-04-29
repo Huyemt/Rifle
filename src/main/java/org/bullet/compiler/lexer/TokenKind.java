@@ -25,7 +25,7 @@ public enum TokenKind {
     AND("and"),
     OR("or"),
     NOT("not"),
-    FUNCTION("function"),
+    FUNCTION("func"),
     RETURN("return"),
     BREAK("break"),
     CONTINUE("continue"),

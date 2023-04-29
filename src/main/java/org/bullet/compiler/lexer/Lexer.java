@@ -24,44 +24,44 @@ public class Lexer implements ILexer {
 
     static {
         tokens.put("\0", TokenKind.EOF);
-        tokens.put("+", TokenKind.PLUS);
-        tokens.put("-", TokenKind.MINUS);
-        tokens.put("*", TokenKind.STAR);
-        tokens.put("/", TokenKind.SLASH);
-        tokens.put("(", TokenKind.SLPAREN);
-        tokens.put(")", TokenKind.SRPAREN);
-        tokens.put("[", TokenKind.MLPAREN);
-        tokens.put("]", TokenKind.MRPAREN);
-        tokens.put("{", TokenKind.BLPAREN);
-        tokens.put("}", TokenKind.BRPAREN);
-        tokens.put(",", TokenKind.COMMA);
-        tokens.put(";", TokenKind.SEMICOLON);
-        tokens.put("=", TokenKind.ASSIGN);
-        tokens.put("!", TokenKind.EXCLAMATION);
-        tokens.put("&", TokenKind.L_AND);
-        tokens.put("|", TokenKind.L_OR);
-        tokens.put(">", TokenKind.GREATER);
-        tokens.put("<", TokenKind.LESSER);
-        tokens.put(".", TokenKind.POINT);
-        tokens.put("@", TokenKind.AT);
-        tokens.put("#", TokenKind.SHARP);
-        tokens.put(":", TokenKind.COLON);
+        registerToken(TokenKind.PLUS);
+        registerToken(TokenKind.MINUS);
+        registerToken(TokenKind.STAR);
+        registerToken(TokenKind.SLASH);
+        registerToken(TokenKind.SLPAREN);
+        registerToken(TokenKind.SRPAREN);
+        registerToken(TokenKind.MLPAREN);
+        registerToken(TokenKind.MRPAREN);
+        registerToken(TokenKind.BLPAREN);
+        registerToken(TokenKind.BRPAREN);
+        registerToken(TokenKind.COMMA);
+        registerToken(TokenKind.SEMICOLON);
+        registerToken(TokenKind.ASSIGN);
+        registerToken(TokenKind.EXCLAMATION);
+        registerToken(TokenKind.L_AND);
+        registerToken(TokenKind.L_OR);
+        registerToken(TokenKind.GREATER);
+        registerToken(TokenKind.LESSER);
+        registerToken(TokenKind.POINT);
+        registerToken(TokenKind.AT);
+        registerToken(TokenKind.SHARP);
+        registerToken(TokenKind.COLON);
 
-        keywords.put("instanceof", TokenKind.INSTANCEOF);
-        keywords.put("true", TokenKind.TRUE);
-        keywords.put("false", TokenKind.FALSE);
-        keywords.put("var", TokenKind.VAR);
-        keywords.put("if", TokenKind.IF);
-        keywords.put("else", TokenKind.ELSE);
-        keywords.put("and", TokenKind.AND);
-        keywords.put("or", TokenKind.OR);
-        keywords.put("not", TokenKind.NOT);
-        keywords.put("for", TokenKind.FOR);
-        keywords.put("until", TokenKind.UNTIL);
-        keywords.put("break", TokenKind.BREAK);
-        keywords.put("continue", TokenKind.CONTINUE);
-        keywords.put("function", TokenKind.FUNCTION);
-        keywords.put("return", TokenKind.RETURN);
+        registerKeyword(TokenKind.INSTANCEOF);
+        registerKeyword(TokenKind.TRUE);
+        registerKeyword(TokenKind.FALSE);
+        registerKeyword(TokenKind.VAR);
+        registerKeyword(TokenKind.IF);
+        registerKeyword(TokenKind.ELSE);
+        registerKeyword(TokenKind.AND);
+        registerKeyword(TokenKind.OR);
+        registerKeyword(TokenKind.NOT);
+        registerKeyword(TokenKind.FOR);
+        registerKeyword(TokenKind.UNTIL);
+        registerKeyword(TokenKind.BREAK);
+        registerKeyword(TokenKind.CONTINUE);
+        registerKeyword(TokenKind.FUNCTION);
+        registerKeyword(TokenKind.RETURN);
     }
 
     public Lexer(String source) throws ParsingException {
@@ -410,5 +410,13 @@ public class Lexer implements ILexer {
         position.next();
 
         this.makeToken(TokenKind.VT_STRING, builder.toString());
+    }
+
+    private static void registerToken(TokenKind kind) {
+        tokens.put(kind.toString(), kind);
+    }
+
+    private static void registerKeyword(TokenKind kind) {
+        keywords.put(kind.toString(), kind);
     }
 }

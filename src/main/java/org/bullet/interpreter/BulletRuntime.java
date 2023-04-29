@@ -48,6 +48,8 @@ public class BulletRuntime {
         builtInFunction(new BtSha512Function(this));
         builtInFunction(new BtEncAESFunction(this));
         builtInFunction(new BtDecAESFunction(this));
+        builtInFunction(new BtEncRSAFunction(this));
+        builtInFunction(new BtDecRSAFunction(this));
     }
 
     public BtScope createScope(BlockNode node) {

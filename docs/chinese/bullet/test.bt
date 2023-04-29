@@ -1,1 +1,95 @@
-print(base64E("你好，我是Bullet内置的Base64加密算法生成的密文"))
+# name = "Security"
+# canBeSelect = true
+# authors = ["Huyemt", "Kevin", "Teaclon"]
+# version = "1.0.0"
+# description = "Bullet密码学工具"
+# website = "https://github.com/Huyemt/Rifle"
+# commands = {
+	"md5": ["s_md5", "MD5加密", ["md5 <content>"]],
+	"sha1": ["s_sha1", "SHA1加密", ["sha1 <content>"]],
+	"sha256": ["s_sha256", "SHA256加密", ["sha256 <content>"]],
+	"sha512": ["s_sha512", "SHA512加密", ["sha512 <content>"]],
+	"aesK": ["s_aesK", "设置AES密钥", ["aesK <key>"]],
+	"aesE": ["s_aesE", "AES加密", ["aesE <content>", "aesE <content> <key>"]],
+	"aesD": ["s_aesD", "AES解密", ["aesD <content>", "aesD <content> <key>"]]
+}
+
+aesKey := ""
+aesPriK := ""
+aesPubK := ""
+
+func onLoad {
+	println("Bullet编写的密码学工具已成功加载")
+}
+
+func onDisable {
+	println("感谢您对Bullet语言的支持")
+}
+
+func onSelected {
+	if (len(aesKey) > 0)
+		print("当前AES密钥为\n\t" + aesKey)
+}
+
+func s_md5 (args) {
+	if (len(args) < 1)
+		println("缺少参数")
+	else
+		println(md5(args[0]))
+}
+
+func s_sha1 (args) {
+	if (len(args) < 1)
+		println("缺少参数")
+	else
+		println(sha1(args[0]))
+}
+
+func s_sha256 (args) {
+	if (len(args) < 1)
+		println("缺少参数")
+	else
+		println(sha256(args[0]))
+}
+
+func s_sha512 (args) {
+	if (len(args) < 1)
+		println("缺少参数")
+	else
+		println(sha512(args[0]))
+}
+
+func s_aesK (args) {
+	if (len(args) < 1)
+		println("缺少参数")
+	else
+		print("设置AESKey成功:\n\t" + (aesKey = args[0]))
+}
+
+func s_aesE (args) {
+	n := len(args)
+
+	if (n < 1)
+		println("缺少参数")
+	else if (n == 1) {
+		if (len(aesKey) == 0)
+			println("缺少参数")
+		else
+			print("\n" + aesE(args[0], aesKey) + "\n")
+	} else
+		print("\n" + aesE(args[0], args[1]) + "\n")
+}
+
+func s_aesD (args) {
+	n := len(args)
+
+	if (n < 1)
+		println("缺少参数")
+	else if (n == 1) {
+		if (len(aesKey) == 0)
+			println("缺少参数")
+		else
+			print("\n" + aesD(args[0], aesKey) + "\n")
+	} else
+		print("\n" + aesD(args[0], args[1]) + "\n")
+}

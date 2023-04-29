@@ -378,7 +378,7 @@ public class RSA {
 
         @Override
         public String toString() {
-            return "PublicKey:\n\t" + getPublicKey() + "\nPrivateKey:\n\t" + getPrivateKey() + "\nEncrypted:\n\t" + getResult();
+            return "PublicKey:\n\t".concat(getPublicKey()).concat("\nPrivateKey:\n\t").concat(getPrivateKey()).concat("\nEncrypted:\n\t").concat(getResult());
         }
     }
 
