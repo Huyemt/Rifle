@@ -2,6 +2,7 @@ package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtFunction;
 import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;
@@ -37,13 +38,13 @@ public class BtEncRSAFunction extends BtFunction {
         // 没有密码对
         if (args.length == 1) {
             RSA.Result result = Crypto4J.RSA.randomEncrypt(content);
-            BtArray array = new BtArray();
-            array.vector.add(result.result);
-            array.vector.add(result.publicKey);
-            array.vector.add(result.privateKey);
-            array.vector.add(new BigDecimal(1));
+            BtDictionary dictionary = new BtDictionary();
+            dictionary.vector.put("password", result.result);
+            dictionary.vector.put("publicKey", result.publicKey);
+            dictionary.vector.put("privateKey", result.privateKey);
+            dictionary.vector.put("padding", new BigDecimal(1));
 
-            return array;
+            return dictionary;
         } else if (args.length == 2) {
             // key
             if (args[1] instanceof String) {

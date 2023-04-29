@@ -73,7 +73,7 @@ public class ModuleManager {
                 return false;
             }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s", e.getMessage()));
+            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
             return false;
         }
     }

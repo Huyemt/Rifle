@@ -17,15 +17,11 @@ public class Main {
             if (e instanceof BulletException) {
                 if (e instanceof ParsingException) {
                     Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((ParsingException) e).position, e.getMessage())));
-                } else {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                    return;
                 }
-
-                Rifle.getInstance().getConsole().shutdown();
-                return;
             }
 
-            Rifle.getInstance().getLogger().error(e.getMessage());
+            Rifle.getInstance().getLogger().error(TextFormat.FONT_RED + e.getMessage());
             Rifle.getInstance().getConsole().shutdown();
         }
     }

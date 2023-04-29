@@ -277,6 +277,10 @@ public class Interpreter extends Visitor {
 
                         if (((BtArray) rr).vector.size() > jj && jj >= 0) {
                             rr = ((BtArray) rr).vector.get(jj);
+
+                            if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
+                                rr = new BigDecimal(rr.toString());
+                            }
                             continue;
                         }
 
@@ -291,7 +295,15 @@ public class Interpreter extends Visitor {
                         }
 
                         rr = ((BtDictionary) rr).vector.get(index);
+
+                        if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
+                            rr = new BigDecimal(rr.toString());
+                        }
                     }
+                }
+
+                if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
+                    rr = new BigDecimal(rr.toString());
                 }
 
                 return rr;
@@ -331,6 +343,10 @@ public class Interpreter extends Visitor {
 
                         if (((BtArray) rr).vector.size() > jj && jj >= 0) {
                             rr = ((BtArray) rr).vector.get(jj);
+
+                            if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
+                                rr = new BigDecimal(rr.toString());
+                            }
                             continue;
                         }
 
@@ -345,7 +361,15 @@ public class Interpreter extends Visitor {
                         }
 
                         rr = ((BtDictionary) rr).vector.get(index);
+
+                        if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
+                            rr = new BigDecimal(rr.toString());
+                        }
                     }
+                }
+
+                if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
+                    rr = new BigDecimal(rr.toString());
                 }
 
                 return rr;

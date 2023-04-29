@@ -106,13 +106,11 @@ public class BulletModule extends Module {
                                 if (e instanceof BulletException) {
                                     if (e instanceof RuntimeException) {
                                         Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
-                                    } else {
-                                        Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                                        return;
                                     }
-                                    return;
                                 }
 
-                                Rifle.getInstance().getLogger().error(String.format("\n%s", e.getMessage()));
+                                Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
                             }
                         }
                     });
@@ -122,13 +120,11 @@ public class BulletModule extends Module {
             if (e instanceof BulletException) {
                 if (e instanceof RuntimeException) {
                     Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
-                } else {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                    return;
                 }
-                return;
             }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s", e.getMessage()));
+            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
         }
     }
 
@@ -142,13 +138,11 @@ public class BulletModule extends Module {
             if (e instanceof BulletException) {
                 if (e instanceof RuntimeException) {
                     Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
-                } else {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                    return;
                 }
-                return;
             }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s", e.getMessage()));
+            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
         }
     }
 
@@ -162,13 +156,11 @@ public class BulletModule extends Module {
             if (e instanceof BulletException) {
                 if (e instanceof RuntimeException) {
                     Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
-                } else {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                    return;
                 }
-                return;
             }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s", e.getMessage()));
+            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
         }
     }
 
@@ -182,13 +174,11 @@ public class BulletModule extends Module {
             if (e instanceof BulletException) {
                 if (e instanceof RuntimeException) {
                     Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
-                } else {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                    return;
                 }
-                return;
             }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s", e.getMessage()));
+            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
         }
     }
 

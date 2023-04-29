@@ -60,7 +60,7 @@ public class Rifle {
         } catch (InterruptedException e) {
             getConsole().shutdown();
         } catch (Exception e) {
-            getLogger().error(e.getMessage());
+            getLogger().error(TextFormat.FONT_RED + e.getMessage());
         }
     }
 

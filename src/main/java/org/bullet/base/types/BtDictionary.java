@@ -1,5 +1,6 @@
 package org.bullet.base.types;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -12,6 +13,27 @@ public class BtDictionary {
 
     public BtDictionary() {
         vector = new LinkedHashMap<>();
+    }
+
+    public static BtDictionary parse(Map map) {
+        BtDictionary dictionary = new BtDictionary();
+
+        for (Object key : map.keySet()) {
+            Object v = map.get(key);
+            if (v instanceof Double || v instanceof Integer || v instanceof Float) {
+                dictionary.vector.put(key.toString(), new BigDecimal(v.toString()));
+                continue;
+            }
+
+            if (v.getClass().isArray()) {
+                dictionary.vector.put(key.toString(), BtArray.parse((Object[]) v));
+                continue;
+            }
+
+            dictionary.vector.put(key.toString(), v);
+        }
+
+        return dictionary;
     }
 
     @Override
@@ -42,5 +64,29 @@ public class BtDictionary {
         builder.append("}");
 
         return builder.toString();
+    }
+
+    public final Map<String, Object> toMap() {
+        return translate(this);
+    }
+
+    private Map<String, Object> translate(BtDictionary dictionary) {
+        LinkedHashMap<String, Object> map = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Object> entry : dictionary.vector.entrySet()) {
+            if (entry.getValue() instanceof BtDictionary) {
+                map.put(entry.getKey(), translate((BtDictionary) entry.getValue()));
+                continue;
+            }
+
+            if (entry.getValue() instanceof BtArray) {
+                map.put(entry.getKey(), ((BtArray) entry.getValue()).toArray());
+                continue;
+            }
+
+            map.put(entry.getKey(), entry.getValue());
+        }
+
+        return map;
     }
 }

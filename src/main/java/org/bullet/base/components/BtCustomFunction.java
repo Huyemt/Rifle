@@ -1,10 +1,13 @@
 package org.bullet.base.components;
 
+import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtDictionary;
 import org.bullet.compiler.ast.nodes.FunctionNode;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.Interpreter;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * @author Huyemt
@@ -37,11 +40,10 @@ public class BtCustomFunction extends BtFunction {
         for (int i = 0; i < node.params.size(); i++) {
             if (args[i] instanceof Integer || args[i] instanceof Float || args[i] instanceof Double) {
                 args[i] = new BigDecimal(args[i].toString());
-            }
-
-            // 将 Java 的数组转换为 BtArray 类型
-            if (args[i].getClass().isArray()) {
-                args[i] = translateArray((Object[]) args[i]);
+            } else if (args[i].getClass().isArray()) {
+                args[i] = BtArray.parse((Object[]) args[i]);
+            } else if (args[i] instanceof Map) {
+                args[i] = BtDictionary.parse((Map<String, Object>) args[i]);
             }
 
             environment.params.put(node.params.get(i), args[i]);

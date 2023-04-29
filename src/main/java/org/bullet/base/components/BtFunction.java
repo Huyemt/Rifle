@@ -50,26 +50,6 @@ public abstract class BtFunction {
         return funcName;
     }
 
-    protected final BtArray translateArray(Object[] arr) {
-        BtArray array = new BtArray();
-
-        for (Object v : arr) {
-            if (v instanceof Double || v instanceof Integer || v instanceof Float) {
-                array.vector.add(new BigDecimal(v.toString()));
-                continue;
-            }
-
-            if (v.getClass().isArray()) {
-                array.vector.add(translateArray((Object[]) v));
-                continue;
-            }
-
-            array.vector.add(v);
-        }
-
-        return array;
-    }
-
     @Override
     public String toString() {
         return "Function:".concat(funcName);

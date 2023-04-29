@@ -557,6 +557,7 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.MLPAREN) {
             lexer.next();
+
             variable.index.add(this.Assign());
             lexer.expectToken(TokenKind.MRPAREN); // ]
         }

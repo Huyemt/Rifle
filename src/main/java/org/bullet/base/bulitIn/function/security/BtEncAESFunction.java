@@ -54,8 +54,6 @@ public class BtEncAESFunction extends BtFunction {
             if (args[2] instanceof BigDecimal) {
                 return Crypto4J.AES.encrypt(content, key, getMode(((BigDecimal) args[2]).intValueExact()));
             }
-
-            throw new BulletException("Unknown behavior");
         } else if (args.length == 4) {
             // Iv and Mode
             if (args[2] instanceof String && args[3] instanceof BigDecimal) {
@@ -78,8 +76,6 @@ public class BtEncAESFunction extends BtFunction {
                 }
 
             }
-
-            throw new BulletException("Unknown behavior");
         } else {
 
             // Iv Mode Padding
@@ -110,9 +106,9 @@ public class BtEncAESFunction extends BtFunction {
                 }
 
             }
-
-            throw new BulletException("Unknown behavior");
         }
+        
+        throw new BulletException("Unknown behavior");
     }
 
     private AES.Mode getMode(int n) throws BulletException {
