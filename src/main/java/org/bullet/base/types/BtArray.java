@@ -91,4 +91,10 @@ public class BtArray {
 
         return list.toArray(Object[]::new);
     }
+
+    public BtArray clone() {
+        BtArray btArray = new BtArray();
+        btArray.vector = (ArrayList<Object>) vector.clone();
+        return btArray;
+    }
 }

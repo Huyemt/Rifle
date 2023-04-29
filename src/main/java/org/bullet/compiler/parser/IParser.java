@@ -128,6 +128,7 @@ public interface IParser {
      * @throws ParsingException
      */
     Node Assign() throws ParsingException;
+    IndexNode Index() throws ParsingException;
     Node ArrayCall() throws ParsingException;
     DictionaryNode Dictionary() throws ParsingException;
     Node LogicTerm() throws ParsingException;

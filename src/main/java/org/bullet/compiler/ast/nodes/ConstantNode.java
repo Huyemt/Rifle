@@ -10,9 +10,11 @@ import org.bullet.exceptions.RuntimeException;
 
 public class ConstantNode<T> extends Node {
     public T value;
+    public boolean complex;
+    public IndexNode indexNode;
 
     public ConstantNode() {
-
+        indexNode = null;
     }
 
     public T getValue() {

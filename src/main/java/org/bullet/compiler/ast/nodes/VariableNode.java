@@ -13,10 +13,10 @@ import java.util.ArrayList;
 public class VariableNode extends Node {
 
     public String name;
-    public final ArrayList<Node> index;
+    public IndexNode indexNode;
 
     public VariableNode() {
-        index = new ArrayList<>();
+        indexNode = null;
     }
 
     @Override

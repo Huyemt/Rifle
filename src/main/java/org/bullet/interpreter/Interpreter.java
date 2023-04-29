@@ -16,11 +16,13 @@ import org.bullet.exceptions.RuntimeException;
 import org.bullet.exceptions.common.DefinedException;
 import org.bullet.exceptions.common.FileCorruptingExceiption;
 import org.bullet.exceptions.common.ParsingException;
+import org.bullet.exceptions.common.UnderfineException;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -224,6 +226,10 @@ public class Interpreter extends Visitor {
     @Override
     public Object goConstant(ConstantNode<?> node) throws RuntimeException {
         if (node.value instanceof BigDecimal || node.value instanceof Boolean || node.value instanceof String) {
+            if (node.value instanceof String) {
+                return valueOfIndex(node.value, node.indexNode);
+            }
+
             return node.value;
         }
 
@@ -239,143 +245,7 @@ public class Interpreter extends Visitor {
     public Object goVariable(VariableNode node) throws RuntimeException {
         try {
             Object v = runtime.environment != null && runtime.environment.params.containsKey(node.name) ? runtime.environment.params.get(node.name) : runtime.scope.findVariable(node.name).getValue();
-
-            if (v instanceof BtArray) {
-                BtArray array = (BtArray) v;
-
-                if (node.index.size() == 0) {
-                    return array;
-                }
-
-                Object index;
-                Object rr;
-                int jj;
-                index = node.index.get(0).accept(this);
-
-                if (!(index instanceof BigDecimal)) {
-                    throw new RuntimeException(node.index.get(0).position, "Array's index can only be a number");
-                }
-
-                jj = ((BigDecimal) index).intValueExact();
-
-                if (array.vector.size() <= jj) {
-                    throw new RuntimeException(node.index.get(0).position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
-                }
-
-                rr = array.vector.get(jj);
-
-                for (int i = 1; i < node.index.size(); i++) {
-                    index = node.index.get(i).accept(this);
-
-                    if (rr instanceof BtArray) {
-
-                        if (!(index instanceof BigDecimal)) {
-                            throw new RuntimeException(node.index.get(i).position, "Array's index can only be a number");
-                        }
-
-                        jj = ((BigDecimal) index).intValueExact();
-
-                        if (((BtArray) rr).vector.size() > jj && jj >= 0) {
-                            rr = ((BtArray) rr).vector.get(jj);
-
-                            if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
-                                rr = new BigDecimal(rr.toString());
-                            }
-                            continue;
-                        }
-
-                        throw new RuntimeException(node.index.get(i).position, String.format("Index %d out of bounds for length %d", jj, ((BtArray) rr).vector.size()));
-                    } else if (rr instanceof BtDictionary) {
-                        if (!(index instanceof String)) {
-                            throw new RuntimeException(node.index.get(i).position, "Dictionary's index can only be a string");
-                        }
-
-                        if (!((BtDictionary) rr).vector.containsKey(index)) {
-                            throw new RuntimeException(node.index.get(i).position, String.format("The key \"%s\" is not exists", index));
-                        }
-
-                        rr = ((BtDictionary) rr).vector.get(index);
-
-                        if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
-                            rr = new BigDecimal(rr.toString());
-                        }
-                    }
-                }
-
-                if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
-                    rr = new BigDecimal(rr.toString());
-                }
-
-                return rr;
-            }
-
-            if (v instanceof BtDictionary) {
-                BtDictionary dictionary = (BtDictionary) v;
-
-                if (node.index.size() == 0) {
-                    return v;
-                }
-
-                Object index;
-                Object rr;
-                int jj;
-                index = node.index.get(0).accept(this);
-
-                if (!(index instanceof String)) {
-                    throw new RuntimeException(node.index.get(0).position, "Dictionary's index can only be a string");
-                }
-
-                if (!dictionary.vector.containsKey(index)) {
-                    throw new RuntimeException(node.index.get(0).position, String.format("The key \"%s\" is not exists", index));
-                }
-
-                rr = dictionary.vector.get(index);
-
-                for (int i = 1; i < node.index.size(); i++) {
-                    index = node.index.get(i).accept(this);
-
-                    if (rr instanceof BtArray) {
-                        if (!(index instanceof BigDecimal)) {
-                            throw new RuntimeException(node.index.get(i).position, "Array's index can only be a number");
-                        }
-
-                        jj = ((BigDecimal) index).intValueExact();
-
-                        if (((BtArray) rr).vector.size() > jj && jj >= 0) {
-                            rr = ((BtArray) rr).vector.get(jj);
-
-                            if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
-                                rr = new BigDecimal(rr.toString());
-                            }
-                            continue;
-                        }
-
-                        throw new RuntimeException(node.index.get(i).position, String.format("Index %d out of bounds for length %d", jj, ((BtArray) rr).vector.size()));
-                    } else if (rr instanceof BtDictionary) {
-                        if (!(index instanceof String)) {
-                            throw new RuntimeException(node.index.get(i).position, "Dictionary's index can only be a string");
-                        }
-
-                        if (!((BtDictionary) rr).vector.containsKey(index)) {
-                            throw new RuntimeException(node.index.get(i).position, String.format("The key \"%s\" is not exists", index));
-                        }
-
-                        rr = ((BtDictionary) rr).vector.get(index);
-
-                        if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
-                            rr = new BigDecimal(rr.toString());
-                        }
-                    }
-                }
-
-                if (rr instanceof Integer || rr instanceof Double || rr instanceof Float) {
-                    rr = new BigDecimal(rr.toString());
-                }
-
-                return rr;
-            }
-
-            return v;
+            return valueOfIndex(v, node.indexNode);
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
@@ -384,407 +254,13 @@ public class Interpreter extends Visitor {
     @Override
     public Object goAssign(AssignNode node) throws RuntimeException {
         if (node.left instanceof VariableNode) {
-            VariableNode variable = (VariableNode) node.left;
             Object result = node.right.accept(this);
 
             if (node.complexLevel > 1) {
                 return result;
             }
 
-            try {
-                if (runtime.environment != null && runtime.environment.params.containsKey(variable.name)) {
-                    if (variable.index.size() == 0) {
-                        runtime.environment.params.put(variable.name, result);
-                    } else {
-                        Object v = runtime.environment.params.get(variable.name);
-
-                        if (v instanceof BtArray) {
-                            BtArray array = (BtArray) v;
-                            Object index;
-                            Object rr = null;
-                            int jj;
-
-                            for (int i = 0; i < variable.index.size() - 1; i++) {
-                                index = variable.index.get(i).accept(this);
-
-                                if (!(index instanceof BigDecimal)) {
-                                    throw new RuntimeException(variable.index.get(i).position, "Array's index can only be a number");
-                                }
-
-                                jj = ((BigDecimal) index).intValueExact();
-
-                                if (rr == null) {
-                                    if (array.vector.size() > jj && jj >= 0) {
-                                        rr = array.vector.get(jj);
-
-                                        if (!(rr instanceof BtArray)) {
-                                            throw new RuntimeException(variable.index.get(i).position, "Only arrays can use numeric indexes");
-                                        }
-
-                                        continue;
-                                    }
-                                } else {
-                                    if (((BtArray) rr).vector.size() > jj && jj >= 0) {
-                                        rr = ((BtArray) rr).vector.get(jj);
-
-                                        if (!(rr instanceof BtArray)) {
-                                            throw new RuntimeException(variable.index.get(i).position, "Only arrays can use numeric indexes");
-                                        }
-
-                                        continue;
-                                    }
-                                }
-
-                                throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
-                            }
-
-                            jj = ((BigDecimal) variable.index.get(variable.index.size() - 1).accept(this)).intValueExact();
-
-                            if (result instanceof BtArray) {
-                                BtArray array1 = new BtArray();
-                                array1.vector = (ArrayList<Object>) ((BtArray) result).vector.clone();
-                                result = array1;
-                            }
-
-                            if (rr == null) {
-                                if (jj >= 0) {
-                                    if (jj + 1 < array.vector.size())
-                                        array.vector.set(jj, result);
-                                    else if (jj == array.vector.size())
-                                        array.vector.add(result);
-                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
-
-                                    return array;
-                                }
-                            } else {
-                                if (jj >= 0) {
-                                    BtArray array1 = ((BtArray) rr);
-                                    if (jj + 1 < array1.vector.size())
-                                        array1.vector.set(jj, result);
-                                    else if (jj == array1.vector.size())
-                                        array1.vector.add(result);
-                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
-
-                                    return array;
-                                }
-                            }
-
-                            throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
-                        }
-
-                        if (v instanceof BtDictionary) {
-                            BtDictionary dictionary = (BtDictionary) v;
-                            Object index;
-                            Object rr = null;
-                            int jj;
-
-                            for (int i = 0; i < variable.index.size() - 1; i++) {
-                                index = variable.index.get(i).accept(this);
-
-                                if (rr == null) {
-                                    if (!(index instanceof String)) {
-                                        throw new RuntimeException(variable.index.get(i).position, "Dictionary's index can only be a string");
-                                    }
-
-                                    if (!dictionary.vector.containsKey(index)) {
-                                        throw new RuntimeException(variable.index.get(i).position, String.format("The key \"%s\" is not exists", index));
-                                    }
-
-                                    rr = dictionary.vector.get(index);
-                                } else {
-                                    if (rr instanceof BtArray) {
-                                        if (!(index instanceof BigDecimal)) {
-                                            throw new RuntimeException(variable.index.get(i).position, "Array's index can only be a number");
-                                        }
-
-                                        jj = ((BigDecimal) index).intValueExact();
-
-                                        if (((BtArray) rr).vector.size() > jj && jj >= 0) {
-                                            rr = ((BtArray) rr).vector.get(jj);
-                                            continue;
-                                        }
-
-                                        throw new RuntimeException(variable.index.get(i).position, String.format("Index %d out of bounds for length %d", jj, ((BtArray) rr).vector.size()));
-                                    } else if (rr instanceof BtDictionary) {
-                                        if (!(index instanceof String)) {
-                                            throw new RuntimeException(variable.index.get(i).position, "Dictionary's index can only be a string");
-                                        }
-
-                                        if (!((BtDictionary) rr).vector.containsKey(index)) {
-                                            throw new RuntimeException(variable.index.get(i).position, String.format("The key \"%s\" is not exists", index));
-                                        }
-
-                                        rr = ((BtDictionary) rr).vector.get(index);
-                                    }
-                                }
-                            }
-
-                            index = variable.index.get(variable.index.size() - 1).accept(this);
-
-                            if (result instanceof BtDictionary) {
-                                BtDictionary btDictionary = new BtDictionary();
-                                btDictionary.vector.putAll((Map<? extends String, ?>) ((BtDictionary) result).vector.clone());
-                                result = btDictionary;
-                            }
-
-                            if (rr == null) {
-                                dictionary.vector.put(index.toString(), result);
-                            } else {
-                                if (rr instanceof BtDictionary) {
-                                    ((BtDictionary) rr).vector.put(index.toString(), result);
-                                } else if (rr instanceof BtArray) {
-                                    if (!(index instanceof BigDecimal)) {
-                                        throw new RuntimeException(variable.index.get(variable.index.size() - 1).position, "Array's index can only be a number");
-                                    }
-
-                                    jj = ((BigDecimal) index).intValueExact();
-
-                                    BtArray array1 = ((BtArray) rr);
-
-                                    if (jj >= 0) {
-                                        if (jj < array1.vector.size())
-                                            array1.vector.set(jj, result);
-                                        else if (jj == array1.vector.size())
-                                            array1.vector.add(result);
-                                        else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
-
-                                        return dictionary;
-                                    }
-
-                                    throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
-                                }
-                            }
-
-                            return dictionary;
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Variable \"%s\" is not an array or a dictionary", variable.name));
-                    }
-
-                    return result;
-                }
-
-                if (node.isProvide) {
-                    if (runtime.provideAttributes.containsKey(variable.name)) {
-                        throw new DefinedException(DefinedException.DerfinedType.PROVIDE_ATTRIBUTE, variable.name);
-                    }
-
-                    runtime.provideAttributes.put(variable.name, result);
-                    return result;
-                }
-
-                if (variable.index.size() == 0) {
-                    BtVariable variable1 = node.createAction ? runtime.scope.createVariable(variable.name, result) : runtime.scope.changeVariable(variable.name, result);
-
-                    if (node.createAction) {
-                        variable1.canChange = node.canChange;
-                    }
-
-                    return variable1.getValue();
-                } else {
-                    if (node.createAction) {
-                        throw new RuntimeException(node.position, "Array access cannot be performed when variables are declared");
-                    }
-
-                    BtVariable v = runtime.scope.findVariable(variable.name);
-
-                    if (v.getValue() instanceof BtArray) {
-                        BtArray array = (BtArray) v.getValue();
-                        Object index;
-                        Object rr = null;
-                        int jj = -1;
-
-                        for (int i = 0; i < variable.index.size() - 1; i++) {
-                            index = variable.index.get(i).accept(this);
-
-                            if (rr == null) {
-                                if (!(index instanceof BigDecimal)) {
-                                    throw new RuntimeException(variable.index.get(i).position, "Array's index can only be a number");
-                                }
-
-                                jj = ((BigDecimal) index).intValueExact();
-
-                                if (array.vector.size() > jj && jj >= 0) {
-                                    rr = array.vector.get(jj);
-
-                                    if (!(rr instanceof BtArray)) {
-                                        throw new RuntimeException(variable.index.get(i).position, "Only arrays can use numeric indexes");
-                                    }
-
-                                    continue;
-                                }
-                            } else {
-                                if (rr instanceof BtArray) {
-                                    if (!(index instanceof BigDecimal)) {
-                                        throw new RuntimeException(variable.index.get(i).position, "Array's index can only be a number");
-                                    }
-
-                                    jj = ((BigDecimal) index).intValueExact();
-
-                                    if (((BtArray) rr).vector.size() > jj && jj >= 0) {
-                                        rr = ((BtArray) rr).vector.get(jj);
-                                        continue;
-                                    }
-
-                                    throw new RuntimeException(variable.index.get(i).position, String.format("Index %d out of bounds for length %d", jj, ((BtArray) rr).vector.size()));
-                                } else if (rr instanceof BtDictionary) {
-                                    if (!(index instanceof String)) {
-                                        throw new RuntimeException(variable.index.get(i).position, "Dictionary's index can only be a string");
-                                    }
-
-                                    if (!((BtDictionary) rr).vector.containsKey(index)) {
-                                        throw new RuntimeException(variable.index.get(i).position, String.format("The key \"%s\" is not exists", index));
-                                    }
-
-                                    rr = ((BtDictionary) rr).vector.get(index);
-                                    continue;
-                                }
-                            }
-
-                            throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", i, array.vector.size()));
-                        }
-
-                        index = variable.index.get(variable.index.size() - 1).accept(this);
-
-                        if (result instanceof BtArray) {
-                            BtArray array1 = new BtArray();
-                            array1.vector = (ArrayList<Object>) ((BtArray) result).vector.clone();
-                            result = array1;
-                        }
-
-                        if (rr == null) {
-                            if (!(index instanceof BigDecimal)) {
-                                throw new RuntimeException(variable.index.get(variable.index.size() - 1).position, "Array's index can only be a number");
-                            }
-
-                            jj = ((BigDecimal) index).intValueExact();
-
-                            if (jj >= 0) {
-                                if (jj + 1 < array.vector.size())
-                                    array.vector.set(jj, result);
-                                else if (jj == array.vector.size())
-                                    array.vector.add(result);
-                                else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
-                            }
-
-                            return array;
-                        } else {
-                            if (rr instanceof BtDictionary) {
-                                ((BtDictionary) rr).vector.put(index.toString(), result);
-                            } else if (rr instanceof BtArray) {
-                                if (!(index instanceof BigDecimal)) {
-                                    throw new RuntimeException(variable.index.get(variable.index.size() - 1).position, "Array's index can only be a number");
-                                }
-
-                                jj = ((BigDecimal) index).intValueExact();
-
-                                if (jj >= 0) {
-                                    BtArray array1 = ((BtArray) rr);
-                                    if (jj < array1.vector.size())
-                                        array1.vector.set(jj, result);
-                                    else if (jj == array1.vector.size())
-                                        array1.vector.add(result);
-                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
-                                }
-
-                                return array;
-                            }
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array.vector.size()));
-                    }
-
-                    if (v.getValue() instanceof BtDictionary) {
-                        BtDictionary dictionary = (BtDictionary) v.getValue();
-                        Object index;
-                        Object rr = null;
-                        int jj;
-
-                        for (int i = 0; i < variable.index.size() - 1; i++) {
-                            index = variable.index.get(i).accept(this);
-
-                            if (rr == null) {
-                                if (!(index instanceof String)) {
-                                    throw new RuntimeException(variable.index.get(i).position, "Dictionary's index can only be a string");
-                                }
-
-                                if (!dictionary.vector.containsKey(index)) {
-                                    throw new RuntimeException(variable.index.get(i).position, String.format("The key \"%s\" is not exists", index));
-                                }
-
-                                rr = dictionary.vector.get(index);
-                            } else {
-                                if (rr instanceof BtArray) {
-                                    if (!(index instanceof BigDecimal)) {
-                                        throw new RuntimeException(variable.index.get(i).position, "Array's index can only be a number");
-                                    }
-
-                                    jj = ((BigDecimal) index).intValueExact();
-
-                                    if (((BtArray) rr).vector.size() > jj && jj >= 0) {
-                                        rr = ((BtArray) rr).vector.get(jj);
-                                        continue;
-                                    }
-
-                                    throw new RuntimeException(variable.index.get(i).position, String.format("Index %d out of bounds for length %d", jj, ((BtArray) rr).vector.size()));
-                                } else if (rr instanceof BtDictionary) {
-                                    if (!(index instanceof String)) {
-                                        throw new RuntimeException(variable.index.get(i).position, "Dictionary's index can only be a string");
-                                    }
-
-                                    if (!((BtDictionary) rr).vector.containsKey(index)) {
-                                        throw new RuntimeException(variable.index.get(i).position, String.format("The key \"%s\" is not exists", index));
-                                    }
-
-                                    rr = ((BtDictionary) rr).vector.get(index);
-                                }
-                            }
-                        }
-
-                        index = variable.index.get(variable.index.size() - 1).accept(this);
-
-                        if (result instanceof BtDictionary) {
-                            BtDictionary btDictionary = new BtDictionary();
-                            btDictionary.vector.putAll((Map<? extends String, ?>) ((BtDictionary) result).vector.clone());
-                            result = btDictionary;
-                        }
-
-                        if (rr == null) {
-                            dictionary.vector.put(index.toString(), result);
-                        } else {
-                            if (rr instanceof BtDictionary) {
-                                ((BtDictionary) rr).vector.put(index.toString(), result);
-                            } else if (rr instanceof BtArray) {
-                                if (!(index instanceof BigDecimal)) {
-                                    throw new RuntimeException(variable.index.get(variable.index.size() - 1).position, "Array's index can only be a number");
-                                }
-
-                                jj = ((BigDecimal) index).intValueExact();
-
-                                BtArray array1 = ((BtArray) rr);
-
-                                if (jj >= 0) {
-                                    if (jj < array1.vector.size())
-                                        array1.vector.set(jj, result);
-                                    else if (jj == array1.vector.size())
-                                        array1.vector.add(result);
-                                    else throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
-
-                                    return dictionary;
-                                }
-
-                                throw new RuntimeException(node.position, String.format("Index %d out of bounds for length %d", jj, array1.vector.size()));
-                            }
-                        }
-
-                        return dictionary;
-                    }
-
-                    throw new RuntimeException(node.position, String.format("Variable \"%s\" is not an array or a dictionary", variable.name));
-                }
-            } catch (BulletException e) {
-                throw new RuntimeException(node.position, e.getMessage());
-            }
+            return changeValue(result, node);
         }
 
         throw new RuntimeException(node.position, "Only variables can be assigned values");
@@ -1049,5 +525,331 @@ public class Interpreter extends Visitor {
         }
 
         return dictionary;
+    }
+
+    private Object valueOfIndex(Object v, IndexNode node) throws RuntimeException {
+        if (node == null) {
+            if (v instanceof BtArray || v instanceof BtDictionary || v instanceof String)
+                return v;
+            else if (v instanceof Integer || v instanceof Double || v instanceof Float) {
+                return new BigDecimal(v.toString());
+            }
+        }
+
+        IndexNode indexNode = node;
+
+        while (indexNode != null) {
+            if (indexNode.complex) {
+                if (!(v instanceof BtArray || v instanceof String)) {
+                    throw new RuntimeException(indexNode.position, "Index values are not supported for this type");
+                }
+
+                int start;
+                int end;
+                Object i;
+
+                if (indexNode.start == null) {
+                    start = 0;
+                } else {
+                    i = indexNode.start.accept(this);
+
+                    if (!(i instanceof BigDecimal)) {
+                        throw new RuntimeException(indexNode.start.position, "Complex index values must be numbers");
+                    }
+
+                    start = ((BigDecimal) i).intValueExact();
+
+                    if (start < 0) {
+                        throw new RuntimeException(indexNode.start.position, "Index value less than 0 is not allowed");
+                    }
+                }
+
+                if (indexNode.end == null) {
+                    if (v instanceof String) {
+                        end = ((String) v).length();
+                    } else {
+                        end = ((BtArray) v).vector.size();
+                    }
+                } else {
+                    i = indexNode.end.accept(this);
+
+                    if (!(i instanceof BigDecimal)) {
+                        throw new RuntimeException(indexNode.end.position, "Complex index values must be numbers");
+                    }
+
+                    end = ((BigDecimal) i).intValueExact();
+
+                    if (end < 0) {
+                        throw new RuntimeException(indexNode.end.position, "Index value less than 0 is not allowed");
+                    }
+                }
+
+                int len;
+
+                if (v instanceof String) {
+                    String str = (String) v;
+                    len = str.length();
+
+                    if (start > end) {
+                        int temp = end;
+                        end = start;
+                        start = temp;
+
+                        str = new StringBuffer(str).reverse().toString();
+                    }
+
+                    if (end > len) {
+                        throw new RuntimeException(node.position, String.format("String index %d is out of range %d", end, len));
+                    }
+
+                    v = str.substring(start, end);
+                } else {
+                    BtArray btArray1 = ((BtArray) v);
+                    len = btArray1.vector.size();
+
+                    if (start > end) {
+                        int temp = end;
+                        end = start;
+                        start = temp;
+
+                        BtArray array = btArray1.clone();
+
+                        Collections.reverse(array.vector);
+
+                        btArray1 = array;
+                    }
+
+                    if (end > len) {
+                        throw new RuntimeException(node.position, String.format("Array index %d is out of range %d", end, len));
+                    }
+
+                    BtArray btArray = new BtArray();
+
+                    for (int n = start; n < end; n++) {
+                        Object a = btArray1.vector.get(n);
+
+                        if (a instanceof Integer || a instanceof Double || a instanceof Float) {
+                            a = new BigDecimal(a.toString());
+                        }
+
+                        btArray.vector.add(a);
+                    }
+
+                    v = btArray;
+                }
+            } else {
+                if (!(v instanceof BtArray || v instanceof String || v instanceof BtDictionary)) {
+                    throw new RuntimeException(indexNode.position, String.format("Index values are not supported for this type \"%s\"", v.getClass().getSimpleName()));
+                }
+
+                Object i = indexNode.start == null ? null : indexNode.start.accept(this);
+
+                if (v instanceof BtDictionary) {
+                    if (!(i instanceof String)) {
+                        throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, "Dictionary index must be a string");
+                    }
+
+                    v = ((BtDictionary) v).vector.get(i);
+                } else {
+                    if (!(i instanceof BigDecimal || i == null)) {
+                        throw new RuntimeException(indexNode.start.position, String.format("%s index must be a number", i.getClass().getSimpleName()));
+                    }
+
+                    int len;
+
+                    if (v instanceof BtArray) {
+                        BtArray btArray = (BtArray) v;
+                        len = i == null ? btArray.vector.size() - 1 : ((BigDecimal) i).intValueExact();
+                        if (len >= btArray.vector.size()) {
+                            throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("Array index %d is out of range %d", len, btArray.vector.size()));
+                        }
+
+                        v = btArray.vector.get(len);
+                    } else {
+                        String str = (String) v;
+                        len = i == null ? str.length() - 1 : ((BigDecimal) i).intValueExact();
+                        if (len >= str.length()) {
+                            throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("String index %d is out of range %d", len, str.length()));
+                        }
+
+                        v = String.valueOf(str.charAt(len));
+                    }
+                }
+            }
+
+            if (v instanceof Integer || v instanceof Double || v instanceof Float) {
+                v = new BigDecimal(v.toString());
+            }
+
+            indexNode = indexNode.next;
+        }
+
+        return v;
+    }
+
+    private Object changeValue(Object result, AssignNode node) throws RuntimeException {
+        try {
+            VariableNode variable = (VariableNode) node.left;
+            Object v;
+
+            if (runtime.environment != null && runtime.environment.params.containsKey(variable.name)) {
+                if (variable.indexNode == null) {
+                    runtime.environment.params.put(variable.name, result);
+                } else {
+                    v = runtime.environment.params.get(variable.name);
+                    IndexNode address = variable.indexNode;
+
+                    while (address.next != null) {
+                        if (address.next.next == null) {
+                            break;
+                        }
+
+                        address = address.next;
+                    }
+
+                    IndexNode superA;
+
+                    if (address.next == null) {
+                        superA = null;
+                    } else {
+                        superA = address.clone();
+                        address = address.next;
+                        superA.next = null;
+                    }
+
+                    Object s = this.valueOfIndex(v, superA);
+
+                    if (address.complex) {
+                        throw new RuntimeException(address.position, "Cannot use complex indexes when assigning values");
+                    }
+
+                    Object index = address.start == null ? null : address.start.accept(this);
+
+                    if (s instanceof BtArray) {
+                        if (!(index instanceof BigDecimal || index == null)) {
+                            throw new RuntimeException(node.position, String.format("%s index must be a number", s.getClass().getSimpleName()));
+                        }
+
+                        BtArray array = (BtArray) s;
+
+                        if (index == null) {
+                            array.vector.add(result);
+                        } else {
+                            int n = ((BigDecimal) index).intValueExact();
+
+                            if (n > array.vector.size()) {
+                                throw new RuntimeException(node.position, String.format("Array index %d is out of range %d", n, array.vector.size()));
+                            }
+
+                            if (n == array.vector.size()) {
+                                array.vector.add(result);
+                            } else {
+                                array.vector.set(n, result);
+                            }
+                        }
+                    } else if (s instanceof BtDictionary) {
+                        if (!(index instanceof String)) {
+                            throw new RuntimeException(node.position, String.format("%s index must be a string", s.getClass().getSimpleName()));
+                        }
+
+                        ((BtDictionary) s).vector.put(index.toString(), result);
+                    } else {
+                        throw new RuntimeException(node.position, String.format("the Type \"%s\" does not support assignment in this way", s.getClass().getSimpleName()));
+                    }
+
+                    return result;
+                }
+
+                return result;
+            }
+
+            if (node.isProvide) {
+                if (runtime.provideAttributes.containsKey(variable.name)) {
+                    throw new DefinedException(DefinedException.DerfinedType.PROVIDE_ATTRIBUTE, variable.name);
+                }
+
+                runtime.provideAttributes.put(variable.name, result);
+                return result;
+            }
+
+            if (!runtime.scope.existsVariable(variable.name)) {
+                if (variable.indexNode != null) {
+                    throw new UnderfineException(UnderfineException.UnderfineType.VARIABLE, variable.name);
+                }
+
+                runtime.scope.createVariable(variable.name, result);
+            } else {
+                BtVariable btVariable = runtime.scope.findVariable(variable.name);
+
+                if (variable.indexNode == null) {
+                    return btVariable.setValue(result).getValue();
+                } else {
+                    v = btVariable.getValue();
+                    IndexNode address = variable.indexNode;
+
+                    while (address.next != null) {
+                        if (address.next.next == null) {
+                            break;
+                        }
+
+                        address = address.next;
+                    }
+
+                    IndexNode superA;
+
+                    if (address.next == null) {
+                        superA = null;
+                    } else {
+                        superA = address.clone();
+                        address = address.next;
+                        superA.next = null;
+                    }
+
+                    Object s = this.valueOfIndex(v, superA);
+
+                    if (address.complex) {
+                        throw new RuntimeException(address.position, "Cannot use complex indexes when assigning values");
+                    }
+
+                    Object index = address.start == null ? null : address.start.accept(this);
+
+                    if (s instanceof BtArray) {
+                        if (!(index instanceof BigDecimal || index == null)) {
+                            throw new RuntimeException(node.position, String.format("%s index must be a number", s.getClass().getSimpleName()));
+                        }
+
+                        BtArray array = (BtArray) s;
+
+                        if (index == null) {
+                            array.vector.add(result);
+                        } else {
+                            int n = ((BigDecimal) index).intValueExact();
+
+                            if (n > array.vector.size()) {
+                                throw new RuntimeException(node.position, String.format("Array index %d is out of range %d", n, array.vector.size()));
+                            }
+
+                            if (n == array.vector.size()) {
+                                array.vector.add(result);
+                            } else {
+                                array.vector.set(n, result);
+                            }
+                        }
+                    } else if (s instanceof BtDictionary) {
+                        if (!(index instanceof String)) {
+                            throw new RuntimeException(node.position, String.format("%s index must be a string", s.getClass().getSimpleName()));
+                        }
+
+                        ((BtDictionary) s).vector.put(index.toString(), result);
+                    } else {
+                        throw new RuntimeException(node.position, String.format("The type \"%s\" does not support assignment in this way", s.getClass().getSimpleName()));
+                    }
+                }
+            }
+
+            return result;
+        } catch (BulletException e) {
+            throw new RuntimeException(node.position, e.getMessage());
+        }
     }
 }

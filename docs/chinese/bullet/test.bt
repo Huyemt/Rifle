@@ -1,12 +1,18 @@
-url := "https://v.api.aa1.cn/api/api-md5/go.php"
-params := {
-    "act": "加密",
-    "md5": "你好"
-}
+aStr := "abcdefghijklmnopqrstuvwxyz"
 
-// npost -> http post
-// nget -> http get
-rsp := nget(url, params)
+println( aStr[5:10] )
+println( aStr[:10] )
+println( aStr[10:5] )
 
-println(rsp["content"])
-println(md5("你好"))
+aList := [1, 2, 3, 4, 5, 6, 7]
+
+println( aList[5:2] )
+
+// 取最后的元素
+println( aList )
+println( aList[] )
+
+// 自增索引赋值
+aList[] = 8
+println( aList )
+println( aList[] )

@@ -375,7 +375,7 @@ public class Parser implements IParser {
     @Override
     public BreakNode Break() throws ParsingException {
         if (loopLevel == 0) {
-            throw new ParsingException(lexer.position, "Syntax error, it must be used in a circulating body");
+            throw new ParsingException(lexer.position, "Syntax error");
         }
 
         BreakNode node = new BreakNode();
@@ -392,7 +392,7 @@ public class Parser implements IParser {
     @Override
     public ContinueNode Continue() throws ParsingException {
         if (loopLevel == 0) {
-            throw new ParsingException(lexer.position, "Syntax error, it must be used in a circulating body");
+            throw new ParsingException(lexer.position, "Syntax error");
         }
 
         ContinueNode node = new ContinueNode();
@@ -478,10 +478,6 @@ public class Parser implements IParser {
                 throw new ParsingException(lexer.position, "Only variables can be assigned values");
             }
 
-            if (((VariableNode) left).index.size() > 0 && createAction) {
-                throw new ParsingException(lexer.position, String.format("Variable \"%s\" is not an array", ((VariableNode) left).name));
-            }
-
             AssignNode node = new AssignNode();
             node.createAction = createAction;
             node.canChange = canChange;
@@ -548,19 +544,63 @@ public class Parser implements IParser {
     }
 
     @Override
+    public IndexNode Index() throws ParsingException {
+        IndexNode indexNode = null;
+        IndexNode start = null;
+
+        while (lexer.currentToken.kind == TokenKind.MLPAREN) {
+            if (start == null) {
+                start = new IndexNode();
+                start.position = lexer.position.clone();
+
+                indexNode = start;
+            } else {
+                indexNode.next = new IndexNode();
+                indexNode = indexNode.next;
+                indexNode.position = lexer.position.clone();
+            }
+
+            lexer.next();
+
+            if (lexer.currentToken.kind != TokenKind.MRPAREN) {
+                while (lexer.currentToken.kind != TokenKind.MRPAREN) {
+                    if (lexer.currentToken.kind == TokenKind.COLON) {
+                        if (indexNode.complex) {
+                            throw new ParsingException(lexer.position, "Syntax error");
+                        }
+
+                        indexNode.complex = true;
+                        lexer.next();
+                    }
+
+                    if (lexer.currentToken.kind != TokenKind.MRPAREN) {
+                        if (indexNode.complex) {
+                            indexNode.end = this.Assign();
+                        } else {
+                            if (indexNode.start == null) {
+                                indexNode.start = this.Assign();
+                            } else {
+                                throw new ParsingException(lexer.position, "Syntax error");
+                            }
+                        }
+                    }
+                }
+            }
+
+            lexer.expectToken(TokenKind.MRPAREN);
+        }
+
+        return start;
+    }
+
+    @Override
     public Node ArrayCall() throws ParsingException {
         VariableNode variable = new VariableNode();
         variable.position = lexer.position.clone();
         variable.name = ((VToken) lexer.currentToken).value;
-
         lexer.next(); // identifier
 
-        while (lexer.currentToken.kind == TokenKind.MLPAREN) {
-            lexer.next();
-
-            variable.index.add(this.Assign());
-            lexer.expectToken(TokenKind.MRPAREN); // ]
-        }
+        variable.indexNode = this.Index();
 
         return variable;
     }
@@ -786,6 +826,8 @@ public class Parser implements IParser {
             node.value = ((VToken)lexer.currentToken).value;
             node.position = lexer.position.clone();
             lexer.next();
+
+            node.indexNode = this.Index();
 
             return node;
         }
