@@ -1,7 +1,33 @@
-a := {
-    "a": {
-        "a": []
+aDict := {
+    "a": 1,
+    "b": 1.1,
+    "c": "str",
+    "d": [1, 2, 3],
+    "e": false,
+    "f": {
+        "a": 1
     }
 }
-a[][][] = 1
-println(a[][])
+
+// {"a":1,"b":1.1,"c":"str","d":[1,2,3],"e":false,"f":{"a":1}}
+println(aDict)
+
+// str
+println(aDict["c"])
+
+// 3
+println(aDict["d"][])
+
+// 1
+println(aDict["f"]["a"])
+
+// 取最后一项
+// {"a":1}
+println(aDict[])
+
+aDict["g"] = []
+aDict[][] = len(aDict[])
+aDict[][] = len(aDict[])
+aDict[][] = len(aDict[])
+
+println(aDict[])

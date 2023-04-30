@@ -8,6 +8,8 @@
 而且我们拥有像`Golang`一样的变量推导式，使得程序编写的过程中可以更为简洁。
 
 ## 变量
+_注意：Bullet规定程序员对所有不存在的变量进行操作时，都需要使用下面的方法进行声明_
+
 ```bullet
 var i = 10
 ```
@@ -20,7 +22,7 @@ i := 10
 <br>
 
 ### 变量声明演示
-1. 字符串
+**字符串**
 ```bullet
 aStr := "Hello, world"
 
@@ -35,7 +37,7 @@ println(aStr[5:0])
 ```
 <br>
 
-2. 列表
+**列表**
 ```bullet
 var aList = [0, 1, 2, 3, 4]
 
@@ -72,7 +74,7 @@ println(aList)
 ```
 <br>
 
-3. 字典
+**字典**
 ```bullet
 aDict := {
     "a": 1,
@@ -100,6 +102,13 @@ println(aDict["f"]["a"])
 // 取最后一项
 // {"a":1}
 println(aDict[])
+
+aDict[][] = len(aDict[])
+aDict[][] = len(aDict[])
+aDict[][] = len(aDict[])
+
+// [0,1,2]
+println(aDict[])
 ```
 ## 函数
 _注意：Bullet目前不支持嵌套函数的写法。_
@@ -120,8 +129,7 @@ func voidFunction {
 <br>
 
 ### 函数的四种类型
-
-1. **无参数无返回值**
+#### 无参数无返回值
 ```bullet
 func aFunc {
     println("Hello, world")
@@ -132,7 +140,7 @@ aFunc()
 ```
 <br>
 
-2. **有参数无返回值**
+#### 有参数无返回值
 ```bullet
 func aFunc( param ) {
     println(param)
@@ -143,7 +151,7 @@ aFunc("Hello, world")
 ```
 <br>
 
-3. **无参数有返回值**
+#### 无参数有返回值
 ```bullet
 aK := 1
 func aFunc {
@@ -156,7 +164,7 @@ println(aFunc())
 ```
 <br>
 
-4. **有参数有返回值**
+#### 有参数有返回值
 ```bullet
 func aFunc( list ) {
     list[] = len(list)

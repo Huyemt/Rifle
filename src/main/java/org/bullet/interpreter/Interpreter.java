@@ -719,24 +719,11 @@ public class Interpreter extends Visitor {
                     IndexNode address = variable.indexNode;
 
                     while (address.next != null) {
-                        if (address.next.next == null) {
-                            break;
-                        }
-
+                        IndexNode node1 = address.clone();
+                        node1.next = null;
+                        v = valueOfIndex(v, node1);
                         address = address.next;
                     }
-
-                    IndexNode superA;
-
-                    if (address.next == null) {
-                        superA = null;
-                    } else {
-                        superA = address.clone();
-                        address = address.next;
-                        superA.next = null;
-                    }
-
-                    Object s = this.valueOfIndex(v, superA);
 
                     if (address.complex) {
                         throw new RuntimeException(address.position, "Cannot use complex indexes when assigning values");
@@ -744,12 +731,12 @@ public class Interpreter extends Visitor {
 
                     Object index = address.start == null ? null : address.start.accept(this);
 
-                    if (s instanceof BtArray) {
+                    if (v instanceof BtArray) {
                         if (!(index instanceof BigDecimal || index == null)) {
-                            throw new RuntimeException(node.position, String.format("%s index must be a number", s.getClass().getSimpleName()));
+                            throw new RuntimeException(node.position, String.format("%s index must be a number", v.getClass().getSimpleName()));
                         }
 
-                        BtArray array = (BtArray) s;
+                        BtArray array = (BtArray) v;
 
                         if (index == null) {
                             array.vector.add(result);
@@ -766,14 +753,14 @@ public class Interpreter extends Visitor {
                                 array.vector.set(n, result);
                             }
                         }
-                    } else if (s instanceof BtDictionary) {
+                    } else if (v instanceof BtDictionary) {
                         if (!(index instanceof String)) {
-                            throw new RuntimeException(node.position, String.format("%s index must be a string", s.getClass().getSimpleName()));
+                            throw new RuntimeException(node.position, String.format("%s index must be a string", v.getClass().getSimpleName()));
                         }
 
-                        ((BtDictionary) s).vector.put(index.toString(), result);
+                        ((BtDictionary) v).vector.put(index.toString(), result);
                     } else {
-                        throw new RuntimeException(node.position, String.format("the Type \"%s\" does not support assignment in this way", s.getClass().getSimpleName()));
+                        throw new RuntimeException(node.position, String.format("the Type \"%s\" does not support assignment in this way", v.getClass().getSimpleName()));
                     }
 
                     return result;
@@ -792,12 +779,19 @@ public class Interpreter extends Visitor {
             }
 
             if (!runtime.scope.existsVariable(variable.name)) {
-                if (variable.indexNode != null) {
-                    throw new UnderfineException(UnderfineException.UnderfineType.VARIABLE, variable.name);
+                if (node.createAction) {
+                    if (variable.indexNode == null) {
+                        runtime.scope.createVariable(variable.name, result);
+                        return result;
+                    }
                 }
 
-                runtime.scope.createVariable(variable.name, result);
+                throw new UnderfineException(UnderfineException.UnderfineType.VARIABLE, variable.name);
             } else {
+                if (node.createAction) {
+                    throw new DefinedException(DefinedException.DerfinedType.VARIABLE, variable.name);
+                }
+
                 BtVariable btVariable = runtime.scope.findVariable(variable.name);
 
                 if (variable.indexNode == null) {
@@ -807,28 +801,11 @@ public class Interpreter extends Visitor {
                     IndexNode address = variable.indexNode;
 
                     while (address.next != null) {
-                        if (address.next.next == null) {
-                            break;
-                        }
-
+                        IndexNode node1 = address.clone();
+                        node1.next = null;
+                        v = valueOfIndex(v, node1);
                         address = address.next;
                     }
-
-                    IndexNode superA;
-
-                    // a[x]
-                    if (address.next == null) {
-                        superA = null;
-                    } else {
-                        // a[x][x]
-                        superA = address.clone();
-                        address = address.next;
-                        superA.next = null;
-                    }
-
-                    Object s = this.valueOfIndex(v, superA);
-
-                    System.out.println(s);
 
                     if (address.complex) {
                         throw new RuntimeException(address.position, "Cannot use complex indexes when assigning values");
@@ -836,12 +813,12 @@ public class Interpreter extends Visitor {
 
                     Object index = address.start == null ? null : address.start.accept(this);
 
-                    if (s instanceof BtArray) {
+                    if (v instanceof BtArray) {
                         if (!(index instanceof BigDecimal || index == null)) {
-                            throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a number", s.getClass().getSimpleName()));
+                            throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a number", v.getClass().getSimpleName()));
                         }
 
-                        BtArray array = (BtArray) s;
+                        BtArray array = (BtArray) v;
 
                         if (index == null) {
                             array.vector.add(result);
@@ -858,14 +835,14 @@ public class Interpreter extends Visitor {
                                 array.vector.set(n, result);
                             }
                         }
-                    } else if (s instanceof BtDictionary) {
+                    } else if (v instanceof BtDictionary) {
                         if (!(index instanceof String)) {
-                            throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a string", s.getClass().getSimpleName()));
+                            throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a string", v.getClass().getSimpleName()));
                         }
 
-                        ((BtDictionary) s).vector.put(index.toString(), result);
+                        ((BtDictionary) v).vector.put(index.toString(), result);
                     } else {
-                        throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("The type \"%s\" does not support assignment in this way", s.getClass().getSimpleName()));
+                        throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("The type \"%s\" does not support assignment in this way", v.getClass().getSimpleName()));
                     }
                 }
             }
