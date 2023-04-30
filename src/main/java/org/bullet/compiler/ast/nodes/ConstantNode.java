@@ -8,8 +8,8 @@ import org.bullet.exceptions.RuntimeException;
  * @author Huyemt
  */
 
-public class ConstantNode<T> extends Node {
-    public T value;
+public class ConstantNode extends Node {
+    public Object value;
     public boolean complex;
     public IndexNode indexNode;
 
@@ -17,7 +17,7 @@ public class ConstantNode<T> extends Node {
         indexNode = null;
     }
 
-    public T getValue() {
+    public Object getValue() {
         return value;
     }
 

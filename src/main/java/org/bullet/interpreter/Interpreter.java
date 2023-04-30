@@ -37,6 +37,11 @@ public class Interpreter extends Visitor {
         Parser parser = new Parser(lexer);
         ProgramNode programNode = parser.Parse();
 
+        // 声明函数
+        for (FunctionNode node : parser.functions.values()) {
+            runtime.functions.put(node.name, new BtCustomFunction(this, node));
+        }
+
         BlockNode blockNode = new BlockNode();
         blockNode.position = programNode.position;
         blockNode.statements = programNode.statements;
@@ -101,13 +106,13 @@ public class Interpreter extends Visitor {
                         return String.valueOf(left).concat(right.toString());
                     }
 
-                    throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                 case SUB:
                     if (right instanceof BigDecimal) {
                         return ((BigDecimal) left).subtract((BigDecimal) right);
                     }
 
-                    throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                 case MUL:
                     if (right instanceof BigDecimal) {
                         return ((BigDecimal) left).multiply((BigDecimal) right);
@@ -115,7 +120,7 @@ public class Interpreter extends Visitor {
                         return ((String) right).repeat(((BigDecimal) left).intValue());
                     }
 
-                    throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                 case DIV:
                     if (right instanceof BigDecimal) {
                         if (((BigDecimal) right).intValue() == 0) {
@@ -125,13 +130,13 @@ public class Interpreter extends Visitor {
                         return ((BigDecimal) left).divide((BigDecimal) right, 1, RoundingMode.HALF_EVEN);
                     }
 
-                    throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                 case POW:
                     if (right instanceof BigDecimal) {
                         return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
                     }
 
-                    throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getName()));
+                    throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                 case EQUAL:
                 case NOT_EQUAL:
                 case GREATER:
@@ -224,8 +229,8 @@ public class Interpreter extends Visitor {
     }
 
     @Override
-    public Object goConstant(ConstantNode<?> node) throws RuntimeException {
-        if (node.value instanceof BigDecimal || node.value instanceof Boolean || node.value instanceof String) {
+    public Object goConstant(ConstantNode node) throws RuntimeException {
+        if (node.value instanceof BigDecimal || node.value instanceof Boolean || node.value instanceof String || node.value == null) {
             if (node.value instanceof String) {
                 return valueOfIndex(node.value, node.indexNode);
             }
@@ -433,17 +438,6 @@ public class Interpreter extends Visitor {
         runtime.loopLevel--;
 
         return result;
-    }
-
-    @Override
-    public Object goFunction(FunctionNode node) throws RuntimeException {
-        if (runtime.functions.containsKey(node.name)) {
-            throw new RuntimeException(node.position, String.format("The function \"%s\" has already been declared", node.name));
-        }
-
-        runtime.functions.put(node.name, new BtCustomFunction(this, node));
-
-        return null;
     }
 
     @Override

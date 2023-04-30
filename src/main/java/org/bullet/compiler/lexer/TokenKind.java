@@ -30,6 +30,7 @@ public enum TokenKind {
     BREAK("break"),
     CONTINUE("continue"),
     INSTANCEOF("instanceof"),
+    NULL("null"),
 
     /*
     运算符

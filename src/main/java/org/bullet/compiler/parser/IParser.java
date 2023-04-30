@@ -140,5 +140,6 @@ public interface IParser {
     Node Factor() throws ParsingException;
     Node Unary() throws ParsingException;
     Node Involution() throws ParsingException;
+    Node Secondary() throws ParsingException;
     Node Primary() throws ParsingException;
 }

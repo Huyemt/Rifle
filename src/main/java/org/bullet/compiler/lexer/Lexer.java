@@ -62,6 +62,7 @@ public class Lexer implements ILexer {
         registerKeyword(TokenKind.CONTINUE);
         registerKeyword(TokenKind.FUNCTION);
         registerKeyword(TokenKind.RETURN);
+        registerKeyword(TokenKind.NULL);
     }
 
     public Lexer(String source) throws ParsingException {

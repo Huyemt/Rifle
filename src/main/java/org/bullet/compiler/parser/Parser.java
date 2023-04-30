@@ -8,6 +8,7 @@ import org.bullet.compiler.lexer.VToken;
 import org.bullet.exceptions.common.ParsingException;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 
 /**
  * @author Huyemt
@@ -18,14 +19,18 @@ public class Parser implements IParser {
     private int blockLevel;
     private int loopLevel;
     private int complexLevel;
+    private int paramLevel;
     private boolean functionParsing;
+    public HashMap<String, FunctionNode> functions;
 
     public Parser(Lexer lexer) {
         this.lexer = lexer;
         blockLevel = 1;
         loopLevel = 0;
         complexLevel = 0;
+        paramLevel = 0;
         functionParsing = false;
+        functions = new HashMap<>();
     }
 
     @Override
@@ -76,6 +81,11 @@ public class Parser implements IParser {
             }
 
             node.name = ((VToken) lexer.currentToken).value;
+
+            if (functions.containsKey(node.name)) {
+                throw new ParsingException(node.position, String.format("The function \"%s\" has already been declared", node.name));
+            }
+
             lexer.expectToken(TokenKind.IDENTIFIER);
 
             if (lexer.currentToken.kind == TokenKind.SLPAREN) {
@@ -86,12 +96,24 @@ public class Parser implements IParser {
                         if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
                             String paramName = ((VToken) lexer.currentToken).value;
 
-                            if (node.params.contains(paramName)) {
+                            if (node.params.containsKey(paramName)) {
                                 throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in the function\"%s\"", paramName, node.name));
                             }
 
-                            node.params.add(paramName);
-                            lexer.expectToken(TokenKind.IDENTIFIER);
+                            lexer.beginPeek();
+                            lexer.next();
+
+                            if (lexer.currentToken.kind == TokenKind.ASSIGN) {
+                                lexer.next();
+                                lexer.endPeek();
+                                lexer.next(2);
+                                node.params.put(paramName, this.Assign());
+                            } else {
+                                lexer.endPeek();
+                                node.params.put(paramName, null);
+                                lexer.next();
+                            }
+
                             continue;
                         }
 
@@ -115,7 +137,7 @@ public class Parser implements IParser {
             node.blockNode = (BlockNode) this.Statement();
             functionParsing = false;
 
-            return node;
+            functions.put(node.name, node);
         }
 
         return this.Statement();
@@ -151,18 +173,21 @@ public class Parser implements IParser {
         node.position = lexer.position.clone();
         node.name = ((VToken) lexer.currentToken).value;
 
+        lexer.checkToken(TokenKind.IDENTIFIER);
+        String name = ((VToken) lexer.currentToken).value;
+
         lexer.expectToken(TokenKind.IDENTIFIER);
+
+        FunctionNode function = functions.get(name);
+
         lexer.expectToken(TokenKind.SLPAREN);
 
-        if (lexer.currentToken.kind != TokenKind.SRPAREN) {
-            while (lexer.currentToken.kind != TokenKind.SRPAREN) {
-                node.args.add(this.Assign());
-
-                if (lexer.currentToken.kind != TokenKind.SRPAREN) {
-                    lexer.expectToken(TokenKind.COMMA);
-                }
-
+        if (function.params.size() == 0) {
+            if (lexer.currentToken.kind != TokenKind.SRPAREN) {
+                throw new ParsingException(lexer.position, "Parameter number exceeds the maximum length of 0");
             }
+        } else {
+
         }
 
         lexer.expectToken(TokenKind.SRPAREN);
@@ -793,7 +818,7 @@ public class Parser implements IParser {
 
     @Override
     public Node Involution() throws ParsingException {
-        Node left = this.Primary();
+        Node left = this.Secondary();
 
         while (lexer.currentToken.kind == TokenKind.POW) {
             BinaryNode node = new BinaryNode();
@@ -801,7 +826,7 @@ public class Parser implements IParser {
             node.position = lexer.position.clone();
             lexer.next();
             node.left = left;
-            node.right = this.Primary();
+            node.right = this.Secondary();
             left = node;
         }
 
@@ -809,10 +834,65 @@ public class Parser implements IParser {
     }
 
     @Override
+    public Node Secondary() throws ParsingException {
+
+        // (
+        if (lexer.currentToken.kind == TokenKind.SLPAREN) {
+            lexer.next();
+            Node node = this.Expression();
+            lexer.expectToken(TokenKind.SRPAREN);
+
+            return node;
+        }
+
+        // 标识符
+        if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
+            lexer.beginPeek();
+            lexer.next();
+
+            // 函数调用
+            // IDENTIFIER ( Expression... )
+            if (lexer.currentToken.kind == TokenKind.SLPAREN) {
+                lexer.endPeek();
+
+                String name = ((VToken) lexer.currentToken).value;
+                if (!functions.containsKey(name)) {
+                    throw new ParsingException(lexer.position, String.format("Function \"%s\" is not define", name));
+                }
+
+                return this.FunctionCall();
+            }
+
+            // 数组访问与字典访问
+            // IDENTIFIER [ Expression ]
+            if (lexer.currentToken.kind == TokenKind.MLPAREN) {
+                lexer.endPeek();
+                return this.ArrayCall();
+            }
+
+            lexer.endPeek();
+
+            VariableNode node = new VariableNode();
+            node.name = ((VToken) lexer.currentToken).value;
+
+            if (Lexer.keywords.containsKey(node.name)) {
+                throw new ParsingException(lexer.position, "\"%s\" is a keyword and cannot be used as the name of a variable");
+            }
+
+            node.position = lexer.position.clone();
+            lexer.next();
+
+            return node;
+        }
+
+        return this.Primary();
+    }
+
+    @Override
     public Node Primary() throws ParsingException {
         // 数字
         if (lexer.currentToken.kind == TokenKind.VT_NUMBER) {
-            ConstantNode<BigDecimal> node = new ConstantNode<>();
+            ConstantNode node = new ConstantNode();
             node.value = new BigDecimal(((VToken)lexer.currentToken).value);
             node.position = lexer.position.clone();
             lexer.next();
@@ -822,12 +902,26 @@ public class Parser implements IParser {
 
         // 字符串
         if (lexer.currentToken.kind == TokenKind.VT_STRING) {
-            ConstantNode<String> node = new ConstantNode<>();
+            ConstantNode node = new ConstantNode();
             node.value = ((VToken)lexer.currentToken).value;
             node.position = lexer.position.clone();
             lexer.next();
 
             node.indexNode = this.Index();
+
+            if (node.indexNode != null && paramLevel > 0) {
+                throw new ParsingException(node.position, "Syntax error");
+            }
+
+            return node;
+        }
+
+        // null
+        if (lexer.currentToken.kind == TokenKind.NULL) {
+            ConstantNode node = new ConstantNode();
+            node.value = null;
+            node.position.clone();
+            lexer.next();
 
             return node;
         }
@@ -859,51 +953,8 @@ public class Parser implements IParser {
 
         // 布尔值 true 和 false
         if (lexer.currentToken.kind == TokenKind.TRUE || lexer.currentToken.kind == TokenKind.FALSE) {
-            ConstantNode<Boolean> node = new ConstantNode<>();
+            ConstantNode node = new ConstantNode();
             node.value = lexer.currentToken.kind == TokenKind.TRUE;
-            node.position = lexer.position.clone();
-            lexer.next();
-
-            return node;
-        }
-
-        // (
-        if (lexer.currentToken.kind == TokenKind.SLPAREN) {
-            lexer.next();
-            Node node = this.Expression();
-            lexer.expectToken(TokenKind.SRPAREN);
-
-            return node;
-        }
-
-        // 标识符
-        if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
-            lexer.beginPeek();
-            lexer.next();
-
-            // 函数调用
-            // IDENTIFIER ( Expression... )
-            if (lexer.currentToken.kind == TokenKind.SLPAREN) {
-                lexer.endPeek();
-                return this.FunctionCall();
-            }
-
-            // 数组访问与字典访问
-            // IDENTIFIER [ Expression ]
-            if (lexer.currentToken.kind == TokenKind.MLPAREN) {
-                lexer.endPeek();
-                return this.ArrayCall();
-            }
-
-            lexer.endPeek();
-
-            VariableNode node = new VariableNode();
-            node.name = ((VToken) lexer.currentToken).value;
-
-            if (Lexer.keywords.containsKey(node.name)) {
-                throw new ParsingException(lexer.position, "\"%s\" is a keyword and cannot be used as the name of a variable");
-            }
-
             node.position = lexer.position.clone();
             lexer.next();
 
