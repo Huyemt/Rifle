@@ -26,3 +26,7 @@ println({"a":1, "b":1.1, "c":"str", "d":[1, 2, 3], "e":false})
 // boolean
 println(true)
 ```
+## 与Python区别
+```bullet
+
+```

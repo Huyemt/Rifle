@@ -89,4 +89,10 @@ public class BtDictionary {
 
         return map;
     }
+
+    public BtDictionary clone() {
+        BtDictionary dictionary = new BtDictionary();
+        dictionary.vector = (LinkedHashMap<String, Object>) vector.clone();
+        return dictionary;
+    }
 }

@@ -1,22 +1,7 @@
-aDict := {
-    "a": 1,
-    "b": 1.1,
-    "c": "str",
-    "d": [1, 2, 3],
-    "e": false,
-    "f": {
-        "a": 1
+a := {
+    "a": {
+        "a": []
     }
 }
-
-// {"a":1,"b":1.1,"c":"str","d":[1,2,3],"e":false,"f":{"a":1}}
-println(aDict)
-
-// str
-println(aDict["c"])
-
-// 3
-println(aDict["d"][])
-
-// 1
-println(aDict["f"]["a"])
+a[][][] = 1
+println(a[][])

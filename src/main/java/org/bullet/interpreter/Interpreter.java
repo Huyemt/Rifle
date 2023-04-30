@@ -529,9 +529,9 @@ public class Interpreter extends Visitor {
 
     private Object valueOfIndex(Object v, IndexNode node) throws RuntimeException {
         if (node == null) {
-            if (v instanceof BtArray || v instanceof BtDictionary || v instanceof String)
+            if (v instanceof BtArray || v instanceof BtDictionary || v instanceof String) {
                 return v;
-            else if (v instanceof Integer || v instanceof Double || v instanceof Float) {
+            } else if (v instanceof Integer || v instanceof Double || v instanceof Float) {
                 return new BigDecimal(v.toString());
             }
         }
@@ -607,8 +607,10 @@ public class Interpreter extends Visitor {
                 } else {
                     BtArray btArray1 = ((BtArray) v);
                     len = btArray1.vector.size();
+                    boolean flag = false;
 
                     if (start > end) {
+                        flag = true;
                         int temp = end;
                         end = start;
                         start = temp;
@@ -630,7 +632,8 @@ public class Interpreter extends Visitor {
                         btArray.vector.add(a);
                     }
 
-                    Collections.reverse(btArray.vector);
+                    if (flag)
+                        Collections.reverse(btArray.vector);
                     v = btArray;
                 }
             } else {
@@ -641,14 +644,28 @@ public class Interpreter extends Visitor {
                 Object i = indexNode.start == null ? null : indexNode.start.accept(this);
 
                 if (v instanceof BtDictionary) {
-                    if (!(i instanceof String)) {
-                        throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, "Dictionary index must be a string");
+                    if (!(i instanceof String || i == null)) {
+                        throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, "BtDictionary index must be a string");
                     }
 
-                    v = ((BtDictionary) v).vector.get(i);
+                    BtDictionary dictionary = ((BtDictionary) v);
+
+                    if (i == null) {
+                        if (dictionary.vector.size() == 0) {
+                            throw new RuntimeException(node.position, "The dictionary is empty");
+                        }
+
+                        v = dictionary.vector.values().toArray(Object[]::new)[dictionary.vector.size() - 1]; // last
+                    } else {
+                        if (!dictionary.vector.containsKey(i)) {
+                            throw new RuntimeException(indexNode.start != null ? indexNode.start.position : node.position, String.format("The key \"%s\" is not defined", i));
+                        }
+
+                        v = dictionary.vector.get(i);
+                    }
                 } else {
                     if (!(i instanceof BigDecimal || i == null)) {
-                        throw new RuntimeException(indexNode.start.position, String.format("%s index must be a number", i.getClass().getSimpleName()));
+                        throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("%s index must be a number", i.getClass().getSimpleName()));
                     }
 
                     int len;
@@ -656,7 +673,7 @@ public class Interpreter extends Visitor {
                     if (v instanceof BtArray) {
                         BtArray btArray = (BtArray) v;
                         len = i == null ? btArray.vector.size() - 1 : ((BigDecimal) i).intValueExact();
-                        if (len >= btArray.vector.size()) {
+                        if (len >= btArray.vector.size() || len < 0) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("Array index %d is out of range %d", len, btArray.vector.size()));
                         }
 
@@ -687,6 +704,12 @@ public class Interpreter extends Visitor {
         try {
             VariableNode variable = (VariableNode) node.left;
             Object v;
+
+            if (result instanceof BtArray) {
+                result = ((BtArray) result).clone();
+            } else if (result instanceof BtDictionary) {
+                result = ((BtDictionary) result).clone();
+            }
 
             if (runtime.environment != null && runtime.environment.params.containsKey(variable.name)) {
                 if (variable.indexNode == null) {
@@ -793,15 +816,19 @@ public class Interpreter extends Visitor {
 
                     IndexNode superA;
 
+                    // a[x]
                     if (address.next == null) {
                         superA = null;
                     } else {
+                        // a[x][x]
                         superA = address.clone();
                         address = address.next;
                         superA.next = null;
                     }
 
                     Object s = this.valueOfIndex(v, superA);
+
+                    System.out.println(s);
 
                     if (address.complex) {
                         throw new RuntimeException(address.position, "Cannot use complex indexes when assigning values");
@@ -811,7 +838,7 @@ public class Interpreter extends Visitor {
 
                     if (s instanceof BtArray) {
                         if (!(index instanceof BigDecimal || index == null)) {
-                            throw new RuntimeException(node.position, String.format("%s index must be a number", s.getClass().getSimpleName()));
+                            throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a number", s.getClass().getSimpleName()));
                         }
 
                         BtArray array = (BtArray) s;
@@ -822,7 +849,7 @@ public class Interpreter extends Visitor {
                             int n = ((BigDecimal) index).intValueExact();
 
                             if (n > array.vector.size()) {
-                                throw new RuntimeException(node.position, String.format("Array index %d is out of range %d", n, array.vector.size()));
+                                throw new RuntimeException(address.start.position, String.format("Array index %d is out of range %d", n, array.vector.size()));
                             }
 
                             if (n == array.vector.size()) {
@@ -833,17 +860,19 @@ public class Interpreter extends Visitor {
                         }
                     } else if (s instanceof BtDictionary) {
                         if (!(index instanceof String)) {
-                            throw new RuntimeException(node.position, String.format("%s index must be a string", s.getClass().getSimpleName()));
+                            throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a string", s.getClass().getSimpleName()));
                         }
 
                         ((BtDictionary) s).vector.put(index.toString(), result);
                     } else {
-                        throw new RuntimeException(node.position, String.format("The type \"%s\" does not support assignment in this way", s.getClass().getSimpleName()));
+                        throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("The type \"%s\" does not support assignment in this way", s.getClass().getSimpleName()));
                     }
                 }
             }
 
             return result;
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e.position, e.getMessage());
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
