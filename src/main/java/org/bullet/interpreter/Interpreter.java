@@ -1,9 +1,6 @@
 package org.bullet.interpreter;
 
-import org.bullet.base.components.BtFunction;
-import org.bullet.base.components.BtVariable;
-import org.bullet.base.components.BtScope;
-import org.bullet.base.components.BtCustomFunction;
+import org.bullet.base.components.*;
 import org.bullet.base.types.BtArray;
 import org.bullet.base.types.BtDictionary;
 import org.bullet.compiler.ast.Node;
@@ -23,6 +20,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -33,8 +31,10 @@ public class Interpreter extends Visitor {
     public final BulletRuntime runtime;
 
     public Interpreter(String source, BulletRuntime runtime) throws ParsingException {
+        this.runtime = runtime;
+
         Lexer lexer = new Lexer(source);
-        Parser parser = new Parser(lexer);
+        Parser parser = new Parser(lexer, this);
         ProgramNode programNode = parser.Parse();
 
         // 声明函数
@@ -53,14 +53,19 @@ public class Interpreter extends Visitor {
         scope.node = blockNode;
 
         runtime.scope = scope;
-
-        this.runtime = runtime;
     }
 
     public Interpreter(File file, BulletRuntime runtime) throws ParsingException, FileCorruptingExceiption {
+        this.runtime = runtime;
+
         Lexer lexer = new Lexer(file);
-        Parser parser = new Parser(lexer);
+        Parser parser = new Parser(lexer, this);
         ProgramNode programNode = parser.Parse();
+
+        // 声明函数
+        for (FunctionNode node : parser.functions.values()) {
+            runtime.functions.put(node.name, new BtCustomFunction(this, node));
+        }
 
         BlockNode blockNode = new BlockNode();
         blockNode.position = programNode.position;
@@ -73,8 +78,6 @@ public class Interpreter extends Visitor {
         scope.node = blockNode;
 
         runtime.scope = scope;
-
-        this.runtime = runtime;
     }
 
     public Object eval() throws RuntimeException {
@@ -97,109 +100,110 @@ public class Interpreter extends Visitor {
         Object right = node.right.accept(this);
         Object left = node.left.accept(this);
 
-        if (left instanceof BigDecimal) {
-            switch (node.operator) {
-                case ADD:
-                    if (right instanceof BigDecimal) {
-                        return ((BigDecimal) left).add((BigDecimal) right);
-                    } else if (right instanceof String) {
-                        return String.valueOf(left).concat(right.toString());
-                    }
-
-                    throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case SUB:
-                    if (right instanceof BigDecimal) {
-                        return ((BigDecimal) left).subtract((BigDecimal) right);
-                    }
-
-                    throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case MUL:
-                    if (right instanceof BigDecimal) {
-                        return ((BigDecimal) left).multiply((BigDecimal) right);
-                    } else if (right instanceof String) {
-                        return ((String) right).repeat(((BigDecimal) left).intValue());
-                    }
-
-                    throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case DIV:
-                    if (right instanceof BigDecimal) {
-                        if (((BigDecimal) right).intValue() == 0) {
-                            throw new RuntimeException(node.position, "Cannot divide by zero");
+        if (node.operator != BinaryNode.Operator.INSTANCEOF) {
+            if (left instanceof BigDecimal) {
+                switch (node.operator) {
+                    case ADD:
+                        if (right instanceof BigDecimal) {
+                            return ((BigDecimal) left).add((BigDecimal) right);
                         }
 
-                        return ((BigDecimal) left).divide((BigDecimal) right, 1, RoundingMode.HALF_EVEN);
-                    }
+                        throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case SUB:
+                        if (right instanceof BigDecimal) {
+                            return ((BigDecimal) left).subtract((BigDecimal) right);
+                        }
 
-                    throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case POW:
-                    if (right instanceof BigDecimal) {
-                        return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
-                    }
+                        throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case MUL:
+                        if (right instanceof BigDecimal) {
+                            return ((BigDecimal) left).multiply((BigDecimal) right);
+                        }
 
-                    throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case EQUAL:
-                case NOT_EQUAL:
-                case GREATER:
-                case GREATER_OR_EQUAL:
-                case LESSER:
-                case LESSER_OR_EQUAL:
-                    int flag = ((BigDecimal) left).compareTo((BigDecimal) right);
+                        throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case DIV:
+                        if (right instanceof BigDecimal) {
+                            if (((BigDecimal) right).intValue() == 0) {
+                                throw new RuntimeException(node.position, "Cannot divide by zero");
+                            }
 
-                    if (node.operator == BinaryNode.Operator.EQUAL) {
-                        return flag == 0;
-                    }
+                            return ((BigDecimal) left).divide((BigDecimal) right, 1, RoundingMode.HALF_EVEN);
+                        }
 
-                    if (node.operator == BinaryNode.Operator.NOT_EQUAL) {
-                        return flag != 0;
-                    }
+                        throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case POW:
+                        if (right instanceof BigDecimal) {
+                            return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
+                        }
 
-                    if (node.operator == BinaryNode.Operator.GREATER) {
-                        return flag > 0;
-                    }
+                        throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case EQUAL:
+                    case NOT_EQUAL:
+                    case GREATER:
+                    case GREATER_OR_EQUAL:
+                    case LESSER:
+                    case LESSER_OR_EQUAL:
+                        int flag = ((BigDecimal) left).compareTo((BigDecimal) right);
 
-                    if (node.operator == BinaryNode.Operator.GREATER_OR_EQUAL) {
-                        return flag > 0 || flag == 0;
-                    }
+                        if (node.operator == BinaryNode.Operator.EQUAL) {
+                            return flag == 0;
+                        }
 
-                    if (node.operator == BinaryNode.Operator.LESSER) {
-                        return flag < 0;
-                    }
+                        if (node.operator == BinaryNode.Operator.NOT_EQUAL) {
+                            return flag != 0;
+                        }
 
-                    return flag < 0 || flag == 0;
-                default:
-                    throw new RuntimeException(node.position, "Unsupported binary operator");
+                        if (node.operator == BinaryNode.Operator.GREATER) {
+                            return flag > 0;
+                        }
+
+                        if (node.operator == BinaryNode.Operator.GREATER_OR_EQUAL) {
+                            return flag > 0 || flag == 0;
+                        }
+
+                        if (node.operator == BinaryNode.Operator.LESSER) {
+                            return flag < 0;
+                        }
+
+                        return flag < 0 || flag == 0;
+                    default:
+                        throw new RuntimeException(node.position, "Unsupported binary operator");
+                }
+            } else if (left instanceof Boolean && right instanceof Boolean) {
+                switch (node.operator) {
+                    case OR:
+                        return ((Boolean) left) || ((Boolean) right);
+                    case AND:
+                        return ((Boolean) left) && ((Boolean) right);
+                    default:
+                        throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
+                }
+            } else if (left instanceof String && !(right instanceof BtArray)) {
+                if (node.operator == BinaryNode.Operator.ADD) {
+                    return ((String) left).concat(String.valueOf(right));
+                }
+
+                if (node.operator == BinaryNode.Operator.MUL && right instanceof BigDecimal) {
+                    return ((String) left).repeat(((BigDecimal) right).intValueExact());
+                }
+
+                throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\" and \"*\"");
+            } else if (left instanceof BtArray && right instanceof BtArray) {
+                if (node.operator == BinaryNode.Operator.ADD) {
+                    BtArray array = new BtArray();
+                    array.vector.addAll(((BtArray) left).vector);
+                    array.vector.addAll(((BtArray) right).vector);
+                    return array;
+                }
+
+                throw new RuntimeException(node.position, "Arrays cannot perform operations other than \"+\"");
             }
-        } else if (left instanceof Boolean && right instanceof Boolean) {
-            switch (node.operator) {
-                case OR:
-                    return ((Boolean) left) || ((Boolean) right);
-                case AND:
-                    return ((Boolean) left) && ((Boolean) right);
-                default:
-                    throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
-            }
-        } else if (left instanceof String && !(right instanceof BtArray)) {
-            if (node.operator == BinaryNode.Operator.ADD) {
-                return ((String) left).concat(String.valueOf(right));
-            }
 
-            if (node.operator == BinaryNode.Operator.MUL && right instanceof BigDecimal) {
-                return ((String) left).repeat(((BigDecimal) right).intValueExact());
-            }
-
-            throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\" and \"*\"");
-        } else if (left instanceof BtArray && right instanceof BtArray) {
-            if (node.operator == BinaryNode.Operator.ADD) {
-                BtArray array = new BtArray();
-                array.vector.addAll(((BtArray) left).vector);
-                array.vector.addAll(((BtArray) right).vector);
-                return array;
-            }
-
-            throw new RuntimeException(node.position, "Arrays cannot perform operations other than \"+\"");
+            throw new RuntimeException(node.position, "Unsupported type operation");
+        } else {
+            return left.getClass().getTypeName().equals(right.getClass().getTypeName());
         }
 
-        throw new RuntimeException(node.position, "Unsupported type operation");
     }
 
     @Override
@@ -447,12 +451,43 @@ public class Interpreter extends Visitor {
             BtFunction function = runtime.findFunction(node.name);
             ArrayList<Object> args = new ArrayList<>();
 
-            for (int i = 0; i < node.args.size(); i++) {
-                run = node.args.get(i);
+            for (Map.Entry<String, Node> entry : node.args.entrySet()) {
+                run = node.args.get(entry.getKey());
+
                 args.add(run.accept(this));
             }
 
             return function.invokeFV(args.toArray());
+        } catch (BulletException e) {
+            throw new RuntimeException(run == null ? node.position : run.position, e.getMessage());
+        }
+    }
+
+    @Override
+    public Object goBuiltInFunctionCall(BuiltInFunctionCallNode node) throws RuntimeException {
+        Node run = null;
+        try {
+            BtBulitInFunction function = BulletRuntime.builtInfunctions.get(node.name);
+            LinkedHashMap<String, Object> args = new LinkedHashMap<>();
+
+            for (Map.Entry<String, Node> entry : node.args.entrySet()) {
+                run = entry.getValue();
+
+                args.put(entry.getKey(), run == null ? null : run.accept(this));
+            }
+
+            for (Map.Entry<String, Object> entry : function.args.entrySet()) {
+                if (args.get(entry.getKey()) == null) {
+
+                    if (entry.getValue() == null) {
+                        throw new ParsingException(node.position, String.format("Missing parameter \"%s\"", entry.getKey()));
+                    }
+
+                    args.put(entry.getKey(), this.parseBaseType(function.args.get(entry.getKey())));
+                }
+            }
+
+            return function.invokeFV(args.values().toArray());
         } catch (BulletException e) {
             throw new RuntimeException(run == null ? node.position : run.position, e.getMessage());
         }
@@ -847,5 +882,21 @@ public class Interpreter extends Visitor {
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
+    }
+
+    private Object parseBaseType(Object v) {
+        if (v instanceof Integer || v instanceof Float || v instanceof Double) {
+            return new BigDecimal(v.toString());
+        }
+
+        if (v.getClass().isArray()) {
+            return BtArray.parse((Object[]) v);
+        }
+
+        if (v instanceof Map) {
+            return BtDictionary.parse((Map<String, Object>) v);
+        }
+
+        return v;
     }
 }

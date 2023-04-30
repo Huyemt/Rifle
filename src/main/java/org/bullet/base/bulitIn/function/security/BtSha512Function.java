@@ -1,55 +1,37 @@
 package org.bullet.base.bulitIn.function.security;
 
-import org.bullet.base.components.BtFunction;
+import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtArray;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 
 /**
  * @author Huyemt
  */
 
-public class BtSha512Function extends BtFunction {
+public class BtSha512Function extends BtBulitInFunction {
     public BtSha512Function(BulletRuntime runtime) {
         super("sha512", runtime);
+        args.put("content", null);
     }
 
     @Override
-    public Object invokeFV(Object... args) throws BulletException {
-        if (args.length == 0) {
-            throw new BulletException(String.format("Parameter missing for the function \"%s\"", funcName));
+    public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
+        Object r = args.get("content");
+
+        if (!(r instanceof String) && !(r instanceof BtArray) && !(r instanceof BigDecimal)) {
+            throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
         }
 
-        if (args.length == 1) {
-            if (!(args[0] instanceof String) && !(args[0] instanceof BtArray) && !(args[0] instanceof BigDecimal)) {
-                throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
-            }
-
-            if (args[0] instanceof BtArray) {
-                return encryptArr((BtArray) args[0]);
-            }
-
-            return Crypto4J.SHA512.encrypt(args[0].toString());
+        if (r instanceof BtArray) {
+            return encryptArr((BtArray) r);
         }
 
-        BtArray array = new BtArray();
-        for (Object obj : args) {
-            if (!(obj instanceof String) && !(obj instanceof BtArray) && !(obj instanceof BigDecimal)) {
-                throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
-            }
-
-            if (obj instanceof BtArray) {
-                array.vector.add(encryptArr((BtArray) obj));
-                continue;
-            }
-
-            array.vector.add(Crypto4J.SHA512.encrypt(obj.toString()));
-        }
-
-        return array;
+        return Crypto4J.SHA512.encrypt(r.toString());
     }
 
     private BtArray encryptArr(BtArray array) throws BulletException {

@@ -1,5 +1,6 @@
 package org.bullet.base.bulitIn.function.security;
 
+import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.components.BtFunction;
 import org.bullet.base.types.BtArray;
 import org.bullet.exceptions.BulletException;
@@ -8,54 +9,42 @@ import org.huyemt.crypto4j.Crypto4J;
 import org.huyemt.crypto4j.digest.RSA;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 
 /**
  * @author Huyemt
  */
 
-public class BtDecRSAFunction extends BtFunction {
+public class BtDecRSAFunction extends BtBulitInFunction {
     public BtDecRSAFunction(BulletRuntime runtime) {
         super("rsaD", runtime);
+        args.put("content", null);
+        args.put("key", null);
+        args.put("padding", 1);
     }
 
     @Override
-    public Object invokeFV(Object... args) throws BulletException {
-        if (args.length > 3) {
-            throw new BulletException("Parameter is out of the specified range");
+    public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
+        Object content = args.get("content");
+        Object key = args.get("key");
+        Object padding = args.get("padding");
+
+        if ((!(content instanceof String || content instanceof BigDecimal))) {
+            throw new BulletException(String.format("Parameter type \"%s\" is not supported for RSA decryption", content.getClass().getSimpleName()));
         }
 
-        if (args.length < 2) {
-            throw new BulletException("Missing parameter");
+        if (!(key instanceof String)) {
+            throw new BulletException("RSA privateKey must be a string");
         }
 
-        if (!(args[0] instanceof String || args[0] instanceof BigDecimal)) {
-            throw new BulletException("The decrypted content must be a string or a number");
+        if (!(padding instanceof BigDecimal)) {
+            throw new BulletException("Padding mode must be numeric");
         }
 
-        String content = args[0].toString();
+        RSA.EncryptConfig config = new RSA.EncryptConfig();
+        config.PADDING = getPadding(((BigDecimal) padding).intValueExact());
 
-        if (args.length == 2) {
-            // key
-            if (args[1] instanceof String) {
-                return Crypto4J.RSA.decrypt(content, args[1].toString());
-            }
-        } else {
-            // key
-            if (args[1] instanceof String && args[2] instanceof BigDecimal) {
-                RSA.DecryptConfig config = new RSA.DecryptConfig();
-                config.PADDING = getPadding(((BigDecimal) args[2]).intValueExact());
-                return Crypto4J.RSA.decrypt(content, args[1].toString(), config);
-            }
-
-            // padding
-            if (args[1] instanceof BigDecimal && args[2] instanceof String) {
-                RSA.DecryptConfig config = new RSA.DecryptConfig();
-                config.PADDING = getPadding(((BigDecimal) args[1]).intValueExact());
-                return Crypto4J.RSA.decrypt(content, args[2].toString(), config);
-            }
-        }
-
-        throw new BulletException("Unknown behavior");
+        return Crypto4J.RSA.encrypt(content.toString(), key.toString(), config);
     }
 
     private RSA.Padding getPadding(int n) throws BulletException {

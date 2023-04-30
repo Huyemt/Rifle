@@ -1,53 +1,45 @@
 package org.bullet.base.bulitIn.function;
 
-import org.bullet.base.components.BtFunction;
+import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtArray;
 import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 
 /**
  * @author Huyemt
  */
 
-public class BtLenFunction extends BtFunction {
+public class BtLenFunction extends BtBulitInFunction {
     public BtLenFunction(BulletRuntime runtime) {
         super("len", runtime);
+        args.put("obj", null);
     }
 
     @Override
-    public final Object invokeFV(Object... args) throws BulletException {
-        BigDecimal big = new BigDecimal(0L);
-        Object r;
+    public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
 
-        for (Object arg : args) {
-            r = arg;
+        Object r = args.get("obj");
 
-            if (r instanceof BtArray) {
-                big = big.add(new BigDecimal(((BtArray) r).vector.size()));
-                continue;
-            }
-
-            if (r instanceof BtDictionary) {
-                big = big.add(new BigDecimal(((BtDictionary) r).vector.size()));
-                continue;
-            }
-
-            if (r.getClass().isArray()) {
-                big = big.add(new BigDecimal(BtArray.parse((Object[]) r).vector.size()));
-                continue;
-            }
-
-            if (r instanceof String) {
-                big = big.add(new BigDecimal(((String) r).length()));
-                continue;
-            }
-
-            throw new BulletException(String.format("Length of \"%s\" type is not supported", big.getClass().getName()));
+        if (r instanceof BtArray) {
+            return new BigDecimal(((BtArray) r).vector.size());
         }
 
-        return big;
+        if (r instanceof BtDictionary) {
+            return new BigDecimal(((BtDictionary) r).vector.size());
+        }
+
+        if (r.getClass().isArray()) {
+            return new BigDecimal(BtArray.parse((Object[]) r).vector.size());
+        }
+
+        if (r instanceof String) {
+            return new BigDecimal(((String) r).length());
+        }
+
+        throw new BulletException(String.format("Length of \"%s\" type is not supported", r.getClass().getSimpleName()));
     }
 }

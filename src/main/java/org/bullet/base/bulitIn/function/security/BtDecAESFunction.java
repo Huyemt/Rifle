@@ -1,113 +1,64 @@
 package org.bullet.base.bulitIn.function.security;
 
-import org.bullet.base.components.BtFunction;
+import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;
 import org.huyemt.crypto4j.digest.AES;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 
 /**
  * @author Huyemt
  */
 
-public class BtDecAESFunction extends BtFunction {
+public class BtDecAESFunction extends BtBulitInFunction {
     public BtDecAESFunction(BulletRuntime runtime) {
         super("aesD", runtime);
+
+        args.put("content", null);
+        args.put("key", null);
+        args.put("mode", 1);
+        args.put("padding", 1);
+        args.put("iv", "");
     }
 
     @Override
-    public Object invokeFV(Object... args) throws BulletException {
-        if (args.length > 5) {
-            throw new BulletException("Parameter is out of the specified range");
+    public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
+        Object content = args.get("content");
+        Object key = args.get("key");
+        Object mode = args.get("mode");
+        Object padding = args.get("padding");
+        Object iv = args.get("iv");
+
+        if ((!(content instanceof String || content instanceof BigDecimal))) {
+            throw new BulletException(String.format("Parameter type \"%s\" is not supported for AES decryption", content.getClass().getSimpleName()));
         }
 
-        if (args.length < 2) {
-            throw new BulletException("Missing parameter");
+        if (!(key instanceof String)) {
+            throw new BulletException("AES key must be a string");
         }
 
-        String content;
-        String key;
-
-        if (!(args[0] instanceof String || args[0] instanceof BigDecimal)) {
-            throw new BulletException("The decrypted content must be a string or a number");
+        if (!(mode instanceof BigDecimal)) {
+            throw new BulletException("Decryption mode must be numeric");
         }
 
-        if (!(args[1] instanceof String)) {
-            throw new BulletException("The decrypted content must be a string");
+        if (!(padding instanceof BigDecimal)) {
+            throw new BulletException("Padding mode must be numeric");
         }
 
-        content = args[0].toString();
-        key = args[1].toString();
+        if (!(iv instanceof String)) {
+            throw new BulletException("Iv must be a string");
+        }
 
-        if (args.length == 2) {
-            return Crypto4J.AES.decrypt(content, key);
-        } else if (args.length == 3) {
-            // Iv
-            if (args[2] instanceof String) {
-                return Crypto4J.AES.decrypt(content, key, AES.Mode.ECB, AES.Padding.PKCS5_PADDING, args[2].toString());
-            }
+        String iiv = iv.toString();
 
-            // Mode
-            if (args[2] instanceof BigDecimal) {
-                return Crypto4J.AES.decrypt(content, key, getMode(((BigDecimal) args[2]).intValueExact()));
-            }
-        } else if (args.length == 4) {
-            // Iv and Mode
-            if (args[2] instanceof String && args[3] instanceof BigDecimal) {
-                BigDecimal decimal = (BigDecimal) args[3];
-                AES.Mode mode = getMode(decimal.intValueExact());
-
-                return Crypto4J.AES.decrypt(content, key, mode, AES.Padding.PKCS5_PADDING, args[2].toString());
-            }
-
-            // Mode and Iv || Mode and Padding
-            if (args[2] instanceof BigDecimal) {
-                AES.Mode mode = getMode(((BigDecimal) args[2]).intValueExact());
-
-                // Iv
-                if (args[3] instanceof String) {
-                    return Crypto4J.AES.decrypt(content, key, mode, AES.Padding.PKCS5_PADDING, args[3].toString());
-                } else if (args[3] instanceof BigDecimal) {
-                    // Padding
-                    return Crypto4J.AES.decrypt(content, key, mode, getPadding(((BigDecimal) args[3]).intValueExact()));
-                }
-
-            }
+        if (iiv.length() == 0) {
+            return Crypto4J.AES.decrypt(content.toString(), key.toString(), getMode(((BigDecimal) mode).intValueExact()), getPadding(((BigDecimal) padding).intValueExact()));
         } else {
-
-            // Iv Mode Padding
-            if (args[2] instanceof String && args[3] instanceof BigDecimal && args[4] instanceof BigDecimal) {
-                return Crypto4J.AES.decrypt(content, key, getMode(((BigDecimal) args[3]).intValueExact()), getPadding(((BigDecimal) args[4]).intValueExact()), args[2].toString());
-            }
-
-            if (args[2] instanceof BigDecimal) {
-                AES.Mode mode = getMode(((BigDecimal) args[2]).intValueExact());
-
-                // Iv
-                if (args[3] instanceof String) {
-                    String iv = args[3].toString();
-
-                    // Padding
-                    if (args[4] instanceof BigDecimal) {
-                        return Crypto4J.AES.decrypt(content, key, mode, getPadding(((BigDecimal) args[4]).intValueExact()), iv);
-                    }
-
-                } else if (args[3] instanceof BigDecimal) {
-                    // Padding
-                    AES.Padding padding = getPadding(((BigDecimal) args[3]).intValueExact());
-
-                    // Iv
-                    if (args[4] instanceof String) {
-                        return Crypto4J.AES.decrypt(content, key, mode, padding, args[4].toString());
-                    }
-                }
-
-            }
+            return Crypto4J.AES.decrypt(content.toString(), key.toString(), getMode(((BigDecimal) mode).intValueExact()), getPadding(((BigDecimal) padding).intValueExact()), iiv);
         }
-
-        throw new BulletException("Unknown behavior");
     }
 
     private AES.Mode getMode(int n) throws BulletException {

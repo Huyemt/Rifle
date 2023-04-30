@@ -2,11 +2,14 @@ package org.bullet.base.components;
 
 import org.bullet.base.types.BtArray;
 import org.bullet.base.types.BtDictionary;
+import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.FunctionNode;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.Interpreter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
@@ -27,17 +30,32 @@ public class BtCustomFunction extends BtFunction {
 
     @Override
     public Object invokeFV(Object ... args) throws BulletException {
-        if (args.length > node.params.size()) {
-            throw new BulletException(String.format("Too many parameters -> %d", args.length - node.params.size()));
-        } else if (args.length < node.params.size()) {
-            throw new BulletException(String.format("Missing parameters -> %d", node.params.size() - args.length));
+
+        ArrayList<Object> as = new ArrayList<>(Arrays.asList(args));
+
+        if (as.size() < node.params.size()) {
+
+            String[] params = node.params.keySet().toArray(String[]::new);
+
+            for (int start = as.size(); start < params.length; start++) {
+                Node node1 = node.params.get(params[start]);
+
+                if (node1 == null) {
+                    throw new BulletException(String.format("The parameter \"%s\"has already been defined", params[start]));
+                }
+
+                as.add(node1.accept(interpreter));
+            }
         }
+
+        args = as.toArray();
 
         FunctionEnvironment environment = new FunctionEnvironment();
         environment.body = node.blockNode;
         environment.from = interpreter.runtime.scope;
 
-        for (int i = 0; i < node.params.size(); i++) {
+        int i = 0;
+        for (String name : node.params.keySet()) {
             if (args[i] instanceof Integer || args[i] instanceof Float || args[i] instanceof Double) {
                 args[i] = new BigDecimal(args[i].toString());
             } else if (args[i].getClass().isArray()) {
@@ -46,7 +64,9 @@ public class BtCustomFunction extends BtFunction {
                 args[i] = BtDictionary.parse((Map<String, Object>) args[i]);
             }
 
-            environment.params.put(node.params.get(i), args[i]);
+            environment.params.put(name, args[i]);
+
+            i++;
         }
 
         if (runtime.environment != null) {

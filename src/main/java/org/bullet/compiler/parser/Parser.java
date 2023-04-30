@@ -1,14 +1,18 @@
 package org.bullet.compiler.parser;
 
+import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.*;
 import org.bullet.compiler.lexer.Lexer;
+import org.bullet.compiler.lexer.Position;
 import org.bullet.compiler.lexer.TokenKind;
 import org.bullet.compiler.lexer.VToken;
 import org.bullet.exceptions.common.ParsingException;
+import org.bullet.interpreter.BulletRuntime;
+import org.bullet.interpreter.Interpreter;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * @author Huyemt
@@ -21,9 +25,11 @@ public class Parser implements IParser {
     private int complexLevel;
     private int paramLevel;
     private boolean functionParsing;
+    private final Interpreter interpreter;
     public HashMap<String, FunctionNode> functions;
 
-    public Parser(Lexer lexer) {
+    public Parser(Lexer lexer, Interpreter interpreter) {
+        this.interpreter = interpreter;
         this.lexer = lexer;
         blockLevel = 1;
         loopLevel = 0;
@@ -82,11 +88,17 @@ public class Parser implements IParser {
 
             node.name = ((VToken) lexer.currentToken).value;
 
+            if (interpreter.runtime.functions.containsKey(node.name)) {
+                throw new ParsingException(lexer.position, String.format("\"%s\" is a Bullet built-in function and cannot be declared again", node.name));
+            }
+
             if (functions.containsKey(node.name)) {
                 throw new ParsingException(node.position, String.format("The function \"%s\" has already been declared", node.name));
             }
 
             lexer.expectToken(TokenKind.IDENTIFIER);
+
+            paramLevel++;
 
             if (lexer.currentToken.kind == TokenKind.SLPAREN) {
                 lexer.expectToken(TokenKind.SLPAREN);
@@ -107,7 +119,7 @@ public class Parser implements IParser {
                                 lexer.next();
                                 lexer.endPeek();
                                 lexer.next(2);
-                                node.params.put(paramName, this.Assign());
+                                node.params.put(paramName, this.Primary());
                             } else {
                                 lexer.endPeek();
                                 node.params.put(paramName, null);
@@ -132,6 +144,8 @@ public class Parser implements IParser {
             if (lexer.currentToken.kind != TokenKind.BLPAREN) {
                 throw new ParsingException(lexer.position, "The statements of the function must be written between '{' and '}'");
             }
+
+            paramLevel--;
 
             functionParsing = true;
             node.blockNode = (BlockNode) this.Statement();
@@ -178,17 +192,27 @@ public class Parser implements IParser {
 
         lexer.expectToken(TokenKind.IDENTIFIER);
 
-        FunctionNode function = functions.get(name);
-
         lexer.expectToken(TokenKind.SLPAREN);
 
-        if (function.params.size() == 0) {
-            if (lexer.currentToken.kind != TokenKind.SRPAREN) {
-                throw new ParsingException(lexer.position, "Parameter number exceeds the maximum length of 0");
-            }
-        } else {
+        // 内置函数
+        if (BulletRuntime.builtInfunctions.containsKey(name)) {
+            BtBulitInFunction function = BulletRuntime.builtInfunctions.get(name);
+            BuiltInFunctionCallNode built = new BuiltInFunctionCallNode();
+            built.position = node.position;
+            built.name = name;
+            built.args = matchParams(built, function.args);
+            lexer.expectToken(TokenKind.SRPAREN);
 
+            return built;
         }
+
+        if (!functions.containsKey(name)) {
+            throw new ParsingException(lexer.position, String.format("Function \"%s\" is undefined", name));
+        }
+
+        FunctionNode function = functions.get(name);
+
+        node.args = matchParams(node, function.params);
 
         lexer.expectToken(TokenKind.SRPAREN);
 
@@ -643,9 +667,9 @@ public class Parser implements IParser {
 
             while (lexer.currentToken.kind != TokenKind.BRPAREN) {
                 // 字符串键
-                key = this.Assign();
+                key = paramLevel > 0 ? this.Primary() : this.Assign();
                 lexer.expectToken(TokenKind.COLON);
-                value = this.Assign();
+                value = paramLevel > 0 ? this.Primary() : this.Assign();
 
                 node.vector.put(key, value);
 
@@ -725,20 +749,10 @@ public class Parser implements IParser {
     public Node Relational() throws ParsingException {
         Node left = this.Term();
 
-        while (lexer.currentToken.kind == TokenKind.GREATER || lexer.currentToken.kind == TokenKind.GREATER_OR_EQUAL || lexer.currentToken.kind == TokenKind.LESSER || lexer.currentToken.kind == TokenKind.LESSER_OR_EQUAL) {
+        while (lexer.currentToken.kind == TokenKind.GREATER || lexer.currentToken.kind == TokenKind.GREATER_OR_EQUAL || lexer.currentToken.kind == TokenKind.LESSER || lexer.currentToken.kind == TokenKind.LESSER_OR_EQUAL || lexer.currentToken.kind == TokenKind.INSTANCEOF) {
             BinaryNode node = new BinaryNode();
             node.position = lexer.position.clone();
-
-            if (lexer.currentToken.kind == TokenKind.GREATER)
-                node.operator = BinaryNode.Operator.GREATER;
-            else if (lexer.currentToken.kind == TokenKind.GREATER_OR_EQUAL)
-                node.operator = BinaryNode.Operator.GREATER_OR_EQUAL;
-            else if (lexer.currentToken.kind == TokenKind.LESSER)
-                node.operator = BinaryNode.Operator.LESSER;
-            else if (lexer.currentToken.kind == TokenKind.LESSER_OR_EQUAL)
-                node.operator = BinaryNode.Operator.LESSER_OR_EQUAL;
-            else
-                throw new ParsingException(node.position, "Syntax error");
+            node.operator = this.matchBinOpt();
 
             lexer.next();
 
@@ -855,11 +869,6 @@ public class Parser implements IParser {
             if (lexer.currentToken.kind == TokenKind.SLPAREN) {
                 lexer.endPeek();
 
-                String name = ((VToken) lexer.currentToken).value;
-                if (!functions.containsKey(name)) {
-                    throw new ParsingException(lexer.position, String.format("Function \"%s\" is not define", name));
-                }
-
                 return this.FunctionCall();
             }
 
@@ -934,7 +943,7 @@ public class Parser implements IParser {
             lexer.next();
 
             while (lexer.currentToken.kind != TokenKind.MRPAREN) {
-                array.values.add(this.Assign());
+                array.values.add(paramLevel > 0 ? this.Primary() : this.Assign());
 
                 if (lexer.currentToken.kind != TokenKind.MRPAREN) {
                     lexer.expectToken(TokenKind.COMMA);
@@ -962,5 +971,146 @@ public class Parser implements IParser {
         }
 
         throw new ParsingException(lexer.position, "Syntax error");
+    }
+
+    /////////////////////////////////////
+    /////////////////////////////////////
+    /////////////////////////////////////
+
+    private BinaryNode.Operator matchBinOpt() throws ParsingException {
+        switch (lexer.currentToken.kind) {
+            case ASSIGN_ADD:
+                return BinaryNode.Operator.ADD;
+            case ASSIGN_SUB:
+                return BinaryNode.Operator.SUB;
+            case ASSIGN_MUL:
+                return BinaryNode.Operator.MUL;
+            case ASSIGN_DIV:
+                return BinaryNode.Operator.DIV;
+            case ASSIGN_POW:
+                return BinaryNode.Operator.POW;
+            case INSTANCEOF:
+                return BinaryNode.Operator.INSTANCEOF;
+            default:
+                throw new ParsingException(lexer.position, "Syntax error");
+        }
+    }
+
+    private String matchParamName(ArrayList<String> data) {
+        String r;
+
+        for (int i = 0; i < data.size(); i++) {
+            r = data.get(i);
+
+            if (r != null) {
+                data.set(i, null);
+                return r;
+            }
+
+        }
+
+        return null;
+    }
+
+    private <T> LinkedHashMap<String, Node> matchParams(Node node, LinkedHashMap<String, T> defined) throws ParsingException {
+        LinkedHashMap<String, Node> result = new LinkedHashMap<>();
+
+        if (defined.size() == 0) {
+            if (lexer.currentToken.kind != TokenKind.SRPAREN) {
+                throw new ParsingException(lexer.position, "Parameter number exceeds the maximum length of 0");
+            }
+        } else {
+            if (lexer.currentToken.kind == TokenKind.SRPAREN) {
+                for (Map.Entry<String, ?> entry : defined.entrySet()) {
+                    if (entry.getValue() == null) {
+                        throw new ParsingException(lexer.position, String.format("Missing parameter \"%s\"", entry.getKey()));
+                    }
+                }
+            } else {
+                ArrayList<String> params = new ArrayList<>(defined.keySet());
+                ArrayList<String> macther = (ArrayList<String>) params.clone();
+
+                for (String key : defined.keySet()) {
+                    result.put(key, null);
+                }
+
+                int counter = 0;
+                boolean flag = false;
+
+                while (lexer.currentToken.kind != TokenKind.SRPAREN) {
+
+                    if (counter == defined.size()) {
+                        throw new ParsingException(lexer.position, String.format("Parameter number exceeds the maximum length of %d", defined.size()));
+                    }
+
+                    if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
+                        flag = false;
+                        lexer.beginPeek();
+                        String param = ((VToken) lexer.currentToken).value;
+                        Position posParam = lexer.position.clone();
+                        lexer.next();
+
+                        if (lexer.currentToken.kind == TokenKind.ASSIGN) {
+                            lexer.endPeek();
+                            lexer.next(2);
+
+                            if (!defined.containsKey(param)) {
+                                throw new ParsingException(posParam, String.format("Parameter \"%s\" does not exist", param));
+                            } else {
+                                if (result.get(param) != null) {
+                                    throw new ParsingException(posParam, String.format("Parameter \"%s\" has already been defined", param));
+                                }
+
+                                macther.set(macther.indexOf(param), null);
+                                result.put(param, this.Assign());
+                            }
+
+                            counter++;
+                            continue;
+                        }
+
+                        lexer.endPeek();
+                    } else if (lexer.currentToken.kind == TokenKind.COMMA) {
+                        if (flag) {
+                            throw new ParsingException(lexer.position, "Syntax error");
+                        }
+
+                        flag = true;
+                        lexer.next();
+                        continue;
+                    }
+
+                    flag = false;
+
+                    String pName = matchParamName(macther);
+
+                    if (pName == null) {
+                        throw new ParsingException(lexer.position, String.format("Parameter number exceeds the maximum length of %d", defined.size()));
+                    }
+
+                    result.put(pName, this.Assign());
+
+                    counter++;
+                }
+
+                for (String param : defined.keySet()) {
+                    if (result.get(param) == null) {
+                        T r = defined.get(param);
+
+                        if ((r != null && !(r instanceof Node))) {
+                            continue;
+                        }
+
+                        if (r == null) {
+                            throw new ParsingException(node.position, String.format("Missing parameter \"%s\"", param));
+                        }
+
+                        result.put(param, (Node) r);
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 }

@@ -22,7 +22,8 @@ public class BinaryNode extends Node {
         LESSER,
         LESSER_OR_EQUAL,
         AND,
-        OR
+        OR,
+        INSTANCEOF
     }
 
     public Operator operator;

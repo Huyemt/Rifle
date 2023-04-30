@@ -1,5 +1,11 @@
-arr := []
+url := "http://www.baidu.com"
 
-arr[] = 1
+headers := {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36",
+}
 
-println(arr[])
+rsp := nget(url=url, headers=headers)
+
+rsp["cookies"]= str(rsp["cookies"])
+
+println(rsp["cookies"])

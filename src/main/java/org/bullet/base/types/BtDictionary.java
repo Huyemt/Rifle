@@ -15,7 +15,7 @@ public class BtDictionary {
         vector = new LinkedHashMap<>();
     }
 
-    public static BtDictionary parse(Map map) {
+    public static BtDictionary parse(Map<?, ?> map) {
         BtDictionary dictionary = new BtDictionary();
 
         for (Object key : map.keySet()) {
@@ -47,11 +47,12 @@ public class BtDictionary {
 
         for (Map.Entry<String, Object> stringObjectEntry : vector.entrySet()) {
             entry = stringObjectEntry;
+
             builder.append("\"").append(entry.getKey().replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n").replace("\"", "\\\"").replace("'", "\\'")).append("\":");
             if (entry.getValue() instanceof String) {
                 builder.append("\"").append(entry.getValue().toString().replace("\t", "\\t").replace("\r", "\\r").replace("\n", "\\n").replace("\"", "\\\"").replace("'", "\\'")).append("\"");
             } else {
-                builder.append(entry.getValue());
+                builder.append(entry.getValue().toString());
             }
 
             if (i + 1 < vector.size()) {

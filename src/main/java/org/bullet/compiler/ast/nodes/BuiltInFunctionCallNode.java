@@ -10,19 +10,17 @@ import java.util.LinkedHashMap;
  * @author Huyemt
  */
 
-public class FunctionCallNode extends Node {
+public class BuiltInFunctionCallNode extends Node {
 
     public String name;
     public LinkedHashMap<String, Node> args;
 
-    public FunctionCallNode() {
-        name = "";
+    public BuiltInFunctionCallNode() {
         args = new LinkedHashMap<>();
-
     }
 
     @Override
     public Object accept(Visitor visitor) throws RuntimeException {
-        return visitor.goFunctionCall(this);
+        return visitor.goBuiltInFunctionCall(this);
     }
 }

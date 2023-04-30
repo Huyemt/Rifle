@@ -1,31 +1,33 @@
 package org.bullet.base.bulitIn.function;
 
+import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.components.BtFunction;
+import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
+
+import java.util.LinkedHashMap;
 
 /**
  * @author Huyemt
  */
 
-public class BtPrintlnFunction extends BtFunction {
+public class BtPrintlnFunction extends BtBulitInFunction {
     public BtPrintlnFunction(BulletRuntime runtime) {
         super("println", runtime);
+        args.put("msg", "");
     }
 
     @Override
-    public final Object invokeFV(Object... args) {
+    public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            builder.append(args[i]);
 
-            if (i + 1 < args.length)
-                builder.append("\t");
-        }
+        builder.append(args.get("msg"));
 
         if (runtime.logger == null)
             System.out.println(builder);
         else
-            runtime.logger.info(builder);
+            runtime.logger.info(builder.toString());
+
 
         return builder.toString();
     }
