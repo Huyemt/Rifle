@@ -1,16 +1,12 @@
 package org.bullet.base.components;
 
-import org.bullet.base.types.BtArray;
-import org.bullet.base.types.BtDictionary;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.FunctionNode;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.Interpreter;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 /**
  * @author Huyemt
@@ -56,16 +52,7 @@ public class BtCustomFunction extends BtFunction {
 
         int i = 0;
         for (String name : node.params.keySet()) {
-            if (args[i] instanceof Integer || args[i] instanceof Float || args[i] instanceof Double) {
-                args[i] = new BigDecimal(args[i].toString());
-            } else if (args[i].getClass().isArray()) {
-                args[i] = BtArray.parse((Object[]) args[i]);
-            } else if (args[i] instanceof Map) {
-                args[i] = BtDictionary.parse((Map<String, Object>) args[i]);
-            }
-
-            environment.params.put(name, args[i]);
-
+            environment.params.put(name, parseBaseType(args[i]));
             i++;
         }
 

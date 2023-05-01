@@ -100,7 +100,6 @@ public class BtNGetFunction extends BtBulitInFunction {
             response = Http4J.get(url, params, headers, cookies, requestBody, config);
             result.vector.put("url", response.url);
             result.vector.put("html", response.html);
-            result.vector.put("content", response.content);
             result.vector.put("headers", BtDictionary.parse(response.headers.getHeaders()));
             result.vector.put("cookies", BtDictionary.parse(response.cookies.getCookieMap()));
             result.vector.put("status_code", new BigDecimal(response.status_code));

@@ -468,6 +468,17 @@ public class Interpreter extends Visitor {
         Node run = null;
         try {
             BtBulitInFunction function = BulletRuntime.builtInfunctions.get(node.name);
+
+            if (function.isVarParam) {
+                ArrayList<Object> list = new ArrayList<>();
+
+                for (Node v : node.args1) {
+                    list.add(v.accept(this));
+                }
+
+                return function.invokeFV(list.toArray());
+            }
+
             LinkedHashMap<String, Object> args = new LinkedHashMap<>();
 
             for (Map.Entry<String, Node> entry : node.args.entrySet()) {
@@ -483,7 +494,7 @@ public class Interpreter extends Visitor {
                         throw new ParsingException(node.position, String.format("Missing parameter \"%s\"", entry.getKey()));
                     }
 
-                    args.put(entry.getKey(), this.parseBaseType(function.args.get(entry.getKey())));
+                    args.put(entry.getKey(), function.args.get(entry.getKey()));
                 }
             }
 
@@ -882,21 +893,5 @@ public class Interpreter extends Visitor {
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
-    }
-
-    private Object parseBaseType(Object v) {
-        if (v instanceof Integer || v instanceof Float || v instanceof Double) {
-            return new BigDecimal(v.toString());
-        }
-
-        if (v.getClass().isArray()) {
-            return BtArray.parse((Object[]) v);
-        }
-
-        if (v instanceof Map) {
-            return BtDictionary.parse((Map<String, Object>) v);
-        }
-
-        return v;
     }
 }

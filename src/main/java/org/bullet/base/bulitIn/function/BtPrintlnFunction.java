@@ -1,11 +1,8 @@
 package org.bullet.base.bulitIn.function;
 
 import org.bullet.base.components.BtBulitInFunction;
-import org.bullet.base.components.BtFunction;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
-
-import java.util.LinkedHashMap;
 
 /**
  * @author Huyemt
@@ -14,20 +11,27 @@ import java.util.LinkedHashMap;
 public class BtPrintlnFunction extends BtBulitInFunction {
     public BtPrintlnFunction(BulletRuntime runtime) {
         super("println", runtime);
-        args.put("msg", "");
+        isVarParam = true;
     }
 
     @Override
-    public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
+    public Object eval(Object[] args) throws BulletException {
         StringBuilder builder = new StringBuilder();
 
-        builder.append(args.get("msg"));
+        int i = 0;
+        for (Object v : args) {
+            builder.append(v.toString());
+            i++;
+
+            if (i < args.length) {
+                builder.append("\t");
+            }
+        }
 
         if (runtime.logger == null)
             System.out.println(builder);
         else
             runtime.logger.info(builder.toString());
-
 
         return builder.toString();
     }

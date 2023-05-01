@@ -200,7 +200,13 @@ public class Parser implements IParser {
             BuiltInFunctionCallNode built = new BuiltInFunctionCallNode();
             built.position = node.position;
             built.name = name;
-            built.args = matchParams(built, function.args);
+
+            if (function.isVarParam) {
+                built.args1 = matchVarParams();
+            } else {
+                built.args = matchParams(built, function.args);
+            }
+
             lexer.expectToken(TokenKind.SRPAREN);
 
             return built;
@@ -1112,5 +1118,24 @@ public class Parser implements IParser {
         }
 
         return result;
+    }
+
+    private ArrayList<Node> matchVarParams() throws ParsingException {
+        ArrayList<Node> params = new ArrayList<>();
+
+        if (lexer.currentToken.kind != TokenKind.SRPAREN) {
+            params.add(this.Assign());
+            if (lexer.currentToken.kind == TokenKind.COMMA) {
+                while (lexer.currentToken.kind == TokenKind.COMMA) {
+                    lexer.next();
+                    params.add(this.Assign());
+                    if (lexer.currentToken.kind == TokenKind.SRPAREN) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return params;
     }
 }
