@@ -1,7 +1,7 @@
 package org.rifle.module;
 
 import org.bullet.CompiledBullet;
-import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtList;
 import org.bullet.interpreter.BulletRuntime;
 
 import java.io.File;
@@ -140,10 +140,10 @@ public class ModuleLoader implements ILoader {
     }
 
     private String[] makeAus(Object r) {
-        if (r instanceof BtArray) {
+        if (r instanceof BtList) {
             ArrayList<String> arrayList = new ArrayList<>();
 
-            for (Object rr : ((BtArray) r).vector) {
+            for (Object rr : ((BtList) r).values()) {
                 arrayList.add(rr.toString());
             }
 

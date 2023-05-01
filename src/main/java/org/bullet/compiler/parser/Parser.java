@@ -1,12 +1,15 @@
 package org.bullet.compiler.parser;
 
 import org.bullet.base.components.BtBulitInFunction;
+import org.bullet.base.types.BtByteString;
+import org.bullet.base.types.BtNull;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.*;
 import org.bullet.compiler.lexer.Lexer;
 import org.bullet.compiler.lexer.Position;
 import org.bullet.compiler.lexer.TokenKind;
 import org.bullet.compiler.lexer.VToken;
+import org.bullet.exceptions.BulletException;
 import org.bullet.exceptions.common.ParsingException;
 import org.bullet.interpreter.BulletRuntime;
 import org.bullet.interpreter.Interpreter;
@@ -63,7 +66,7 @@ public class Parser implements IParser {
             }
 
             FunctionNode node = new FunctionNode();
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
 
             lexer.next();
 
@@ -139,6 +142,8 @@ public class Parser implements IParser {
                 }
 
                 lexer.expectToken(TokenKind.SRPAREN);
+
+                functions.put(node.name, node);
             }
 
             if (lexer.currentToken.kind != TokenKind.BLPAREN) {
@@ -163,7 +168,7 @@ public class Parser implements IParser {
             throw new ParsingException(lexer.position, "The \"return\" keyword can only be used in functions and loop bodies of functions");
         }
         ReturnNode node = new ReturnNode();
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
         lexer.next();
 
         if (lexer.currentToken.kind != TokenKind.SEMICOLON) {
@@ -184,7 +189,7 @@ public class Parser implements IParser {
     public Node FunctionCall() throws ParsingException {
         FunctionCallNode node = new FunctionCallNode();
 
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
         node.name = ((VToken) lexer.currentToken).value;
 
         lexer.checkToken(TokenKind.IDENTIFIER);
@@ -209,6 +214,8 @@ public class Parser implements IParser {
 
             lexer.expectToken(TokenKind.SRPAREN);
 
+            built.indexNode = this.Index();
+
             return built;
         }
 
@@ -221,6 +228,8 @@ public class Parser implements IParser {
         node.args = matchParams(node, function.params);
 
         lexer.expectToken(TokenKind.SRPAREN);
+
+        node.indexNode = this.Index();
 
         return node;
     }
@@ -303,7 +312,11 @@ public class Parser implements IParser {
         解析语句
          */
         StatementNode node = new StatementNode();
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
+
+        if (lexer.currentToken.kind == TokenKind.EOF) {
+            return node;
+        }
 
         if (lexer.currentToken.kind != TokenKind.SEMICOLON) {
             node.left = this.Expression();
@@ -394,7 +407,7 @@ public class Parser implements IParser {
     @Override
     public UntilNode Until() throws ParsingException {
         UntilNode node = new UntilNode();
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
 
         lexer.next();
 
@@ -434,7 +447,7 @@ public class Parser implements IParser {
         }
 
         BreakNode node = new BreakNode();
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
         lexer.next();
 
         while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
@@ -451,7 +464,7 @@ public class Parser implements IParser {
         }
 
         ContinueNode node = new ContinueNode();
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
         lexer.next();
 
         while (lexer.currentToken.kind == TokenKind.SEMICOLON) {
@@ -463,7 +476,7 @@ public class Parser implements IParser {
     @Override
     public BlockNode Block() throws ParsingException {
         BlockNode node = new BlockNode();
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
 
         lexer.next();
 
@@ -478,6 +491,7 @@ public class Parser implements IParser {
         }
 
         lexer.expectToken(TokenKind.BRPAREN);
+
         blockLevel--;
 
         return node;
@@ -606,13 +620,13 @@ public class Parser implements IParser {
         while (lexer.currentToken.kind == TokenKind.MLPAREN) {
             if (start == null) {
                 start = new IndexNode();
-                start.position = lexer.position.clone();
+                start.position = lexer.currentToken.position;
 
                 indexNode = start;
             } else {
                 indexNode.next = new IndexNode();
                 indexNode = indexNode.next;
-                indexNode.position = lexer.position.clone();
+                indexNode.position = lexer.currentToken.position;
             }
 
             lexer.next();
@@ -651,7 +665,7 @@ public class Parser implements IParser {
     @Override
     public Node ArrayCall() throws ParsingException {
         VariableNode variable = new VariableNode();
-        variable.position = lexer.position.clone();
+        variable.position = lexer.currentToken.position;
         variable.name = ((VToken) lexer.currentToken).value;
         lexer.next(); // identifier
 
@@ -663,7 +677,7 @@ public class Parser implements IParser {
     @Override
     public DictionaryNode Dictionary() throws ParsingException {
         DictionaryNode node = new DictionaryNode();
-        node.position = lexer.position.clone();
+        node.position = lexer.currentToken.position;
 
         lexer.next();
 
@@ -686,10 +700,14 @@ public class Parser implements IParser {
 
             lexer.expectToken(TokenKind.BRPAREN);
 
+            node.indexNode = this.Index();
+
             return node;
         }
 
         lexer.next();
+
+        node.indexNode = this.Index();
 
         return node;
     }
@@ -700,7 +718,7 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.AND) {
             BinaryNode node = new BinaryNode();
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
             node.operator = BinaryNode.Operator.AND;
             lexer.next();
 
@@ -719,7 +737,7 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.OR) {
             BinaryNode node = new BinaryNode();
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
             node.operator = BinaryNode.Operator.OR;
             lexer.next();
 
@@ -738,8 +756,8 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.EQUAL || lexer.currentToken.kind == TokenKind.NOT_EQUAL) {
             BinaryNode node = new BinaryNode();
-            node.position = lexer.position.clone();
-            node.operator = lexer.currentToken.kind == TokenKind.EQUAL ? BinaryNode.Operator.EQUAL : BinaryNode.Operator.NOT_EQUAL;
+            node.position = lexer.currentToken.position;
+            node.operator = this.matchBinOpt();
             lexer.next();
 
             node.left = left;
@@ -757,7 +775,7 @@ public class Parser implements IParser {
 
         while (lexer.currentToken.kind == TokenKind.GREATER || lexer.currentToken.kind == TokenKind.GREATER_OR_EQUAL || lexer.currentToken.kind == TokenKind.LESSER || lexer.currentToken.kind == TokenKind.LESSER_OR_EQUAL || lexer.currentToken.kind == TokenKind.INSTANCEOF) {
             BinaryNode node = new BinaryNode();
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
             node.operator = this.matchBinOpt();
 
             lexer.next();
@@ -783,9 +801,9 @@ public class Parser implements IParser {
         while (lexer.currentToken.kind == TokenKind.PLUS || lexer.currentToken.kind == TokenKind.MINUS) {
             BinaryNode node = new BinaryNode();
 
-            node.operator = lexer.currentToken.kind == TokenKind.PLUS ? BinaryNode.Operator.ADD : BinaryNode.Operator.SUB;
+            node.operator = this.matchBinOpt();
 
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
             lexer.next();
             node.left = left;
             node.right = this.Factor();
@@ -802,9 +820,9 @@ public class Parser implements IParser {
         while (lexer.currentToken.kind == TokenKind.STAR || lexer.currentToken.kind == TokenKind.SLASH) {
             BinaryNode node = new BinaryNode();
 
-            node.operator = lexer.currentToken.kind == TokenKind.STAR ? BinaryNode.Operator.MUL : BinaryNode.Operator.DIV;
+            node.operator = this.matchBinOpt();
 
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
             lexer.next();
             node.left = left;
             node.right = this.Unary();
@@ -826,7 +844,7 @@ public class Parser implements IParser {
             else
                 node.operator = UnaryNode.Operator.NOT;
 
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
             lexer.next();
             node.left = this.Unary();
 
@@ -843,7 +861,7 @@ public class Parser implements IParser {
         while (lexer.currentToken.kind == TokenKind.POW) {
             BinaryNode node = new BinaryNode();
             node.operator = BinaryNode.Operator.POW;
-            node.position = lexer.position.clone();
+            node.position = lexer.currentToken.position;
             lexer.next();
             node.left = left;
             node.right = this.Secondary();
@@ -905,75 +923,91 @@ public class Parser implements IParser {
 
     @Override
     public Node Primary() throws ParsingException {
-        // 数字
-        if (lexer.currentToken.kind == TokenKind.VT_NUMBER) {
-            ConstantNode node = new ConstantNode();
-            node.value = new BigDecimal(((VToken)lexer.currentToken).value);
-            node.position = lexer.position.clone();
-            lexer.next();
+        try {
+            // 数字
+            if (lexer.currentToken.kind == TokenKind.VT_NUMBER) {
+                ConstantNode node = new ConstantNode();
+                node.value = new BigDecimal(((VToken)lexer.currentToken).value);
+                node.position = lexer.currentToken.position;
+                lexer.next();
 
-            return node;
-        }
-
-        // 字符串
-        if (lexer.currentToken.kind == TokenKind.VT_STRING) {
-            ConstantNode node = new ConstantNode();
-            node.value = ((VToken)lexer.currentToken).value;
-            node.position = lexer.position.clone();
-            lexer.next();
-
-            node.indexNode = this.Index();
-
-            if (node.indexNode != null && paramLevel > 0) {
-                throw new ParsingException(node.position, "Syntax error");
+                return node;
             }
 
-            return node;
-        }
+            // 字符串
+            if (lexer.currentToken.kind == TokenKind.VT_STRING) {
+                ConstantNode node = new ConstantNode();
+                node.value = ((VToken)lexer.currentToken).value;
+                node.position = lexer.currentToken.position;
+                lexer.next();
 
-        // null
-        if (lexer.currentToken.kind == TokenKind.NULL) {
-            ConstantNode node = new ConstantNode();
-            node.value = null;
-            node.position.clone();
-            lexer.next();
+                node.indexNode = this.Index();
 
-            return node;
-        }
-
-        // 数组 []
-        if (lexer.currentToken.kind == TokenKind.MLPAREN) {
-            ArrayNode array = new ArrayNode();
-            array.position = lexer.position.clone();
-
-            lexer.next();
-
-            while (lexer.currentToken.kind != TokenKind.MRPAREN) {
-                array.values.add(paramLevel > 0 ? this.Primary() : this.Assign());
-
-                if (lexer.currentToken.kind != TokenKind.MRPAREN) {
-                    lexer.expectToken(TokenKind.COMMA);
+                if (node.indexNode != null && paramLevel > 0) {
+                    throw new ParsingException(node.position, "Syntax error");
                 }
+
+                return node;
             }
 
-            lexer.expectToken(TokenKind.MRPAREN);
+            // 用字符串表示的字节
+            if (lexer.currentToken.kind == TokenKind.VT_BYTE_STRING) {
+                ConstantNode node = new ConstantNode();
+                node.position = lexer.currentToken.position;
+                node.value = new BtByteString(((VToken)lexer.currentToken).value, true);
+                lexer.next();
 
-            return array;
-        }
+                return node;
+            }
 
-        // 字典
-        if (lexer.currentToken.kind == TokenKind.BLPAREN) {
-            return this.Dictionary();
-        }
+            // null
+            if (lexer.currentToken.kind == TokenKind.NULL) {
+                ConstantNode node = new ConstantNode();
+                node.value = new BtNull();
+                node.position = lexer.currentToken.position;
+                lexer.next();
 
-        // 布尔值 true 和 false
-        if (lexer.currentToken.kind == TokenKind.TRUE || lexer.currentToken.kind == TokenKind.FALSE) {
-            ConstantNode node = new ConstantNode();
-            node.value = lexer.currentToken.kind == TokenKind.TRUE;
-            node.position = lexer.position.clone();
-            lexer.next();
+                return node;
+            }
 
-            return node;
+            // 数组 []
+            if (lexer.currentToken.kind == TokenKind.MLPAREN) {
+                ListNode array = new ListNode();
+                array.position = lexer.currentToken.position;
+
+                lexer.next();
+
+                while (lexer.currentToken.kind != TokenKind.MRPAREN) {
+                    array.values.add(paramLevel > 0 ? this.Primary() : this.Assign());
+
+                    if (lexer.currentToken.kind != TokenKind.MRPAREN) {
+                        lexer.expectToken(TokenKind.COMMA);
+                    }
+                }
+
+                lexer.expectToken(TokenKind.MRPAREN);
+
+                array.indexNode = this.Index();
+
+                return array;
+            }
+
+            // 字典
+            if (lexer.currentToken.kind == TokenKind.BLPAREN) {
+                return this.Dictionary();
+            }
+
+            // 布尔值 true 和 false
+            if (lexer.currentToken.kind == TokenKind.TRUE || lexer.currentToken.kind == TokenKind.FALSE) {
+                ConstantNode node = new ConstantNode();
+                node.value = lexer.currentToken.kind == TokenKind.TRUE;
+                node.position = lexer.currentToken.position;
+                lexer.next();
+
+                return node;
+            }
+        } catch (BulletException e) {
+            throw new ParsingException(lexer.position, e.getMessage());
         }
 
         throw new ParsingException(lexer.position, "Syntax error");
@@ -985,18 +1019,39 @@ public class Parser implements IParser {
 
     private BinaryNode.Operator matchBinOpt() throws ParsingException {
         switch (lexer.currentToken.kind) {
+            case PLUS:
             case ASSIGN_ADD:
                 return BinaryNode.Operator.ADD;
+
+            case MINUS:
             case ASSIGN_SUB:
                 return BinaryNode.Operator.SUB;
+
+            case STAR:
             case ASSIGN_MUL:
                 return BinaryNode.Operator.MUL;
+
+            case SLASH:
             case ASSIGN_DIV:
                 return BinaryNode.Operator.DIV;
+
+            case POW:
             case ASSIGN_POW:
                 return BinaryNode.Operator.POW;
             case INSTANCEOF:
                 return BinaryNode.Operator.INSTANCEOF;
+            case EQUAL:
+                return BinaryNode.Operator.EQUAL;
+            case NOT_EQUAL:
+                return BinaryNode.Operator.NOT_EQUAL;
+            case GREATER:
+                return BinaryNode.Operator.GREATER;
+            case GREATER_OR_EQUAL:
+                return BinaryNode.Operator.GREATER_OR_EQUAL;
+            case LESSER:
+                return BinaryNode.Operator.LESSER;
+            case LESSER_OR_EQUAL:
+                return BinaryNode.Operator.LESSER_OR_EQUAL;
             default:
                 throw new ParsingException(lexer.position, "Syntax error");
         }

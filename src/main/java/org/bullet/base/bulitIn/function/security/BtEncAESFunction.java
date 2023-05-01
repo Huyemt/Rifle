@@ -1,8 +1,6 @@
 package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtBulitInFunction;
-import org.bullet.base.components.BtFunction;
-import org.bullet.base.types.BtArray;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;

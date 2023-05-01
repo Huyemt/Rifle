@@ -1,7 +1,6 @@
 package org.bullet.base.bulitIn.function.net;
 
 import org.bullet.base.components.BtBulitInFunction;
-import org.bullet.base.components.BtFunction;
 import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
@@ -98,12 +97,22 @@ public class BtNPostFunction extends BtBulitInFunction {
         }
 
         try {
-            response = Http4J.post(url, params, headers, cookies, requestBody, config);
-            result.vector.put("url", response.url);
-            result.vector.put("html", response.html);
-            result.vector.put("headers", BtDictionary.parse(response.headers.getHeaders()));
-            result.vector.put("cookies", BtDictionary.parse(response.cookies.getCookieMap()));
-            result.vector.put("status_code", new BigDecimal(response.status_code));
+            response = Http4J.get(url, params, headers, cookies, requestBody, config);
+            result.add("url", response.url);
+            result.add("content", response.content);
+            result.add("html", response.html);
+            result.add("headers", BtDictionary.parse(response.headers.getHeaders()));
+
+            BtDictionary cache = new BtDictionary();
+
+            for (HttpCookie cookie : response.cookies.getCookieMap().values()) {
+                String a = cookie.toString();
+                int name = a.indexOf('=');
+                cache.add(a.substring(0, name), a.substring(name + 1));
+            }
+
+            result.add("cookies", cache);
+            result.add("status_code", new BigDecimal(response.status_code));
 
             return result;
         } catch (IOException e) {

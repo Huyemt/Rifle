@@ -1,9 +1,13 @@
-rsp := npost(
-    "http://localhost/lang/translate",
-    data={
-        "value": "你好"
+aDict := {
+    "a": 1,
+    "b": 1.1,
+    "c": "str",
+    "d": [1, 2, 3],
+    "e": false,
+    "f": {
+        "a": 1
     }
-)
+}
 
-println(rsp["html"])
-
+// true
+println( isdict(aDict) )

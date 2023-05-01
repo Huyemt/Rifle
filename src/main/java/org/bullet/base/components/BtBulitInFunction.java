@@ -1,5 +1,6 @@
 package org.bullet.base.components;
 
+import org.bullet.base.types.BtType;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
@@ -23,7 +24,7 @@ public class BtBulitInFunction extends BtFunction {
         if (isVarParam) {
             ArrayList<Object> list = new ArrayList<>();
             for (Object arg : args) {
-                list.add(parseBaseType(arg));
+                list.add(BtType.jTypeToBType(arg));
             }
 
             return eval(list.toArray());
@@ -35,7 +36,7 @@ public class BtBulitInFunction extends BtFunction {
             String[] params = this.args.keySet().toArray(String[]::new);
 
             for (int i = 0; i < args.length; i++) {
-                g.put(params[i], parseBaseType(args[i]));
+                g.put(params[i], BtType.jTypeToBType(args[i]));
             }
 
             for (int i = args.length; i < this.args.size(); i++) {
@@ -49,7 +50,7 @@ public class BtBulitInFunction extends BtFunction {
         } else if (args.length == this.args.size()) {
             int i = 0;
             for (String name : this.args.keySet()) {
-                g.put(name, parseBaseType(args[i]));
+                g.put(name, BtType.jTypeToBType(args[i]));
                 i++;
             }
         } else {

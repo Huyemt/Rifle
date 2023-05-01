@@ -84,6 +84,7 @@ public enum TokenKind {
      */
     VT_NUMBER("NUMBER"),
     VT_STRING("STRING"),
+    VT_BYTE_STRING("BYTE_STRING"),
     ;
 
     private final String value;

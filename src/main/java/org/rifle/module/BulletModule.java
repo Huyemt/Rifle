@@ -3,7 +3,7 @@ package org.rifle.module;
 import org.bullet.CompiledBullet;
 import org.bullet.Reporter;
 import org.bullet.base.components.BtFunction;
-import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtList;
 import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.exceptions.RuntimeException;
@@ -81,20 +81,20 @@ public class BulletModule extends Module {
                 }
 
                 BtDictionary commands = (BtDictionary) obj;
-                for (Map.Entry<String, Object> entry : commands.vector.entrySet()) {
-                    if (!(entry.getValue() instanceof BtArray)) {
+                for (Map.Entry<String, Object> entry : commands.entrys()) {
+                    if (!(entry.getValue() instanceof BtList)) {
                         throw new BulletException("A command message must correspond to a list");
                     }
 
-                    BtArray command = (BtArray) entry.getValue();
+                    BtList command = (BtList) entry.getValue();
 
-                    if (command.vector.size() < 3) {
+                    if (command.size() < 3) {
                         throw new BulletException("Missing command information (name, description, usage)");
                     }
 
-                    BtFunction cmdFunc = bullet.findFunction(command.vector.get(0).toString());
-                    String description = command.vector.get(1).toString();
-                    String[] usages = ((BtArray) command.vector.get(2)).vector.toArray(String[]::new);
+                    BtFunction cmdFunc = bullet.findFunction(command.get(0).toString());
+                    String description = command.get(1).toString();
+                    String[] usages = (String[]) ((BtList) command.get(2)).toArray();
 
                     getCommandManager().register(new Command(entry.getKey(), description, usages) {
                         private final BtFunction function = cmdFunc;

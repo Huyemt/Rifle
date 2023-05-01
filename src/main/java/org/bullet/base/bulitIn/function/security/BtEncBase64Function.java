@@ -1,7 +1,7 @@
 package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtBulitInFunction;
-import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtList;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;
@@ -23,31 +23,31 @@ public class BtEncBase64Function extends BtBulitInFunction {
     public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
         Object r = args.get("content");
 
-        if (!(r instanceof String) && !(r instanceof BtArray) && !(r instanceof BigDecimal)) {
+        if (!(r instanceof String) && !(r instanceof BtList) && !(r instanceof BigDecimal)) {
             throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
         }
 
-        if (r instanceof BtArray) {
-            return encryptArr((BtArray) r);
+        if (r instanceof BtList) {
+            return encryptArr((BtList) r);
         }
 
         return Crypto4J.Base64.encrypt(r.toString());
     }
 
-    private BtArray encryptArr(BtArray array) throws BulletException {
-        BtArray r = new BtArray();
+    private BtList encryptArr(BtList array) throws BulletException {
+        BtList r = new BtList();
 
-        for (Object v : array.vector) {
-            if (!(v instanceof String) && !(v instanceof BtArray) && !(v instanceof BigDecimal)) {
+        for (Object v : array.values()) {
+            if (!(v instanceof String) && !(v instanceof BtList) && !(v instanceof BigDecimal)) {
                 throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
             }
 
-            if (v instanceof BtArray) {
-                r.vector.add(encryptArr((BtArray) v));
+            if (v instanceof BtList) {
+                r.add(encryptArr((BtList) v));
                 continue;
             }
 
-            r.vector.add(Crypto4J.Base64.encrypt(v.toString()));
+            r.add(Crypto4J.Base64.encrypt(v.toString()));
         }
 
         return r;

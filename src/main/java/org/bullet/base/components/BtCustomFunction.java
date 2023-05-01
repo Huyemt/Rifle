@@ -1,5 +1,6 @@
 package org.bullet.base.components;
 
+import org.bullet.base.types.BtType;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.FunctionNode;
 import org.bullet.exceptions.BulletException;
@@ -52,7 +53,7 @@ public class BtCustomFunction extends BtFunction {
 
         int i = 0;
         for (String name : node.params.keySet()) {
-            environment.params.put(name, parseBaseType(args[i]));
+            environment.params.put(name, BtType.jTypeToBType(args[i]));
             i++;
         }
 

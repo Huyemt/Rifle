@@ -1,8 +1,11 @@
 package org.bullet.interpreter;
 
 import org.bullet.base.bulitIn.function.*;
+import org.bullet.base.bulitIn.function.data.BtDecJsonFunction;
+import org.bullet.base.bulitIn.function.data.BtEncJsonFunction;
 import org.bullet.base.bulitIn.function.security.*;
 import org.bullet.base.bulitIn.function.net.*;
+import org.bullet.base.bulitIn.function.type.*;
 import org.bullet.base.components.*;
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.exceptions.common.UnderfineException;
@@ -37,25 +40,7 @@ public class BulletRuntime {
         loopLevel = 0;
         logger = null;
 
-        builtInFunction(new BtPrintFunction(this));
-        builtInFunction(new BtPrintlnFunction(this));
-        builtInFunction(new BtLenFunction(this));
-        builtInFunction(new BtStrFunction(this));
-        builtInFunction(new BtNumFunction(this));
-        builtInFunction(new BtMd5Function(this));
-        builtInFunction(new BtSha1Function(this));
-        builtInFunction(new BtEncBase64Function(this));
-        builtInFunction(new BtDecBase64Function(this));
-        builtInFunction(new BtSha256Function(this));
-        builtInFunction(new BtSha512Function(this));
-        builtInFunction(new BtEncAESFunction(this));
-        builtInFunction(new BtDecAESFunction(this));
-        builtInFunction(new BtEncURLFunction(this));
-        builtInFunction(new BtDecURLFunction(this));
-        builtInFunction(new BtEncRSAFunction(this));
-        builtInFunction(new BtDecRSAFunction(this));
-        builtInFunction(new BtNGetFunction(this));
-        builtInFunction(new BtNPostFunction(this));
+        registerBuiltInFunctions();
     }
 
     public BtScope createScope(BlockNode node) {
@@ -101,5 +86,39 @@ public class BulletRuntime {
 
     private void builtInFunction(BtBulitInFunction function) {
         builtInfunctions.put(function.getName(), function);
+    }
+
+    private void registerBuiltInFunctions() {
+        builtInFunction(new BtPrintFunction(this));
+        builtInFunction(new BtPrintlnFunction(this));
+        builtInFunction(new BtLenFunction(this));
+        builtInFunction(new BtStrFunction(this));
+        builtInFunction(new BtNumFunction(this));
+        builtInFunction(new BtBytesFunction(this));
+        builtInFunction(new BtMd5Function(this));
+        builtInFunction(new BtSha1Function(this));
+        builtInFunction(new BtEncBase64Function(this));
+        builtInFunction(new BtDecBase64Function(this));
+        builtInFunction(new BtSha256Function(this));
+        builtInFunction(new BtSha512Function(this));
+        builtInFunction(new BtEncAESFunction(this));
+        builtInFunction(new BtDecAESFunction(this));
+        builtInFunction(new BtEncURLFunction(this));
+        builtInFunction(new BtDecURLFunction(this));
+        builtInFunction(new BtEncRSAFunction(this));
+        builtInFunction(new BtDecRSAFunction(this));
+        builtInFunction(new BtNGetFunction(this));
+        builtInFunction(new BtNPostFunction(this));
+        builtInFunction(new BtIsNumFunction(this));
+        builtInFunction(new BtIsStrFunction(this));
+        builtInFunction(new BtIsDictionaryFunction(this));
+        builtInFunction(new BtIsListFunction(this));
+        builtInFunction(new BtIsByteFunction(this));
+        builtInFunction(new BtIsNullFunction(this));
+        builtInFunction(new BtIsBooleanFunction(this));
+        builtInFunction(new BtIsByteStringFunction(this));;
+        builtInFunction(new BtTypeofFunction(this));
+        builtInFunction(new BtEncJsonFunction(this));
+        builtInFunction(new BtDecJsonFunction(this));
     }
 }

@@ -14,6 +14,7 @@ public class FunctionCallNode extends Node {
 
     public String name;
     public LinkedHashMap<String, Node> args;
+    public IndexNode indexNode;
 
     public FunctionCallNode() {
         name = "";

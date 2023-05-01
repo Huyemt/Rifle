@@ -27,14 +27,8 @@ i := 10
 ```bullet
 aStr := "Hello, world"
 
-// Hello, world
-println(aStr)
-
-// Hello
-println(aStr[:5])
-
-// olleH
-println(aStr[5:0])
+// true
+println( isstr(aStr) )
 ```
 <br>
 
@@ -42,36 +36,8 @@ println(aStr[5:0])
 ```bullet
 var aList = [0, 1, 2, 3, 4]
 
-// [0,1,2,3,4]
-println(aList)
-
-// 取最后一项
-// 4
-println(aList[])
-
-// [0,1,2]
-println(aList[:3])
-
-// [4,3,2]
-println(aList[5:2])
-
-aList[] = 5
-
-// [0,1,2,3,4,5]
-println(aList)
-
-aList[] = []
-aList[][] = 1
-aList[][] = 2
-aList[][] = 3
-
-// [0,1,2,3,4,5,[1,2,3]]
-println(aList)
-
-// 自身赋值
-aList[] = aList
-// [0,1,2,3,4,5,[1,2,3],[0,1,2,3,4,5,[1,2,3]]]
-println(aList)
+// true
+println( islist(aList) )
 ```
 <br>
 
@@ -88,31 +54,13 @@ aDict := {
     }
 }
 
-// {"a":1,"b":1.1,"c":"str","d":[1,2,3],"e":false,"f":{"a":1}}
-println(aDict)
-
-// str
-println(aDict["c"])
-
-// 3
-println(aDict["d"][])
-
-// 1
-println(aDict["f"]["a"])
-
-// 取最后一项的值
-// {"a":1}
-println(aDict[])
-
-aDict[][] = len(aDict[])
-aDict[][] = len(aDict[])
-aDict[][] = len(aDict[])
-
-// [0,1,2]
-println(aDict[])
+// true
+println( isdict(aDict) )
 ```
 ***
 ## 函数
+`Bullet`内置了许多实用的函数，您可以[点击此处]()进行查询
+
 _注意：Bullet目前不支持嵌套函数的写法。_
 
 在日常编写代码时，会经常遇到写不需要传入参数的函数。
@@ -130,7 +78,7 @@ func voidFunction {
 ```
 <br>
 
-### 函数的四种类型
+### 函数的五种类型
 #### 无参数无返回值
 ```bullet
 func aFunc {

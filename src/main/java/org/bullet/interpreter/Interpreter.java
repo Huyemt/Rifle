@@ -1,8 +1,7 @@
 package org.bullet.interpreter;
 
 import org.bullet.base.components.*;
-import org.bullet.base.types.BtArray;
-import org.bullet.base.types.BtDictionary;
+import org.bullet.base.types.*;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.Visitor;
 import org.bullet.compiler.ast.nodes.*;
@@ -166,37 +165,75 @@ public class Interpreter extends Visitor {
                         }
 
                         return flag < 0 || flag == 0;
-                    default:
-                        throw new RuntimeException(node.position, "Unsupported binary operator");
-                }
-            } else if (left instanceof Boolean && right instanceof Boolean) {
-                switch (node.operator) {
-                    case OR:
-                        return ((Boolean) left) || ((Boolean) right);
-                    case AND:
-                        return ((Boolean) left) && ((Boolean) right);
-                    default:
-                        throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
-                }
-            } else if (left instanceof String && !(right instanceof BtArray)) {
-                if (node.operator == BinaryNode.Operator.ADD) {
-                    return ((String) left).concat(String.valueOf(right));
                 }
 
-                if (node.operator == BinaryNode.Operator.MUL && right instanceof BigDecimal) {
-                    return ((String) left).repeat(((BigDecimal) right).intValueExact());
+                throw new RuntimeException(node.position, "Unsupported binary operator");
+            }
+
+            if (left instanceof Boolean) {
+                if (right instanceof Boolean) {
+                    switch (node.operator) {
+                        case OR:
+                            return ((Boolean) left) || ((Boolean) right);
+                        case AND:
+                            return ((Boolean) left) && ((Boolean) right);
+                        default:
+                            throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
+                    }
+                }
+
+                throw new RuntimeException(node.position, "Boolean values can only be operated with Boolean values");
+            }
+
+            if (left instanceof String) {
+                if (!(right instanceof BtList || right instanceof BtDictionary)) {
+                    if (node.operator == BinaryNode.Operator.ADD) {
+                        if (right instanceof String) {
+                            return ((String) left).concat(String.valueOf(right));
+                        }
+
+                        throw new RuntimeException(node.position, "A string can only be added to a string");
+                    }
+
+                    if (node.operator == BinaryNode.Operator.MUL) {
+                        if (right instanceof BigDecimal) {
+                            return ((String) left).repeat(((BigDecimal) right).intValueExact());
+                        }
+
+                        throw new RuntimeException(node.position, "A string can only be multiplied to a number");
+                    }
+
+                    if (node.operator == BinaryNode.Operator.EQUAL) {
+                        return !(right instanceof BtNull) && !(right instanceof BigDecimal) && left.toString().equals(right.toString());
+                    }
                 }
 
                 throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\" and \"*\"");
-            } else if (left instanceof BtArray && right instanceof BtArray) {
-                if (node.operator == BinaryNode.Operator.ADD) {
-                    BtArray array = new BtArray();
-                    array.vector.addAll(((BtArray) left).vector);
-                    array.vector.addAll(((BtArray) right).vector);
-                    return array;
+            }
+
+            if (left instanceof BtList) {
+                if (right instanceof BtList) {
+                    if (node.operator == BinaryNode.Operator.ADD) {
+                        BtList list = new BtList();
+                        list.addAll((BtList) left);
+                        list.addAll((BtList) right);
+                        return list;
+                    }
                 }
 
-                throw new RuntimeException(node.position, "Arrays cannot perform operations other than \"+\"");
+                throw new RuntimeException(node.position, "Lists cannot perform operations other than \"+\"");
+            }
+
+            if (left instanceof BtNull) {
+                if (node.operator == BinaryNode.Operator.EQUAL) {
+                    return right instanceof BtNull;
+                }
+
+                if (node.operator == BinaryNode.Operator.NOT_EQUAL) {
+                    return !(right instanceof BtNull);
+                }
+
+                throw new RuntimeException(node.position, "Null cannot perform operations other than \"==\" and \"!=\"");
             }
 
             throw new RuntimeException(node.position, "Unsupported type operation");
@@ -234,7 +271,7 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goConstant(ConstantNode node) throws RuntimeException {
-        if (node.value instanceof BigDecimal || node.value instanceof Boolean || node.value instanceof String || node.value == null) {
+        if (node.value instanceof BigDecimal || node.value instanceof Boolean || node.value instanceof String || node.value instanceof BtNull || node.value instanceof BtByteString || node.value instanceof BtByte) {
             if (node.value instanceof String) {
                 return valueOfIndex(node.value, node.indexNode);
             }
@@ -326,8 +363,16 @@ public class Interpreter extends Visitor {
         }
 
         if (runtime.environment != null && runtime.environment.from != null && runtime.loopLevel == 0) {
+            runtime.scope = null;
+
+            System.gc();
+
             runtime.scope = runtime.environment.from;
         } else if (runtime.scope.from != null) {
+            runtime.scope = null;
+
+            System.gc();
+
             runtime.scope = runtime.scope.from;
         }
 
@@ -457,7 +502,7 @@ public class Interpreter extends Visitor {
                 args.add(run.accept(this));
             }
 
-            return function.invokeFV(args.toArray());
+            return valueOfIndex(function.invokeFV(args.toArray()), node.indexNode);
         } catch (BulletException e) {
             throw new RuntimeException(run == null ? node.position : run.position, e.getMessage());
         }
@@ -468,6 +513,7 @@ public class Interpreter extends Visitor {
         Node run = null;
         try {
             BtBulitInFunction function = BulletRuntime.builtInfunctions.get(node.name);
+            Object r;
 
             if (function.isVarParam) {
                 ArrayList<Object> list = new ArrayList<>();
@@ -476,29 +522,31 @@ public class Interpreter extends Visitor {
                     list.add(v.accept(this));
                 }
 
-                return function.invokeFV(list.toArray());
-            }
+                r = function.invokeFV(list.toArray());
+            } else {
 
-            LinkedHashMap<String, Object> args = new LinkedHashMap<>();
+                LinkedHashMap<String, Object> args = new LinkedHashMap<>();
 
-            for (Map.Entry<String, Node> entry : node.args.entrySet()) {
-                run = entry.getValue();
+                for (Map.Entry<String, Node> entry : node.args.entrySet()) {
+                    run = entry.getValue();
 
-                args.put(entry.getKey(), run == null ? null : run.accept(this));
-            }
-
-            for (Map.Entry<String, Object> entry : function.args.entrySet()) {
-                if (args.get(entry.getKey()) == null) {
-
-                    if (entry.getValue() == null) {
-                        throw new ParsingException(node.position, String.format("Missing parameter \"%s\"", entry.getKey()));
-                    }
-
-                    args.put(entry.getKey(), function.args.get(entry.getKey()));
+                    args.put(entry.getKey(), run == null ? null : run.accept(this));
                 }
+
+                for (Map.Entry<String, Object> entry : function.args.entrySet()) {
+                    if (args.get(entry.getKey()) == null) {
+
+                        if (entry.getValue() == null) {
+                            throw new ParsingException(node.position, String.format("Missing parameter \"%s\"", entry.getKey()));
+                        }
+
+                        args.put(entry.getKey(), function.args.get(entry.getKey()));
+                    }
+                }
+                r = function.invokeFV(args.values().toArray());
             }
 
-            return function.invokeFV(args.values().toArray());
+            return valueOfIndex(r, node.indexNode);
         } catch (BulletException e) {
             throw new RuntimeException(run == null ? node.position : run.position, e.getMessage());
         }
@@ -534,18 +582,18 @@ public class Interpreter extends Visitor {
     }
 
     @Override
-    public BtArray goArray(ArrayNode node) throws RuntimeException {
-        BtArray array = new BtArray();
+    public Object goList(ListNode node) throws RuntimeException {
+        BtList list = new BtList();
 
         for (int i = 0; i < node.values.size(); i++) {
-            array.vector.add(node.values.get(i).accept(this));
+            list.add(node.values.get(i).accept(this));
         }
 
-        return array;
+        return valueOfIndex(list, node.indexNode);
     }
 
     @Override
-    public BtDictionary goDictionary(DictionaryNode node) throws RuntimeException {
+    public Object goDictionary(DictionaryNode node) throws RuntimeException {
         BtDictionary dictionary = new BtDictionary();
 
         if (node.vector.size() > 0) {
@@ -557,22 +605,20 @@ public class Interpreter extends Visitor {
                 value = entry.getValue().accept(this);
 
                 if (key instanceof String) {
-                    dictionary.vector.put(key.toString(), value);
+                    dictionary.add(key.toString(), value);
                 } else {
-                    throw new RuntimeException(entry.getValue().position, "It is not a String");
+                    throw new RuntimeException(entry.getValue().position, "It is not a string");
                 }
             }
         }
 
-        return dictionary;
+        return valueOfIndex(dictionary, node.indexNode);
     }
 
     private Object valueOfIndex(Object v, IndexNode node) throws RuntimeException {
         if (node == null) {
-            if (v instanceof BtArray || v instanceof BtDictionary || v instanceof String) {
+            if (v instanceof BtList || v instanceof BtDictionary || v instanceof String) {
                 return v;
-            } else if (v instanceof Integer || v instanceof Double || v instanceof Float) {
-                return new BigDecimal(v.toString());
             }
         }
 
@@ -580,7 +626,7 @@ public class Interpreter extends Visitor {
 
         while (indexNode != null) {
             if (indexNode.complex) {
-                if (!(v instanceof BtArray || v instanceof String)) {
+                if (!(v instanceof BtList || v instanceof String)) {
                     throw new RuntimeException(indexNode.position, "Index values are not supported for this type");
                 }
 
@@ -608,7 +654,7 @@ public class Interpreter extends Visitor {
                     if (v instanceof String) {
                         end = ((String) v).length();
                     } else {
-                        end = ((BtArray) v).vector.size();
+                        end = ((BtList) v).size();
                     }
                 } else {
                     i = indexNode.end.accept(this);
@@ -642,11 +688,18 @@ public class Interpreter extends Visitor {
                         throw new RuntimeException(node.position, String.format("String index %d is out of range %d", end, len));
                     }
 
+                    if (start == end) {
+                        if (indexNode.start != null && indexNode.end == null) {
+                            start = 0;
+                            flag = true;
+                        }
+                    }
+
                     str = str.substring(start, end);
                     v = flag ? new StringBuffer(str).reverse() : str;
                 } else {
-                    BtArray btArray1 = ((BtArray) v);
-                    len = btArray1.vector.size();
+                    BtList btList1 = ((BtList) v);
+                    len = btList1.size();
                     boolean flag = false;
 
                     if (start > end) {
@@ -657,27 +710,28 @@ public class Interpreter extends Visitor {
                     }
 
                     if (end > len) {
-                        throw new RuntimeException(node.position, String.format("Array index %d is out of range %d", end, len));
+                        throw new RuntimeException(node.position, String.format("List index %d is out of range %d", end, len));
                     }
 
-                    BtArray btArray = new BtArray();
+                    if (start == end) {
+                        if (indexNode.start != null && indexNode.end == null) {
+                            start = 0;
+                            flag = true;
+                        }
+                    }
+
+                    BtList btList = new BtList();
 
                     for (int n = start; n < end; n++) {
-                        Object a = btArray1.vector.get(n);
-
-                        if (a instanceof Integer || a instanceof Double || a instanceof Float) {
-                            a = new BigDecimal(a.toString());
-                        }
-
-                        btArray.vector.add(a);
+                        btList.add(btList1.get(n));
                     }
 
                     if (flag)
-                        Collections.reverse(btArray.vector);
-                    v = btArray;
+                        btList.reverse();
+                    v = btList;
                 }
             } else {
-                if (!(v instanceof BtArray || v instanceof String || v instanceof BtDictionary)) {
+                if (!(v instanceof BtList || v instanceof String || v instanceof BtDictionary || v instanceof BtByteString)) {
                     throw new RuntimeException(indexNode.position, String.format("Index values are not supported for this type \"%s\"", v.getClass().getSimpleName()));
                 }
 
@@ -691,17 +745,17 @@ public class Interpreter extends Visitor {
                     BtDictionary dictionary = ((BtDictionary) v);
 
                     if (i == null) {
-                        if (dictionary.vector.size() == 0) {
+                        if (dictionary.size() == 0) {
                             throw new RuntimeException(node.position, "The dictionary is empty");
                         }
 
-                        v = dictionary.vector.values().toArray(Object[]::new)[dictionary.vector.size() - 1]; // last
+                        v = dictionary.values().toArray(Object[]::new)[dictionary.size() - 1]; // last
                     } else {
-                        if (!dictionary.vector.containsKey(i)) {
+                        if (!dictionary.containsKey(i.toString())) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : node.position, String.format("The key \"%s\" is not defined", i));
                         }
 
-                        v = dictionary.vector.get(i);
+                        v = dictionary.get(i.toString());
                     }
                 } else {
                     if (!(i instanceof BigDecimal || i == null)) {
@@ -710,15 +764,15 @@ public class Interpreter extends Visitor {
 
                     int len;
 
-                    if (v instanceof BtArray) {
-                        BtArray btArray = (BtArray) v;
-                        len = i == null ? btArray.vector.size() - 1 : ((BigDecimal) i).intValueExact();
-                        if (len >= btArray.vector.size() || len < 0) {
-                            throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("Array index %d is out of range %d", len, btArray.vector.size()));
+                    if (v instanceof BtList) {
+                        BtList btList = (BtList) v;
+                        len = i == null ? btList.size() - 1 : ((BigDecimal) i).intValueExact();
+                        if (len >= btList.size() || len < 0) {
+                            throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("List index %d is out of range %d", len, btList.size()));
                         }
 
-                        v = btArray.vector.get(len);
-                    } else {
+                        v = btList.get(len);
+                    } else if (v instanceof String) {
                         String str = (String) v;
                         len = i == null ? str.length() - 1 : ((BigDecimal) i).intValueExact();
                         if (len >= str.length()) {
@@ -726,12 +780,16 @@ public class Interpreter extends Visitor {
                         }
 
                         v = String.valueOf(str.charAt(len));
+                    } else {
+                        BtByteString str = (BtByteString) v;
+                        len = i == null ? str.size() - 1 : ((BigDecimal) i).intValueExact();
+                        if (len >= str.size()) {
+                            throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("ByteString index %d is out of range %d", len, str.size()));
+                        }
+
+                        v = str.get(len);
                     }
                 }
-            }
-
-            if (v instanceof Integer || v instanceof Double || v instanceof Float) {
-                v = new BigDecimal(v.toString());
             }
 
             indexNode = indexNode.next;
@@ -745,8 +803,8 @@ public class Interpreter extends Visitor {
             VariableNode variable = (VariableNode) node.left;
             Object v;
 
-            if (result instanceof BtArray) {
-                result = ((BtArray) result).clone();
+            if (result instanceof BtList) {
+                result = ((BtList) result).clone();
             } else if (result instanceof BtDictionary) {
                 result = ((BtDictionary) result).clone();
             }
@@ -771,26 +829,26 @@ public class Interpreter extends Visitor {
 
                     Object index = address.start == null ? null : address.start.accept(this);
 
-                    if (v instanceof BtArray) {
+                    if (v instanceof BtList) {
                         if (!(index instanceof BigDecimal || index == null)) {
                             throw new RuntimeException(node.position, String.format("%s index must be a number", v.getClass().getSimpleName()));
                         }
 
-                        BtArray array = (BtArray) v;
+                        BtList list = (BtList) v;
 
                         if (index == null) {
-                            array.vector.add(result);
+                            list.add(result);
                         } else {
                             int n = ((BigDecimal) index).intValueExact();
 
-                            if (n > array.vector.size()) {
-                                throw new RuntimeException(node.position, String.format("Array index %d is out of range %d", n, array.vector.size()));
+                            if (n > list.size()) {
+                                throw new RuntimeException(node.position, String.format("List index %d is out of range %d", n, list.size()));
                             }
 
-                            if (n == array.vector.size()) {
-                                array.vector.add(result);
+                            if (n == list.size()) {
+                                list.add(result);
                             } else {
-                                array.vector.set(n, result);
+                                list.set(n, result);
                             }
                         }
                     } else if (v instanceof BtDictionary) {
@@ -798,7 +856,7 @@ public class Interpreter extends Visitor {
                             throw new RuntimeException(node.position, String.format("%s index must be a string", v.getClass().getSimpleName()));
                         }
 
-                        ((BtDictionary) v).vector.put(index.toString(), result);
+                        ((BtDictionary) v).add(index.toString(), result);
                     } else {
                         throw new RuntimeException(node.position, String.format("the Type \"%s\" does not support assignment in this way", v.getClass().getSimpleName()));
                     }
@@ -853,26 +911,26 @@ public class Interpreter extends Visitor {
 
                     Object index = address.start == null ? null : address.start.accept(this);
 
-                    if (v instanceof BtArray) {
+                    if (v instanceof BtList) {
                         if (!(index instanceof BigDecimal || index == null)) {
                             throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a number", v.getClass().getSimpleName()));
                         }
 
-                        BtArray array = (BtArray) v;
+                        BtList list = (BtList) v;
 
                         if (index == null) {
-                            array.vector.add(result);
+                            list.add(result);
                         } else {
                             int n = ((BigDecimal) index).intValueExact();
 
-                            if (n > array.vector.size()) {
-                                throw new RuntimeException(address.start.position, String.format("Array index %d is out of range %d", n, array.vector.size()));
+                            if (n > list.size()) {
+                                throw new RuntimeException(address.start.position, String.format("List index %d is out of range %d", n, list.size()));
                             }
 
-                            if (n == array.vector.size()) {
-                                array.vector.add(result);
+                            if (n == list.size()) {
+                                list.add(result);
                             } else {
-                                array.vector.set(n, result);
+                                list.set(n, result);
                             }
                         }
                     } else if (v instanceof BtDictionary) {
@@ -880,7 +938,7 @@ public class Interpreter extends Visitor {
                             throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a string", v.getClass().getSimpleName()));
                         }
 
-                        ((BtDictionary) v).vector.put(index.toString(), result);
+                        ((BtDictionary) v).add(index.toString(), result);
                     } else {
                         throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("The type \"%s\" does not support assignment in this way", v.getClass().getSimpleName()));
                     }

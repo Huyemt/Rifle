@@ -16,6 +16,7 @@ public class BuiltInFunctionCallNode extends Node {
     public String name;
     public LinkedHashMap<String, Node> args;
     public ArrayList<Node> args1;
+    public IndexNode indexNode;
 
     public BuiltInFunctionCallNode() {
         args = new LinkedHashMap<>();

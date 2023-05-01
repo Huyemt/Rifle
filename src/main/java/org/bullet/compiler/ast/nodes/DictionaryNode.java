@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 public class DictionaryNode extends Node {
 
     public LinkedHashMap<Node, Node> vector;
+    public IndexNode indexNode;
 
     public DictionaryNode() {
         vector = new LinkedHashMap<>();

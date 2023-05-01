@@ -43,10 +43,10 @@ public class BtEncRSAFunction extends BtBulitInFunction {
         if (((String) key).length() == 0) {
             RSA.Result result = Crypto4J.RSA.randomEncrypt(content.toString());
             BtDictionary dictionary = new BtDictionary();
-            dictionary.vector.put("result", result.result);
-            dictionary.vector.put("publicKey", result.publicKey);
-            dictionary.vector.put("privateKey", result.privateKey);
-            dictionary.vector.put("padding", new BigDecimal(1));
+            dictionary.add("result", result.result);
+            dictionary.add("publicKey", result.publicKey);
+            dictionary.add("privateKey", result.privateKey);
+            dictionary.add("padding", 1);
 
             return dictionary;
         } else {

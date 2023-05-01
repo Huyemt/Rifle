@@ -253,6 +253,11 @@ public class Lexer implements ILexer {
             return;
         }
 
+        if (position.currentChar == '\'') {
+            this.makeString1();
+            return;
+        }
+
         throw new ParsingException(position, String.format("Current char '%c' is illegal", position.currentChar));
     }
 
@@ -359,7 +364,16 @@ public class Lexer implements ILexer {
 
         StringBuilder builder = new StringBuilder();
 
+        if (position.currentChar == '\\' && peekChar(1) == 'x') {
+            this.makeByteString(true);
+            return;
+        }
+
         while (position.currentChar != '\"') {
+            if (position.currentChar == '\0') {
+                throw new ParsingException(position, "\" expected");
+            }
+
             if (position.currentChar == '\\') {
                 char c = this.peekChar(1);
                 if (c == 'b') {
@@ -388,7 +402,7 @@ public class Lexer implements ILexer {
 
                     for (int i = 1; i <= 4; i++) {
                         if (!Character.isLetterOrDigit(peekChar(i))) {
-                            throw new ParsingException(position, "Wrong unicode format");
+                            throw new ParsingException(position, "Error unicode format");
                         }
                     }
 
@@ -400,7 +414,9 @@ public class Lexer implements ILexer {
                     }
 
                     builder.append(Crypto4J.Unicode.decrypt("\\u".concat(position.source.substring(start, position.index + 1))));
-                } else builder.append(position.currentChar);
+                } else {
+                    builder.append(position.currentChar);
+                }
             } else {
                 builder.append(position.currentChar);
             }
@@ -411,6 +427,111 @@ public class Lexer implements ILexer {
         position.next();
 
         this.makeToken(TokenKind.VT_STRING, builder.toString());
+    }
+
+    private void makeString1() throws ParsingException {
+        position.next();
+
+        StringBuilder builder = new StringBuilder();
+
+        if (position.currentChar == '\\' && peekChar(1) == 'x') {
+            this.makeByteString(false);
+            return;
+        }
+
+        while (position.currentChar != '\'') {
+            if (position.currentChar == '\0') {
+                throw new ParsingException(position, "\" expected");
+            }
+
+            if (position.currentChar == '\\') {
+                char c = this.peekChar(1);
+                if (c == 'b') {
+                    builder.append('\b');
+                    position.next();
+                } else if (c == 'n') {
+                    builder.append('\n');
+                    position.next();
+                } else if (c == 't') {
+                    builder.append('\t');
+                    position.next();
+                } else if (c == 'r') {
+                    builder.append('\r');
+                    position.next();
+                } else if (c == '\'') {
+                    builder.append('\'');
+                    position.next();
+                } else if (c == '\"') {
+                    builder.append('\"');
+                    position.next();
+                } else if (c == '\\') {
+                    builder.append('\\');
+                    position.next();
+                } else if (c == 'u') {
+                    position.next();
+
+                    for (int i = 1; i <= 4; i++) {
+                        if (!Character.isLetterOrDigit(peekChar(i))) {
+                            throw new ParsingException(position, "Error unicode format");
+                        }
+                    }
+
+                    position.next();
+                    int start = position.index;
+
+                    for (int i = 0; i < 3; i++) {
+                        position.next();
+                    }
+
+                    builder.append(Crypto4J.Unicode.decrypt("\\u".concat(position.source.substring(start, position.index + 1))));
+                } else {
+                    builder.append(position.currentChar);
+                }
+            } else {
+                builder.append(position.currentChar);
+            }
+
+            position.next();
+        }
+
+        position.next();
+
+        this.makeToken(TokenKind.VT_STRING, builder.toString());
+    }
+
+    private void makeByteString(boolean f) throws ParsingException {
+        StringBuilder builder = new StringBuilder();
+
+        char id = f ? '\"' : '\'';
+
+        while (position.currentChar != id) {
+            if (position.currentChar == '\0') {
+                throw new ParsingException(position, "\" expected");
+            }
+
+            if (position.currentChar == '\\' && peekChar(1) == 'x') {
+                position.next(2);
+
+                int start = position.index;
+
+                for (int i = 0; i < 2; i++) {
+                    if (Character.isLetterOrDigit(position.currentChar)) {
+                        position.next();
+                        continue;
+                    }
+
+                    throw new ParsingException(position, "Error byte string format");
+                }
+
+                builder.append("\\x").append(position.source.substring(start, position.index));
+            } else {
+                throw new ParsingException(position, "Error byte string format");
+            }
+        }
+
+        position.next();
+
+        this.makeToken(TokenKind.VT_BYTE_STRING, builder.toString().toLowerCase());
     }
 
     private static void registerToken(TokenKind kind) {

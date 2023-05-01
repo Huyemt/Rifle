@@ -1,12 +1,7 @@
 package org.bullet.base.components;
 
-import org.bullet.base.types.BtArray;
-import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
-
-import java.math.BigDecimal;
-import java.util.Map;
 
 /**
  * Bullet的函数
@@ -55,21 +50,5 @@ public abstract class BtFunction {
     @Override
     public String toString() {
         return "Function:".concat(funcName);
-    }
-
-    protected final Object parseBaseType(Object v) {
-        if (v instanceof Integer || v instanceof Float || v instanceof Double) {
-            return new BigDecimal(v.toString());
-        }
-
-        if (v.getClass().isArray()) {
-            return BtArray.parse((Object[]) v);
-        }
-
-        if (v instanceof Map) {
-            return BtDictionary.parse((Map<String, Object>) v);
-        }
-
-        return v;
     }
 }

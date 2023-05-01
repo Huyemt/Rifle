@@ -1,7 +1,9 @@
 package org.bullet.base.bulitIn.function;
 
 import org.bullet.base.components.BtBulitInFunction;
-import org.bullet.base.types.BtArray;
+import org.bullet.base.types.BtByte;
+import org.bullet.base.types.BtByteString;
+import org.bullet.base.types.BtList;
 import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
@@ -21,25 +23,32 @@ public class BtLenFunction extends BtBulitInFunction {
 
     @Override
     public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
+        Object obj = args.get("obj");
 
-        Object r = args.get("obj");
-
-        if (r instanceof BtArray) {
-            return new BigDecimal(((BtArray) r).vector.size());
+        if (obj instanceof BtList) {
+            return new BigDecimal(((BtList) obj).size());
         }
 
-        if (r instanceof BtDictionary) {
-            return new BigDecimal(((BtDictionary) r).vector.size());
+        if (obj instanceof BtDictionary) {
+            return new BigDecimal(((BtDictionary) obj).size());
         }
 
-        if (r.getClass().isArray()) {
-            return new BigDecimal(BtArray.parse((Object[]) r).vector.size());
+        if (obj instanceof String) {
+            return new BigDecimal(((String) obj).length());
         }
 
-        if (r instanceof String) {
-            return new BigDecimal(((String) r).length());
+        if (obj instanceof BtByteString) {
+            return ((BtByteString) obj).size();
         }
 
-        throw new BulletException(String.format("Length of \"%s\" type is not supported", r.getClass().getSimpleName()));
+        if (obj instanceof BigDecimal) {
+            return ((BigDecimal) obj).intValueExact();
+        }
+
+        if (obj instanceof BtByte) {
+            return 1;
+        }
+
+        throw new BulletException(String.format("Length of \"%s\" type is not supported", obj.getClass().getSimpleName()));
     }
 }
