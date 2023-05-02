@@ -32,7 +32,6 @@ public class ModuleLoader implements ILoader {
         if (success == null)
             return null;
 
-
         switch (success) {
             case "jar": {
                 try (JarFile jarFile = new JarFile(file)) {

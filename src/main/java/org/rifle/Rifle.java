@@ -1,5 +1,8 @@
 package org.rifle;
 
+import org.bullet.Reporter;
+import org.bullet.exceptions.BulletException;
+import org.bullet.exceptions.common.ParsingException;
 import org.rifle.command.builtIn.*;
 import org.rifle.manager.CommandManager;
 import org.rifle.console.Console;
@@ -60,7 +63,8 @@ public class Rifle {
         } catch (InterruptedException e) {
             getConsole().shutdown();
         } catch (Exception e) {
-            getLogger().error(TextFormat.FONT_RED + e.getMessage());
+            e.printStackTrace();
+            Rifle.getInstance().getConsole().shutdown();
         }
     }
 

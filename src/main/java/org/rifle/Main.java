@@ -19,9 +19,10 @@ public class Main {
                     Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((ParsingException) e).position, e.getMessage())));
                     return;
                 }
-            }
 
-            Rifle.getInstance().getLogger().error(TextFormat.FONT_RED + e.getMessage());
+                Rifle.getInstance().getLogger().error(TextFormat.FONT_RED + e.getMessage());
+            } else e.printStackTrace();
+
             Rifle.getInstance().getConsole().shutdown();
         }
     }

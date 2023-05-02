@@ -153,7 +153,7 @@ public class BtList extends BtType {
     }
 
     public ArrayList<Object> values() {
-        return (ArrayList<Object>) Collections.unmodifiableList((List<Object>) vector.clone());
+        return (ArrayList<Object>) vector.clone();
     }
 
     public void reverse() {

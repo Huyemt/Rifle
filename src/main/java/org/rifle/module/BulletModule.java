@@ -7,6 +7,7 @@ import org.bullet.base.types.BtList;
 import org.bullet.base.types.BtDictionary;
 import org.bullet.exceptions.BulletException;
 import org.bullet.exceptions.RuntimeException;
+import org.bullet.exceptions.common.ParsingException;
 import org.rifle.Rifle;
 import org.rifle.command.Command;
 import org.rifle.command.arguments.Argument;
@@ -94,7 +95,7 @@ public class BulletModule extends Module {
 
                     BtFunction cmdFunc = bullet.findFunction(command.get(0).toString());
                     String description = command.get(1).toString();
-                    String[] usages = (String[]) ((BtList) command.get(2)).toArray();
+                    String[] usages = sArr(((BtList) command.get(2)).toArray());
 
                     getCommandManager().register(new Command(entry.getKey(), description, usages) {
                         private final BtFunction function = cmdFunc;
@@ -118,13 +119,13 @@ public class BulletModule extends Module {
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {
-                if (e instanceof RuntimeException) {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
+                if (e instanceof ParsingException) {
+                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((ParsingException) e).position, e.getMessage())));
                     return;
                 }
-            }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                Rifle.getInstance().getLogger().error(TextFormat.FONT_RED + e.getMessage());
+            } else e.printStackTrace();
         }
     }
 
@@ -136,13 +137,13 @@ public class BulletModule extends Module {
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {
-                if (e instanceof RuntimeException) {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
+                if (e instanceof ParsingException) {
+                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((ParsingException) e).position, e.getMessage())));
                     return;
                 }
-            }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                Rifle.getInstance().getLogger().error(TextFormat.FONT_RED + e.getMessage());
+            } else e.printStackTrace();
         }
     }
 
@@ -154,13 +155,13 @@ public class BulletModule extends Module {
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {
-                if (e instanceof RuntimeException) {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
+                if (e instanceof ParsingException) {
+                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((ParsingException) e).position, e.getMessage())));
                     return;
                 }
-            }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                Rifle.getInstance().getLogger().error(TextFormat.FONT_RED + e.getMessage());
+            } else e.printStackTrace();
         }
     }
 
@@ -172,13 +173,13 @@ public class BulletModule extends Module {
             }
         } catch (Exception e) {
             if (e instanceof BulletException) {
-                if (e instanceof RuntimeException) {
-                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((RuntimeException) e).position, e.getMessage())));
+                if (e instanceof ParsingException) {
+                    Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, Reporter.report(e.getClass().getName(), ((ParsingException) e).position, e.getMessage())));
                     return;
                 }
-            }
 
-            Rifle.getInstance().getLogger().error(String.format("\n%s%s", TextFormat.FONT_RED, e.getMessage()));
+                Rifle.getInstance().getLogger().error(TextFormat.FONT_RED + e.getMessage());
+            } else e.printStackTrace();
         }
     }
 
@@ -191,6 +192,16 @@ public class BulletModule extends Module {
     public void init(String main, File file) {
         super.init(main, file);
         bullet.runtime.logger = getLogger();
+    }
+
+    private <T> String[] sArr(T[] data) {
+        String[] a = new String[data.length];
+
+        for (int i = 0; i < data.length; i++) {
+            a[i] = data[i].toString();
+        }
+
+        return a;
     }
 }
 
