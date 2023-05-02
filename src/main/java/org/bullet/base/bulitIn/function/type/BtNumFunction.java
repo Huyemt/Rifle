@@ -4,10 +4,10 @@ import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtByte;
 import org.bullet.base.types.BtByteString;
 import org.bullet.base.types.BtList;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -24,12 +24,12 @@ public class BtNumFunction extends BtBulitInFunction {
     public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
         Object obj = args.get("obj");
 
-        if (obj instanceof BigDecimal) {
+        if (obj instanceof BtNumber) {
             return obj;
         }
 
         if (obj instanceof BtByte) {
-            return new BigDecimal(((BtByte) obj).getValue());
+            return new BtNumber(((BtByte) obj).getValue());
         }
 
         if (obj instanceof BtByteString) {
@@ -44,7 +44,7 @@ public class BtNumFunction extends BtBulitInFunction {
         }
 
         if (obj instanceof String) {
-            return new BigDecimal((String) obj);
+            return new BtNumber((String) obj);
         }
 
         throw new BulletException(String.format("The type \"%s\" to numeric type is not supported", obj.getClass().getSimpleName()));

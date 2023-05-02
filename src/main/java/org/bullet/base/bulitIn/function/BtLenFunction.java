@@ -1,14 +1,10 @@
 package org.bullet.base.bulitIn.function;
 
 import org.bullet.base.components.BtBulitInFunction;
-import org.bullet.base.types.BtByte;
-import org.bullet.base.types.BtByteString;
-import org.bullet.base.types.BtList;
-import org.bullet.base.types.BtDictionary;
+import org.bullet.base.types.*;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -26,23 +22,19 @@ public class BtLenFunction extends BtBulitInFunction {
         Object obj = args.get("obj");
 
         if (obj instanceof BtList) {
-            return new BigDecimal(((BtList) obj).size());
+            return new BtNumber(((BtList) obj).size());
         }
 
         if (obj instanceof BtDictionary) {
-            return new BigDecimal(((BtDictionary) obj).size());
+            return new BtNumber(((BtDictionary) obj).size());
         }
 
         if (obj instanceof String) {
-            return new BigDecimal(((String) obj).length());
+            return new BtNumber(((String) obj).length());
         }
 
         if (obj instanceof BtByteString) {
             return ((BtByteString) obj).size();
-        }
-
-        if (obj instanceof BigDecimal) {
-            return ((BigDecimal) obj).intValueExact();
         }
 
         if (obj instanceof BtByte) {

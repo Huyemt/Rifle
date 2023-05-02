@@ -2,10 +2,10 @@ package org.bullet.base.bulitIn.function.type;
 
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtByteString;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -30,7 +30,7 @@ public class BtBytesFunction extends BtBulitInFunction {
             return r;
         }
 
-        if (r instanceof BigDecimal) {
+        if (r instanceof BtNumber) {
             return new BtByteString(r.toString());
         }
 

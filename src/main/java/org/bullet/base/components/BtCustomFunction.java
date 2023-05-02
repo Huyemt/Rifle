@@ -16,7 +16,6 @@ import java.util.Arrays;
 public class BtCustomFunction extends BtFunction {
     private final FunctionNode node;
     private final Interpreter interpreter;
-    //private static final Pattern NUMBER_PARTTERN = Pattern.compile("^-?\\d+(\\.\\d+)?$");
 
 
     public BtCustomFunction(Interpreter interpreter, FunctionNode node) {

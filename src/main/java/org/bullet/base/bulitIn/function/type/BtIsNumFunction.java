@@ -1,10 +1,10 @@
 package org.bullet.base.bulitIn.function.type;
 
 import org.bullet.base.components.BtBulitInFunction;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -19,6 +19,6 @@ public class BtIsNumFunction extends BtBulitInFunction {
 
     @Override
     public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
-        return args.get("obj") instanceof BigDecimal;
+        return args.get("obj") instanceof BtNumber;
     }
 }

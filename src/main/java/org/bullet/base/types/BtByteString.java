@@ -35,6 +35,7 @@ public class BtByteString extends BtType {
         this(value, false);
     }
 
+
     public BtByteString(byte[] bytes) {
         for (byte b : bytes) {
             this.bytes.add(new BtByte(b));

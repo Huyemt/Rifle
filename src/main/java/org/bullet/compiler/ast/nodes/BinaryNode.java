@@ -23,6 +23,7 @@ public class BinaryNode extends Node {
         LESSER_OR_EQUAL,
         AND,
         OR,
+        MOD,
         INSTANCEOF
     }
 

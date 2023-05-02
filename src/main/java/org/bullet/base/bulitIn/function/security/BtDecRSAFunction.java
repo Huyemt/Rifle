@@ -1,12 +1,12 @@
 package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtBulitInFunction;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;
 import org.huyemt.crypto4j.digest.RSA;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -27,7 +27,7 @@ public class BtDecRSAFunction extends BtBulitInFunction {
         Object key = args.get("key");
         Object padding = args.get("padding");
 
-        if ((!(content instanceof String || content instanceof BigDecimal))) {
+        if ((!(content instanceof String || content instanceof BtNumber))) {
             throw new BulletException(String.format("Parameter type \"%s\" is not supported for RSA decryption", content.getClass().getSimpleName()));
         }
 
@@ -35,12 +35,12 @@ public class BtDecRSAFunction extends BtBulitInFunction {
             throw new BulletException("RSA privateKey must be a string");
         }
 
-        if (!(padding instanceof BigDecimal)) {
+        if (!(padding instanceof BtNumber)) {
             throw new BulletException("Padding mode must be numeric");
         }
 
         RSA.EncryptConfig config = new RSA.EncryptConfig();
-        config.PADDING = getPadding(((BigDecimal) padding).intValueExact());
+        config.PADDING = getPadding(((BtNumber) padding).toInteger());
 
         return Crypto4J.RSA.encrypt(content.toString(), key.toString(), config);
     }

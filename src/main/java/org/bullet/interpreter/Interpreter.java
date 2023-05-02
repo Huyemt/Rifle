@@ -15,10 +15,7 @@ import org.bullet.exceptions.common.ParsingException;
 import org.bullet.exceptions.common.UnderfineException;
 
 import java.io.File;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -100,39 +97,49 @@ public class Interpreter extends Visitor {
         Object left = node.left.accept(this);
 
         if (node.operator != BinaryNode.Operator.INSTANCEOF) {
-            if (left instanceof BigDecimal) {
+            if (left instanceof BtNumber) {
                 switch (node.operator) {
                     case ADD:
-                        if (right instanceof BigDecimal) {
-                            return ((BigDecimal) left).add((BigDecimal) right);
+                        if (right instanceof BtNumber) {
+                            return ((BtNumber) left).add((BtNumber) right);
                         }
 
                         throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                     case SUB:
-                        if (right instanceof BigDecimal) {
-                            return ((BigDecimal) left).subtract((BigDecimal) right);
+                        if (right instanceof BtNumber) {
+                            return ((BtNumber) left).subtract((BtNumber) right);
                         }
 
                         throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                     case MUL:
-                        if (right instanceof BigDecimal) {
-                            return ((BigDecimal) left).multiply((BigDecimal) right);
+                        if (right instanceof BtNumber) {
+                            return ((BtNumber) left).multiply((BtNumber) right);
                         }
 
                         throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                     case DIV:
-                        if (right instanceof BigDecimal) {
-                            if (((BigDecimal) right).intValue() == 0) {
+                        if (right instanceof BtNumber) {
+                            if (((BtNumber) right).toInteger() == 0) {
                                 throw new RuntimeException(node.position, "Cannot divide by zero");
                             }
 
-                            return ((BigDecimal) left).divide((BigDecimal) right, 1, RoundingMode.HALF_EVEN);
+                            return ((BtNumber) left).divide((BtNumber) right);
                         }
 
                         throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case MOD:
+                        if (right instanceof BtNumber) {
+                            if (((BtNumber) right).toInteger() == 0) {
+                                throw new RuntimeException(node.position, "Cannot divide by zero");
+                            }
+
+                            return ((BtNumber) left).mod((BtNumber) right);
+                        }
+
+                        throw new RuntimeException(node.position, String.format("Remainder of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                     case POW:
-                        if (right instanceof BigDecimal) {
-                            return ((BigDecimal) left).pow(((BigDecimal) right).intValueExact());
+                        if (right instanceof BtNumber) {
+                            return ((BtNumber) left).pow(((BtNumber) right).toInteger());
                         }
 
                         throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
@@ -142,7 +149,7 @@ public class Interpreter extends Visitor {
                     case GREATER_OR_EQUAL:
                     case LESSER:
                     case LESSER_OR_EQUAL:
-                        int flag = ((BigDecimal) left).compareTo((BigDecimal) right);
+                        int flag = ((BtNumber) left).compare((BtNumber) right);
 
                         if (node.operator == BinaryNode.Operator.EQUAL) {
                             return flag == 0;
@@ -196,15 +203,15 @@ public class Interpreter extends Visitor {
                     }
 
                     if (node.operator == BinaryNode.Operator.MUL) {
-                        if (right instanceof BigDecimal) {
-                            return ((String) left).repeat(((BigDecimal) right).intValueExact());
+                        if (right instanceof BtNumber) {
+                            return ((String) left).repeat(((BtNumber) right).toInteger());
                         }
 
                         throw new RuntimeException(node.position, "A string can only be multiplied to a number");
                     }
 
                     if (node.operator == BinaryNode.Operator.EQUAL) {
-                        return !(right instanceof BtNull) && !(right instanceof BigDecimal) && left.toString().equals(right.toString());
+                        return !(right instanceof BtNull) && !(right instanceof BtNumber) && left.toString().equals(right.toString());
                     }
                 }
 
@@ -247,12 +254,12 @@ public class Interpreter extends Visitor {
     public Object goUnary(UnaryNode node) throws RuntimeException {
         Object left = node.left.accept(this);
 
-        if (left instanceof BigDecimal) {
+        if (left instanceof BtNumber) {
             switch (node.operator) {
                 case PLUS:
                     return left;
                 case MINUS:
-                    return ((BigDecimal) left).negate();
+                    return ((BtNumber) left).negate();
                 default:
                     throw new RuntimeException(node.position, "Unsupported unary operator");
             }
@@ -271,7 +278,7 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goConstant(ConstantNode node) throws RuntimeException {
-        if (node.value instanceof BigDecimal || node.value instanceof Boolean || node.value instanceof String || node.value instanceof BtNull || node.value instanceof BtByteString || node.value instanceof BtByte) {
+        if (node.value instanceof BtNumber || node.value instanceof Boolean || node.value instanceof String || node.value instanceof BtNull || node.value instanceof BtByteString || node.value instanceof BtByte) {
             if (node.value instanceof String) {
                 return valueOfIndex(node.value, node.indexNode);
             }
@@ -318,8 +325,8 @@ public class Interpreter extends Visitor {
 
         boolean flag = false;
 
-        if (condition instanceof BigDecimal) {
-            flag = ((BigDecimal) condition).intValue() != 0;
+        if (condition instanceof BtNumber) {
+            flag = ((BtNumber) condition).toInteger() != 0;
         }
 
         if (condition instanceof Boolean) {
@@ -639,11 +646,11 @@ public class Interpreter extends Visitor {
                 } else {
                     i = indexNode.start.accept(this);
 
-                    if (!(i instanceof BigDecimal)) {
+                    if (!(i instanceof BtNumber)) {
                         throw new RuntimeException(indexNode.start.position, "Complex index values must be numbers");
                     }
 
-                    start = ((BigDecimal) i).intValueExact();
+                    start = ((BtNumber) i).toInteger();
 
                     if (start < 0) {
                         throw new RuntimeException(indexNode.start.position, "Index value less than 0 is not allowed");
@@ -659,11 +666,11 @@ public class Interpreter extends Visitor {
                 } else {
                     i = indexNode.end.accept(this);
 
-                    if (!(i instanceof BigDecimal)) {
+                    if (!(i instanceof BtNumber)) {
                         throw new RuntimeException(indexNode.end.position, "Complex index values must be numbers");
                     }
 
-                    end = ((BigDecimal) i).intValueExact();
+                    end = ((BtNumber) i).toInteger();
 
                     if (end < 0) {
                         throw new RuntimeException(indexNode.end.position, "Index value less than 0 is not allowed");
@@ -758,7 +765,7 @@ public class Interpreter extends Visitor {
                         v = dictionary.get(i.toString());
                     }
                 } else {
-                    if (!(i instanceof BigDecimal || i == null)) {
+                    if (!(i instanceof BtNumber || i == null)) {
                         throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("%s index must be a number", i.getClass().getSimpleName()));
                     }
 
@@ -766,7 +773,7 @@ public class Interpreter extends Visitor {
 
                     if (v instanceof BtList) {
                         BtList btList = (BtList) v;
-                        len = i == null ? btList.size() - 1 : ((BigDecimal) i).intValueExact();
+                        len = i == null ? btList.size() - 1 : ((BtNumber) i).toInteger();
                         if (len >= btList.size() || len < 0) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("List index %d is out of range %d", len, btList.size()));
                         }
@@ -774,7 +781,7 @@ public class Interpreter extends Visitor {
                         v = btList.get(len);
                     } else if (v instanceof String) {
                         String str = (String) v;
-                        len = i == null ? str.length() - 1 : ((BigDecimal) i).intValueExact();
+                        len = i == null ? str.length() - 1 : ((BtNumber) i).toInteger();
                         if (len >= str.length()) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("String index %d is out of range %d", len, str.length()));
                         }
@@ -782,7 +789,7 @@ public class Interpreter extends Visitor {
                         v = String.valueOf(str.charAt(len));
                     } else {
                         BtByteString str = (BtByteString) v;
-                        len = i == null ? str.size() - 1 : ((BigDecimal) i).intValueExact();
+                        len = i == null ? str.size() - 1 : ((BtNumber) i).toInteger();
                         if (len >= str.size()) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("ByteString index %d is out of range %d", len, str.size()));
                         }
@@ -830,7 +837,7 @@ public class Interpreter extends Visitor {
                     Object index = address.start == null ? null : address.start.accept(this);
 
                     if (v instanceof BtList) {
-                        if (!(index instanceof BigDecimal || index == null)) {
+                        if (!(index instanceof BtNumber || index == null)) {
                             throw new RuntimeException(node.position, String.format("%s index must be a number", v.getClass().getSimpleName()));
                         }
 
@@ -839,7 +846,7 @@ public class Interpreter extends Visitor {
                         if (index == null) {
                             list.add(result);
                         } else {
-                            int n = ((BigDecimal) index).intValueExact();
+                            int n = ((BtNumber) index).toInteger();
 
                             if (n > list.size()) {
                                 throw new RuntimeException(node.position, String.format("List index %d is out of range %d", n, list.size()));
@@ -912,7 +919,7 @@ public class Interpreter extends Visitor {
                     Object index = address.start == null ? null : address.start.accept(this);
 
                     if (v instanceof BtList) {
-                        if (!(index instanceof BigDecimal || index == null)) {
+                        if (!(index instanceof BtNumber || index == null)) {
                             throw new RuntimeException(address.start != null ? address.start.position : address.position, String.format("%s index must be a number", v.getClass().getSimpleName()));
                         }
 
@@ -921,7 +928,7 @@ public class Interpreter extends Visitor {
                         if (index == null) {
                             list.add(result);
                         } else {
-                            int n = ((BigDecimal) index).intValueExact();
+                            int n = ((BtNumber) index).toInteger();
 
                             if (n > list.size()) {
                                 throw new RuntimeException(address.start.position, String.format("List index %d is out of range %d", n, list.size()));

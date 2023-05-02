@@ -1,12 +1,12 @@
 package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtBulitInFunction;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;
 import org.huyemt.crypto4j.digest.AES;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -33,7 +33,7 @@ public class BtEncAESFunction extends BtBulitInFunction {
         Object padding = args.get("padding");
         Object iv = args.get("iv");
 
-        if ((!(content instanceof String || content instanceof BigDecimal))) {
+        if ((!(content instanceof String || content instanceof BtNumber))) {
             throw new BulletException(String.format("Parameter type \"%s\" is not supported for AES encryption", content.getClass().getSimpleName()));
         }
 
@@ -41,11 +41,11 @@ public class BtEncAESFunction extends BtBulitInFunction {
             throw new BulletException("AES key must be a string");
         }
 
-        if (!(mode instanceof BigDecimal)) {
+        if (!(mode instanceof BtNumber)) {
             throw new BulletException("Encryption mode must be numeric");
         }
 
-        if (!(padding instanceof BigDecimal)) {
+        if (!(padding instanceof BtNumber)) {
             throw new BulletException("Padding mode must be numeric");
         }
 
@@ -56,9 +56,9 @@ public class BtEncAESFunction extends BtBulitInFunction {
         String iiv = iv.toString();
 
         if (iiv.length() == 0) {
-            return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode(((BigDecimal) mode).intValueExact()), getPadding(((BigDecimal) padding).intValueExact()));
+            return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()));
         } else {
-            return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode(((BigDecimal) mode).intValueExact()), getPadding(((BigDecimal) padding).intValueExact()), iiv);
+            return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()), iiv);
         }
     }
 

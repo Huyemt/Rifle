@@ -46,6 +46,7 @@ public class Lexer implements ILexer {
         registerToken(TokenKind.AT);
         registerToken(TokenKind.SHARP);
         registerToken(TokenKind.COLON);
+        registerToken(TokenKind.MOD);
 
         registerKeyword(TokenKind.INSTANCEOF);
         registerKeyword(TokenKind.TRUE);
@@ -221,6 +222,12 @@ public class Lexer implements ILexer {
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.ASSIGN_DIV);
+                        break;
+                    }
+                case '%':
+                    if (this.peekChar(1) == '=') {
+                        position.next();
+                        this.makeToken(TokenKind.ASSIGN_MOD);
                         break;
                     }
                 case ':':

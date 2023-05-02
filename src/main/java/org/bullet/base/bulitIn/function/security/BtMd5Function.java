@@ -2,11 +2,11 @@ package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtList;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.crypto4j.Crypto4J;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 /**
@@ -24,7 +24,7 @@ public class BtMd5Function extends BtBulitInFunction {
     public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
         Object r = args.get("content");
 
-        if (!(r instanceof String) && !(r instanceof BtList) && !(r instanceof BigDecimal)) {
+        if (!(r instanceof String) && !(r instanceof BtList) && !(r instanceof BtNumber)) {
             throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
         }
 
@@ -39,7 +39,7 @@ public class BtMd5Function extends BtBulitInFunction {
         BtList r = new BtList();
 
         for (Object v : array.values()) {
-            if (!(v instanceof String) && !(v instanceof BtList) && !(v instanceof BigDecimal)) {
+            if (!(v instanceof String) && !(v instanceof BtList) && !(v instanceof BtNumber)) {
                 throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
             }
 

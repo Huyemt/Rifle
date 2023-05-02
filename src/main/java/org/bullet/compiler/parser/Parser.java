@@ -3,6 +3,7 @@ package org.bullet.compiler.parser;
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtByteString;
 import org.bullet.base.types.BtNull;
+import org.bullet.base.types.BtNumber;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.*;
 import org.bullet.compiler.lexer.Lexer;
@@ -14,7 +15,6 @@ import org.bullet.exceptions.common.ParsingException;
 import org.bullet.interpreter.BulletRuntime;
 import org.bullet.interpreter.Interpreter;
 
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -561,7 +561,7 @@ public class Parser implements IParser {
             return node;
         }
 
-        if (lexer.currentToken.kind == TokenKind.ASSIGN_ADD || lexer.currentToken.kind == TokenKind.ASSIGN_SUB || lexer.currentToken.kind == TokenKind.ASSIGN_MUL || lexer.currentToken.kind == TokenKind.ASSIGN_DIV || lexer.currentToken.kind == TokenKind.ASSIGN_POW) {
+        if (lexer.currentToken.kind == TokenKind.ASSIGN_ADD || lexer.currentToken.kind == TokenKind.ASSIGN_SUB || lexer.currentToken.kind == TokenKind.ASSIGN_MUL || lexer.currentToken.kind == TokenKind.ASSIGN_DIV || lexer.currentToken.kind == TokenKind.ASSIGN_POW || lexer.currentToken.kind == TokenKind.ASSIGN_MOD) {
             if (!(left instanceof VariableNode)) {
                 throw new ParsingException(lexer.position, "Only variables can be assigned values");
             }
@@ -583,18 +583,7 @@ public class Parser implements IParser {
             BinaryNode binaryNode = new BinaryNode();
             binaryNode.position = node.position;
 
-            if (lexer.currentToken.kind == TokenKind.ASSIGN_ADD)
-                binaryNode.operator = BinaryNode.Operator.ADD;
-            else if (lexer.currentToken.kind == TokenKind.ASSIGN_SUB)
-                binaryNode.operator = BinaryNode.Operator.SUB;
-            else if (lexer.currentToken.kind == TokenKind.ASSIGN_MUL)
-                binaryNode.operator = BinaryNode.Operator.MUL;
-            else if (lexer.currentToken.kind == TokenKind.ASSIGN_DIV)
-                binaryNode.operator = BinaryNode.Operator.DIV;
-            else if (lexer.currentToken.kind == TokenKind.ASSIGN_POW)
-                binaryNode.operator = BinaryNode.Operator.POW;
-            else
-                throw new ParsingException(binaryNode.position, "Syntax error");
+            binaryNode.operator = this.matchBinOpt();
 
             binaryNode.left = left;
 
@@ -856,6 +845,23 @@ public class Parser implements IParser {
 
     @Override
     public Node Involution() throws ParsingException {
+        Node left = this.Involution2();
+
+        while (lexer.currentToken.kind == TokenKind.MOD) {
+            BinaryNode node = new BinaryNode();
+            node.operator = BinaryNode.Operator.MOD;
+            node.position = lexer.currentToken.position;
+            lexer.next();
+            node.left = left;
+            node.right = this.Involution2();
+            left = node;
+        }
+
+        return left;
+    }
+
+    @Override
+    public Node Involution2() throws ParsingException {
         Node left = this.Secondary();
 
         while (lexer.currentToken.kind == TokenKind.POW) {
@@ -927,7 +933,7 @@ public class Parser implements IParser {
             // 数字
             if (lexer.currentToken.kind == TokenKind.VT_NUMBER) {
                 ConstantNode node = new ConstantNode();
-                node.value = new BigDecimal(((VToken)lexer.currentToken).value);
+                node.value = new BtNumber(((VToken)lexer.currentToken).value);
                 node.position = lexer.currentToken.position;
                 lexer.next();
 
@@ -1038,6 +1044,11 @@ public class Parser implements IParser {
             case POW:
             case ASSIGN_POW:
                 return BinaryNode.Operator.POW;
+
+            case MOD:
+            case ASSIGN_MOD:
+                return BinaryNode.Operator.MOD;
+
             case INSTANCEOF:
                 return BinaryNode.Operator.INSTANCEOF;
             case EQUAL:

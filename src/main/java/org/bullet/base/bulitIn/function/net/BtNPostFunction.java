@@ -2,6 +2,7 @@ package org.bullet.base.bulitIn.function.net;
 
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtDictionary;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
 import org.huyemt.http4j.Http4J;
@@ -9,7 +10,6 @@ import org.huyemt.http4j.HttpResponse;
 import org.huyemt.http4j.resource.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.HttpCookie;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -65,7 +65,7 @@ public class BtNPostFunction extends BtBulitInFunction {
             throw new BulletException("Allow rediect must be boolean");
         }
 
-        if (!(timeoutV instanceof BigDecimal)) {
+        if (!(timeoutV instanceof BtNumber)) {
             throw new BulletException("Timeout must be a number");
         }
 
@@ -80,7 +80,7 @@ public class BtNPostFunction extends BtBulitInFunction {
         HttpConfig config = new HttpConfig();
 
         config.allowsRedirect((boolean) allowRediectV);
-        config.timeout(((BigDecimal) timeoutV).intValueExact());
+        config.timeout(((BtNumber) timeoutV).toInteger());
 
         params.setAll(((BtDictionary) paramsV).toMap());
 
@@ -112,7 +112,7 @@ public class BtNPostFunction extends BtBulitInFunction {
             }
 
             result.add("cookies", cache);
-            result.add("status_code", new BigDecimal(response.status_code));
+            result.add("status_code", new BtNumber(response.status_code));
 
             return result;
         } catch (IOException e) {

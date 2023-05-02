@@ -40,6 +40,7 @@ public enum TokenKind {
     MINUS("-"),
     STAR("*"),
     SLASH("/"),
+    MOD("%"),
     POW("**"),
     EXCLAMATION("!"),
     L_AND("&"),
@@ -55,6 +56,7 @@ public enum TokenKind {
     ASSIGN_MUL("*="),
     ASSIGN_DIV("/="),
     ASSIGN_POW("**="),
+    ASSIGN_MOD("%="),
 
 
     /*

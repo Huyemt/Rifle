@@ -1,6 +1,5 @@
 package org.bullet.base.types;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -14,8 +13,12 @@ public class BtType {
             return new BtNull();
         }
 
-        if (v instanceof Double || v instanceof Integer || v instanceof Float) {
-            return new BigDecimal(v.toString());
+        if (v instanceof Number) {
+            if (v instanceof Byte) {
+                return new BtByte((byte) v);
+            }
+
+            return new BtNumber(v.toString());
         }
 
         if (v.getClass().isArray()) {
@@ -52,10 +55,6 @@ public class BtType {
 
         if (v instanceof List) {
             return BtList.parse(((List<?>) v).toArray());
-        }
-
-        if (v instanceof Byte) {
-            return new BtByte((byte) v);
         }
 
         return v;
