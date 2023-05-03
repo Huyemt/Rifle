@@ -16,9 +16,7 @@ public class Shell {
     public static void main(String[] args) {
         try {
             CompiledBullet compiledBullet = new CompiledBullet(new File(System.getProperty("os.name").startsWith("Windows") ? "E:\\AMyCode\\Projects\\Java\\Rifle\\Rifle\\docs\\chinese\\bullet\\test.bt" : "/home/huyemt/AMyCode/Java/Rifle/docs/chinese/bullet/test.bt"), new BulletRuntime());;
-            compiledBullet.eval();
-
-            compiledBullet.invokeFunction("onLoad");
+            compiledBullet.eval();;
         } catch (ParsingException e) {
             System.out.println(Reporter.report(e.getClass().getName(), e.position, e.getMessage()));
         } catch (RuntimeException e) {
