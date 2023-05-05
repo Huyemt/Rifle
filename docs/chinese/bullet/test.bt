@@ -1,7 +1,7 @@
-a := 1 / 3
+i := 1 / 3
 
-// 0.33333333333333333333
-println( a )
+println(i)
 
-// 1
-println( a * 3 )
+println(i * 3)
+
+println(0)

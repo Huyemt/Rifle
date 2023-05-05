@@ -107,37 +107,52 @@ public class Parser implements IParser {
                 lexer.expectToken(TokenKind.SLPAREN);
 
                 if (lexer.currentToken.kind != TokenKind.SRPAREN) {
-                    while (lexer.currentToken.kind != TokenKind.SRPAREN) {
-                        if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
-                            String paramName = ((VToken) lexer.currentToken).value;
+                    lexer.checkToken(TokenKind.IDENTIFIER);
 
-                            if (node.params.containsKey(paramName)) {
-                                throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in the function\"%s\"", paramName, node.name));
-                            }
+                    String paramName = ((VToken) lexer.currentToken).value;
 
-                            lexer.beginPeek();
-                            lexer.next();
+                    if (node.params.containsKey(paramName)) {
+                        throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in the function\"%s\"", paramName, node.name));
+                    }
 
-                            if (lexer.currentToken.kind == TokenKind.ASSIGN) {
-                                lexer.next();
-                                lexer.endPeek();
-                                lexer.next(2);
-                                node.params.put(paramName, this.Primary());
-                            } else {
-                                lexer.endPeek();
-                                node.params.put(paramName, null);
-                                lexer.next();
-                            }
+                    lexer.beginPeek();
+                    lexer.next();
 
-                            continue;
+                    if (lexer.currentToken.kind == TokenKind.ASSIGN) {
+                        lexer.next();
+                        lexer.endPeek();
+                        lexer.next(2);
+                        node.params.put(paramName, this.Primary());
+                    } else {
+                        lexer.endPeek();
+                        node.params.put(paramName, null);
+                        lexer.next();
+                    }
+
+                    while (lexer.currentToken.kind == TokenKind.COMMA) {
+                        lexer.expectToken(TokenKind.COMMA);
+
+                        lexer.checkToken(TokenKind.IDENTIFIER);
+
+                        paramName = ((VToken) lexer.currentToken).value;
+
+                        if (node.params.containsKey(paramName)) {
+                            throw new ParsingException(lexer.position, String.format("The parameter \"%s\" have been defined in the function \"%s\"", paramName, node.name));
                         }
 
-                        if (lexer.currentToken.kind == TokenKind.COMMA) {
-                            lexer.next();
-                            continue;
-                        }
+                        lexer.beginPeek();
+                        lexer.next();
 
-                        throw new ParsingException(lexer.position, "Incorrect function parameter definition behavior");
+                        if (lexer.currentToken.kind == TokenKind.ASSIGN) {
+                            lexer.next();
+                            lexer.endPeek();
+                            lexer.next(2);
+                            node.params.put(paramName, this.Primary());
+                        } else {
+                            lexer.endPeek();
+                            node.params.put(paramName, null);
+                            lexer.next();
+                        }
                     }
                 }
 
@@ -1107,16 +1122,57 @@ public class Parser implements IParser {
                 }
 
                 int counter = 0;
-                boolean flag = false;
+                String pName;
 
-                while (lexer.currentToken.kind != TokenKind.SRPAREN) {
+                if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
+                    lexer.beginPeek();
+                    String param = ((VToken) lexer.currentToken).value;
+                    Position posParam = lexer.position.clone();
+                    lexer.next();
 
+                    if (lexer.currentToken.kind == TokenKind.ASSIGN) {
+                        lexer.endPeek();
+                        lexer.next(2);
+
+                        if (!defined.containsKey(param)) {
+                            throw new ParsingException(posParam, String.format("Parameter \"%s\" does not exist", param));
+                        } else {
+                            if (result.get(param) != null) {
+                                throw new ParsingException(posParam, String.format("Parameter \"%s\" has already been defined", param));
+                            }
+
+                            macther.set(macther.indexOf(param), null);
+                            result.put(param, this.Assign());
+                        }
+
+                        counter++;
+                    } else {
+                        lexer.endPeek();
+
+                        pName = matchParamName(macther);
+
+                        result.put(pName, this.Assign());
+
+                        counter++;
+                    }
+                } else if (lexer.currentToken.kind == TokenKind.COMMA) {
+                    throw new ParsingException(lexer.position, "Syntax error");
+                } else {
+                    pName = matchParamName(macther);
+
+                    result.put(pName, this.Assign());
+
+                    counter++;
+                }
+
+                while (lexer.currentToken.kind == TokenKind.COMMA) {
                     if (counter == defined.size()) {
                         throw new ParsingException(lexer.position, String.format("Parameter number exceeds the maximum length of %d", defined.size()));
                     }
 
+                    lexer.expectToken(TokenKind.COMMA);
+
                     if (lexer.currentToken.kind == TokenKind.IDENTIFIER) {
-                        flag = false;
                         lexer.beginPeek();
                         String param = ((VToken) lexer.currentToken).value;
                         Position posParam = lexer.position.clone();
@@ -1142,19 +1198,9 @@ public class Parser implements IParser {
                         }
 
                         lexer.endPeek();
-                    } else if (lexer.currentToken.kind == TokenKind.COMMA) {
-                        if (flag) {
-                            throw new ParsingException(lexer.position, "Syntax error");
-                        }
-
-                        flag = true;
-                        lexer.next();
-                        continue;
                     }
 
-                    flag = false;
-
-                    String pName = matchParamName(macther);
+                    pName = matchParamName(macther);
 
                     if (pName == null) {
                         throw new ParsingException(lexer.position, String.format("Parameter number exceeds the maximum length of %d", defined.size()));
@@ -1191,14 +1237,9 @@ public class Parser implements IParser {
 
         if (lexer.currentToken.kind != TokenKind.SRPAREN) {
             params.add(this.Assign());
-            if (lexer.currentToken.kind == TokenKind.COMMA) {
-                while (lexer.currentToken.kind == TokenKind.COMMA) {
-                    lexer.next();
-                    params.add(this.Assign());
-                    if (lexer.currentToken.kind == TokenKind.SRPAREN) {
-                        break;
-                    }
-                }
+            while (lexer.currentToken.kind == TokenKind.COMMA) {
+                lexer.next();
+                params.add(this.Assign());
             }
         }
 

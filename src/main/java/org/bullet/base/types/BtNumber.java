@@ -31,7 +31,7 @@ public class BtNumber extends BtType {
 
     public BtNumber(String factor) {
         if (NUMBER_PARTTERN.matcher(factor).matches()) {
-            value = new BigDecimal(formatNumber(factor.toCharArray()));
+            value = new BigDecimal(format(factor));
         } else {
             value = null;
         }
@@ -138,7 +138,7 @@ public class BtNumber extends BtType {
 
     @Override
     public String toString() {
-        return formatNumber(exact().toPlainString().toCharArray());
+        return format(exact().toPlainString());
     }
 
     private BigDecimal exact() {
@@ -157,122 +157,61 @@ public class BtNumber extends BtType {
     ////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////
 
-    private String formatNumber(char[] expr) {
-        ArrayList<Character> a = new ArrayList<>();
-        ArrayList<Character> b = new ArrayList<>();
+    private String format(String expr) {
+        char[] exprs = expr.toCharArray();
+        int iIndex = -1;
+        int fIndex = -1;
+        int point = -1;
 
-        int first = init(expr, a, b);
-
-        int i = positionZero(a, true);
-
-        char[] left = new char[i == -1 ? a.size() : i];
-
-        for (int j = 0; j < left.length; j++) {
-            left[j] = a.get(j);
-        }
-
-        i = positionZero(b, false);
-
-        char[] right = new char[i == -1 ? b.size() : b.size() - i - 1];
-
-        for (int oIndex = i + 1, n = 0; oIndex < b.size(); oIndex++, n++) {
-            right[n] = b.get(oIndex);
-        }
-
-        StringBuilder builder = new StringBuilder();
-
-        if ((left.length == 0 && right.length == 0 ? 0 : first) == -1) {
-            builder.append("-");
-        }
-
-        if (left.length == 0) {
-            builder.append(0);
-        } else {
-            builder.append(parseString(left));
-        }
-
-        if (right.length > 0) {
-            builder.append(".").append(parseString(right));
-        }
-
-        return builder.toString();
-    }
-
-    private String parseString(char[] chars) {
-        if (chars.length == 0) {
-            return "0";
-        }
-
-        StringBuilder builder = new StringBuilder();
-
-        for (char c : chars)
-            builder.insert(0, c);
-
-        return builder.toString();
-    }
-
-    private int init(char[] expr, ArrayList<Character> a, ArrayList<Character> b) {
-        int i = 0;
-        boolean floating = false;
-        int first = expr[i] == '-' ? -1 : 1;
-
-        if (expr[i] == '+' || expr[i] == '-') {
-            i++;
-        }
-
-        for (; i < expr.length; i++) {
-            if (expr[i] == '.') {
-                floating = true;
+        for (int i = 0; i < exprs.length; i++) {
+            if (exprs[i] == '.') {
+                point = i;
                 continue;
             }
 
-            if (floating) {
-                b.add(0, expr[i]);
-            } else {
-                a.add(0, expr[i]);
-            }
-        }
-
-        return first;
-    }
-
-    private int positionZero(ArrayList<Character> list, boolean flag) {
-        int i = -1;
-
-        if (flag) {
-            int a = list.size() - 1;
-
-            for (int j = a; j >= 0; j--) {
-                if (list.get(j) != '0') {
-                    if (j == a) {
-                        break;
-                    }
-                } else {
-                    if (j < a) {
-                        if (list.get(j + 1) == '0') {
-                            i = j;
-                            continue;
-                        }
-
-                        break;
-                    }
-                }
-            }
-        } else {
-            for (int j = 0; j < list.size(); j++) {
-                if (list.get(j) == '0') {
-                    if (j > 0 && list.get(j - 1) != '0') {
+            if (exprs[i] == '0') {
+                if (point > -1) {
+                    if (exprs[i - 1] == '0' || exprs[i - 1] == '.') {
                         continue;
                     }
 
-                    i = j;
-                    continue;
-                }
+                    fIndex = i;
+                } else {
+                    if (i + 1 == exprs.length) {
+                        if (iIndex == -1) {
+                            iIndex = i;
+                        }
 
-                break;
+                        continue;
+                    }
+
+                    if (i + 1 < exprs.length && exprs[i + 1] == '.') continue;
+
+                    if (iIndex + 1 == i) {
+                        if (iIndex > -1 && exprs[iIndex] == '0')
+                            iIndex = i;
+                    }
+                }
+            } else {
+                if (point > -1)
+                    fIndex = i + 1;
+                else if (iIndex == -1)
+                    iIndex = i;
             }
         }
 
-        return i;
+        if (iIndex == -1) {
+            if (point > -1) {
+                return fIndex > -1 ? expr.substring(0, fIndex) : expr.substring(0, point);
+            }
+
+            return "0";
+        } else {
+            if (point > -1) {
+                return fIndex > -1 ? expr.substring(iIndex, fIndex) : expr.substring(iIndex, point);
+            }
+
+            return expr.substring(iIndex);
+        }
     }
 }
