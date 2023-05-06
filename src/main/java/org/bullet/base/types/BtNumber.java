@@ -2,7 +2,6 @@ package org.bullet.base.types;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -30,43 +29,29 @@ public class BtNumber extends BtType {
     }
 
     public BtNumber(String factor) {
-        if (NUMBER_PARTTERN.matcher(factor).matches()) {
+        if (NUMBER_PARTTERN.matcher(factor).matches())
             value = new BigDecimal(format(factor));
-        } else {
-            value = null;
-        }
+        else value = null;
 
         under = null;
     }
 
     public BtNumber add(BtNumber number) {
-        if (value == null) {
-            return number;
-        }
-
-        if (number == null) {
-            return this;
-        }
+        if (value == null) return number;
+        if (number == null) return this;
 
         return new BtNumber(exact().add(number.exact()));
     }
 
     public BtNumber subtract(BtNumber number) {
-        if (value == null) {
-            return number.negate();
-        }
-
-        if (number == null) {
-            return this;
-        }
+        if (value == null) return number.negate();
+        if (number == null) return this;
 
         return new BtNumber(exact().subtract(number.exact()));
     }
 
     public BtNumber multiply(BtNumber number) {
-        if (value == null || number == null) {
-            return new BtNumber(0);
-        }
+        if (value == null || number == null) return new BtNumber(0);
 
         String a = toString();
         String b = number.toString();
@@ -78,23 +63,19 @@ public class BtNumber extends BtType {
         } else if (number.under != null && number.under.toString().equals(a)) {
             number1 = number.clone();
             number1.under = null;
-        } else {
-            number1 = new BtNumber(exact().multiply(number.exact()));
-        }
+        } else number1 = new BtNumber(exact().multiply(number.exact()));
 
         return number1;
 
     }
 
     public BtNumber divide(BtNumber number) {
-        if (value == null) {
-            return new BtNumber(0);
-        }
+        if (value == null) return new BtNumber(0);
         BtNumber number1;
 
-        if (under == null) {
+        if (under == null)
             number1 = clone();
-        } else {
+        else {
             number1 = new BtNumber();
             number1.value = this.value;
         }
@@ -153,6 +134,12 @@ public class BtNumber extends BtType {
         return temp;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        return o instanceof BtNumber && compare((BtNumber) o) == 0;
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////
@@ -171,46 +158,31 @@ public class BtNumber extends BtType {
 
             if (exprs[i] == '0') {
                 if (point > -1) {
-                    if (exprs[i - 1] == '0' || exprs[i - 1] == '.') {
-                        continue;
-                    }
+                    if (exprs[i - 1] == '0' || exprs[i - 1] == '.') continue;
 
                     fIndex = i;
                 } else {
                     if (i + 1 == exprs.length) {
-                        if (iIndex == -1) {
-                            iIndex = i;
-                        }
+                        if (iIndex == -1) iIndex = i;
 
                         continue;
                     }
 
                     if (i + 1 < exprs.length && exprs[i + 1] == '.') continue;
 
-                    if (iIndex + 1 == i) {
-                        if (iIndex > -1 && exprs[iIndex] == '0')
-                            iIndex = i;
-                    }
+                    if (iIndex + 1 == i && iIndex > -1 && exprs[iIndex] == '0') iIndex = i;
                 }
             } else {
-                if (point > -1)
-                    fIndex = i + 1;
-                else if (iIndex == -1)
-                    iIndex = i;
+                if (point > -1) fIndex = i + 1;
+                else if (iIndex == -1) iIndex = i;
             }
         }
 
         if (iIndex == -1) {
-            if (point > -1) {
-                return fIndex > -1 ? expr.substring(0, fIndex) : expr.substring(0, point);
-            }
-
+            if (point > -1) return fIndex > -1 ? expr.substring(0, fIndex) : expr.substring(0, point);
             return "0";
         } else {
-            if (point > -1) {
-                return fIndex > -1 ? expr.substring(iIndex, fIndex) : expr.substring(iIndex, point);
-            }
-
+            if (point > -1) return fIndex > -1 ? expr.substring(iIndex, fIndex) : expr.substring(iIndex, point);
             return expr.substring(iIndex);
         }
     }

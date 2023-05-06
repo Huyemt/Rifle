@@ -96,158 +96,116 @@ public class Interpreter extends Visitor {
         Object right = node.right.accept(this);
         Object left = node.left.accept(this);
 
-        if (node.operator != BinaryNode.Operator.INSTANCEOF) {
-            if (left instanceof BtNumber) {
-                switch (node.operator) {
-                    case ADD:
-                        if (right instanceof BtNumber) {
-                            return ((BtNumber) left).add((BtNumber) right);
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                    case SUB:
-                        if (right instanceof BtNumber) {
-                            return ((BtNumber) left).subtract((BtNumber) right);
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                    case MUL:
-                        if (right instanceof BtNumber) {
-                            return ((BtNumber) left).multiply((BtNumber) right);
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                    case DIV:
-                        if (right instanceof BtNumber) {
-                            if (((BtNumber) right).toInteger() == 0) {
-                                throw new RuntimeException(node.position, "Cannot divide by zero");
-                            }
-
-                            return ((BtNumber) left).divide((BtNumber) right);
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                    case MOD:
-                        if (right instanceof BtNumber) {
-                            if (((BtNumber) right).toInteger() == 0) {
-                                throw new RuntimeException(node.position, "Cannot divide by zero");
-                            }
-
-                            return ((BtNumber) left).mod((BtNumber) right);
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Remainder of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                    case POW:
-                        if (right instanceof BtNumber) {
-                            return ((BtNumber) left).pow(((BtNumber) right).toInteger());
-                        }
-
-                        throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                    case EQUAL:
-                    case NOT_EQUAL:
-                    case GREATER:
-                    case GREATER_OR_EQUAL:
-                    case LESSER:
-                    case LESSER_OR_EQUAL:
-                        int flag = ((BtNumber) left).compare((BtNumber) right);
-
-                        if (node.operator == BinaryNode.Operator.EQUAL) {
-                            return flag == 0;
-                        }
-
-                        if (node.operator == BinaryNode.Operator.NOT_EQUAL) {
-                            return flag != 0;
-                        }
-
-                        if (node.operator == BinaryNode.Operator.GREATER) {
-                            return flag > 0;
-                        }
-
-                        if (node.operator == BinaryNode.Operator.GREATER_OR_EQUAL) {
-                            return flag > 0 || flag == 0;
-                        }
-
-                        if (node.operator == BinaryNode.Operator.LESSER) {
-                            return flag < 0;
-                        }
-
-                        return flag < 0 || flag == 0;
-                }
-
-                throw new RuntimeException(node.position, "Unsupported binary operator");
-            }
-
-            if (left instanceof Boolean) {
-                if (right instanceof Boolean) {
-                    switch (node.operator) {
-                        case OR:
-                            return ((Boolean) left) || ((Boolean) right);
-                        case AND:
-                            return ((Boolean) left) && ((Boolean) right);
-                        default:
-                            throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
-                    }
-                }
-
-                throw new RuntimeException(node.position, "Boolean values can only be operated with Boolean values");
-            }
-
-            if (left instanceof String) {
-                if (!(right instanceof BtList || right instanceof BtDictionary)) {
-                    if (node.operator == BinaryNode.Operator.ADD) {
-                        if (right instanceof String) {
-                            return ((String) left).concat(String.valueOf(right));
-                        }
-
-                        throw new RuntimeException(node.position, "A string can only be added to a string");
-                    }
-
-                    if (node.operator == BinaryNode.Operator.MUL) {
-                        if (right instanceof BtNumber) {
-                            return ((String) left).repeat(((BtNumber) right).toInteger());
-                        }
-
-                        throw new RuntimeException(node.position, "A string can only be multiplied to a number");
-                    }
-
-                    if (node.operator == BinaryNode.Operator.EQUAL) {
-                        return !(right instanceof BtNull) && !(right instanceof BtNumber) && left.toString().equals(right.toString());
-                    }
-                }
-
-                throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\" and \"*\"");
-            }
-
-            if (left instanceof BtList) {
-                if (right instanceof BtList) {
-                    if (node.operator == BinaryNode.Operator.ADD) {
-                        BtList list = new BtList();
-                        list.addAll((BtList) left);
-                        list.addAll((BtList) right);
-                        return list;
-                    }
-                }
-
-                throw new RuntimeException(node.position, "Lists cannot perform operations other than \"+\"");
-            }
-
-            if (left instanceof BtNull) {
-                if (node.operator == BinaryNode.Operator.EQUAL) {
-                    return right instanceof BtNull;
-                }
-
-                if (node.operator == BinaryNode.Operator.NOT_EQUAL) {
-                    return !(right instanceof BtNull);
-                }
-
-                throw new RuntimeException(node.position, "Null cannot perform operations other than \"==\" and \"!=\"");
-            }
-
-            throw new RuntimeException(node.position, "Unsupported type operation");
-        } else {
-            return left.getClass().getTypeName().equals(right.getClass().getTypeName());
+        if (node.operator == BinaryNode.Operator.EQUAL || node.operator == BinaryNode.Operator.NOT_EQUAL) {
+            return (node.operator == BinaryNode.Operator.EQUAL) == left.equals(right);
         }
 
+        if (node.operator == BinaryNode.Operator.GREATER || node.operator == BinaryNode.Operator.GREATER_OR_EQUAL || node.operator == BinaryNode.Operator.LESSER || node.operator == BinaryNode.Operator.LESSER_OR_EQUAL) {
+            if (left instanceof BtNumber && right instanceof BtNumber) {
+                int flag = ((BtNumber) left).compare((BtNumber) right);
+
+                if (node.operator == BinaryNode.Operator.GREATER) return flag > 0;
+                if (node.operator == BinaryNode.Operator.GREATER_OR_EQUAL) return flag > 0 || flag == 0;
+                if (node.operator == BinaryNode.Operator.LESSER) return flag < 0;
+
+                return flag < 0 || flag == 0;
+            }
+
+            return false;
+        }
+
+        if (left instanceof BtNumber) {
+            switch (node.operator) {
+                case ADD:
+                    if (right instanceof BtNumber) return ((BtNumber) left).add((BtNumber) right);
+
+                    throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                case SUB:
+                    if (right instanceof BtNumber) return ((BtNumber) left).subtract((BtNumber) right);
+
+                    throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                case MUL:
+                    if (right instanceof BtNumber) return ((BtNumber) left).multiply((BtNumber) right);
+
+                    throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                case DIV:
+                    if (right instanceof BtNumber) {
+                        if (((BtNumber) right).toInteger() == 0) throw new RuntimeException(node.position, "Cannot divide by zero");
+
+                        return ((BtNumber) left).divide((BtNumber) right);
+                    }
+
+                    throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                case MOD:
+                    if (right instanceof BtNumber) {
+                        if (((BtNumber) right).toInteger() == 0) throw new RuntimeException(node.position, "Cannot divide by zero");
+
+                        return ((BtNumber) left).mod((BtNumber) right);
+                    }
+
+                    throw new RuntimeException(node.position, String.format("Remainder of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                case POW:
+                    if (right instanceof BtNumber) return ((BtNumber) left).pow(((BtNumber) right).toInteger());
+
+                    throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+            }
+
+            throw new RuntimeException(node.position, "Unsupported binary operator");
+        }
+
+        if (left instanceof Boolean) {
+            if (right instanceof Boolean) {
+                switch (node.operator) {
+                    case OR:
+                        return ((Boolean) left) || ((Boolean) right);
+                    case AND:
+                        return ((Boolean) left) && ((Boolean) right);
+                    default:
+                        throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
+                }
+            }
+
+            throw new RuntimeException(node.position, "Boolean values can only be operated with Boolean values");
+        }
+
+        if (left instanceof String) {
+            if (!(right instanceof BtList || right instanceof BtDictionary)) {
+                if (node.operator == BinaryNode.Operator.ADD) {
+                    if (right instanceof String) return ((String) left).concat(String.valueOf(right));
+
+                    throw new RuntimeException(node.position, "A string can only be added to a string");
+                }
+
+                if (node.operator == BinaryNode.Operator.MUL) {
+                    if (right instanceof BtNumber) return ((String) left).repeat(((BtNumber) right).toInteger());
+
+                    throw new RuntimeException(node.position, "A string can only be multiplied to a number");
+                }
+            }
+
+            throw new RuntimeException(node.position, "String values cannot perform operations other than \"+\", \"*\", \"==\" and \"!=\"");
+        }
+
+        if (left instanceof BtList) {
+            if (node.operator == BinaryNode.Operator.ADD) {
+                if (right instanceof BtList) {
+                    BtList list = new BtList();
+                    list.addAll((BtList) left);
+                    list.addAll((BtList) right);
+                    return list;
+                }
+
+                throw new RuntimeException(node.right.position, "List can only be added with list");
+            }
+
+            throw new RuntimeException(node.position, "Lists cannot perform operations other than \"+\", \"==\" and \"!=\"");
+        }
+
+        if (left instanceof BtByteString || left instanceof BtByte || left instanceof BtDictionary || left instanceof BtNull) {
+            throw new RuntimeException(node.position, String.format("%s cannot perform operations other than \"==\" and \"!=\"", left.getClass().getSimpleName()));
+        }
+
+        throw new RuntimeException(node.position, "Unsupported type operation");
     }
 
     @Override
@@ -266,9 +224,7 @@ public class Interpreter extends Visitor {
         }
 
         if (left instanceof Boolean) {
-            if (node.operator == UnaryNode.Operator.NOT) {
-                return !((Boolean) left);
-            }
+            if (node.operator == UnaryNode.Operator.NOT) return !((Boolean) left);
 
             throw new RuntimeException(node.position, "Boolean values can only be inverted unary");
         }
@@ -326,7 +282,7 @@ public class Interpreter extends Visitor {
         boolean flag = false;
 
         if (condition instanceof BtNumber) {
-            flag = ((BtNumber) condition).toInteger() != 0;
+            flag = ((BtNumber) condition).compare(new BtNumber()) != 0;
         }
 
         if (condition instanceof Boolean) {
@@ -370,16 +326,8 @@ public class Interpreter extends Visitor {
         }
 
         if (runtime.environment != null && runtime.environment.from != null && runtime.loopLevel == 0) {
-            runtime.scope = null;
-
-            System.gc();
-
             runtime.scope = runtime.environment.from;
         } else if (runtime.scope.from != null) {
-            runtime.scope = null;
-
-            System.gc();
-
             runtime.scope = runtime.scope.from;
         }
 

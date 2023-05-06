@@ -139,8 +139,7 @@ public interface IParser {
     Node Term() throws ParsingException;
     Node Factor() throws ParsingException;
     Node Unary() throws ParsingException;
-    Node Involution() throws ParsingException;
-    Node Involution2() throws ParsingException;
+    Node Pow() throws ParsingException;
     Node Secondary() throws ParsingException;
     Node Primary() throws ParsingException;
 }

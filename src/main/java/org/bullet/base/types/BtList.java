@@ -3,7 +3,6 @@ package org.bullet.base.types;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * @author Huyemt
@@ -178,5 +177,26 @@ public class BtList extends BtType {
         BtList btList = new BtList();
         btList.vector = (ArrayList<Object>) vector.clone();
         return btList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof BtList) {
+            BtList list = (BtList) o;
+
+            if (list.size() != size()) return false;
+
+            boolean flag = true;
+            for (int i = 0; i < vector.size(); i++) {
+                if (!flag) break;
+                flag = get(i).equals(list.get(i));
+            }
+
+            return flag;
+        }
+
+        return false;
     }
 }

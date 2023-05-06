@@ -84,4 +84,24 @@ public class BtByteString extends BtType {
 
         return r;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof BtByteString) {
+            BtByteString byteString = (BtByteString) o;
+
+            if (size() != byteString.size()) return false;
+
+            for (int i = 0; i < size(); i++) {
+                if (get(i).getValue() == byteString.get(i).getValue()) continue;
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
 }

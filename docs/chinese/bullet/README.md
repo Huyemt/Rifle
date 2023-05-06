@@ -6,7 +6,7 @@
 `Bullet`目前是一门解释型语言，未来会使用`JIT`技术使其变得速度更快，效率更高的混合型语言。
 <br>
 它的语法较为人性，通俗易懂。在`Java`环境下能与其交互。
-## 优势
+# 优势
 相比于Java:
 ```
 1. 自带高精度运算
@@ -22,11 +22,12 @@
 3. 更人性便利的列表与字典操作
 ```
 ***
-## 学习
+# 学习
 * [一个简单的Bullet程序](simple.md)
 * [基本类型](baseType.md)
-* [运算符]()
+* [运算符](operators.md)
 * [变量与函数](funcAndVar.md)
-* [语句结构]()
-* [程序属性]()
-* [基本的Rifle模块编写]()
+* [内置函数](builtFunc.md)
+* [选择与循环](selectAndLoop.md)
+* [程序属性](attribute.md)
+* [基本的Rifle模块编写](rifleModule.md)

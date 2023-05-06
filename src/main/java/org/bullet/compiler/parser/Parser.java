@@ -2,7 +2,6 @@ package org.bullet.compiler.parser;
 
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtByteString;
-import org.bullet.base.types.BtNull;
 import org.bullet.base.types.BtNumber;
 import org.bullet.compiler.ast.Node;
 import org.bullet.compiler.ast.nodes.*;
@@ -777,7 +776,7 @@ public class Parser implements IParser {
     public Node Relational() throws ParsingException {
         Node left = this.Term();
 
-        while (lexer.currentToken.kind == TokenKind.GREATER || lexer.currentToken.kind == TokenKind.GREATER_OR_EQUAL || lexer.currentToken.kind == TokenKind.LESSER || lexer.currentToken.kind == TokenKind.LESSER_OR_EQUAL || lexer.currentToken.kind == TokenKind.INSTANCEOF) {
+        while (lexer.currentToken.kind == TokenKind.GREATER || lexer.currentToken.kind == TokenKind.GREATER_OR_EQUAL || lexer.currentToken.kind == TokenKind.LESSER || lexer.currentToken.kind == TokenKind.LESSER_OR_EQUAL) {
             BinaryNode node = new BinaryNode();
             node.position = lexer.currentToken.position;
             node.operator = this.matchBinOpt();
@@ -821,7 +820,7 @@ public class Parser implements IParser {
     public Node Factor() throws ParsingException {
         Node left = this.Unary();
 
-        while (lexer.currentToken.kind == TokenKind.STAR || lexer.currentToken.kind == TokenKind.SLASH) {
+        while (lexer.currentToken.kind == TokenKind.STAR || lexer.currentToken.kind == TokenKind.SLASH || lexer.currentToken.kind == TokenKind.MOD) {
             BinaryNode node = new BinaryNode();
 
             node.operator = this.matchBinOpt();
@@ -855,28 +854,11 @@ public class Parser implements IParser {
             return node;
         }
 
-        return this.Involution();
+        return this.Pow();
     }
 
     @Override
-    public Node Involution() throws ParsingException {
-        Node left = this.Involution2();
-
-        while (lexer.currentToken.kind == TokenKind.MOD) {
-            BinaryNode node = new BinaryNode();
-            node.operator = BinaryNode.Operator.MOD;
-            node.position = lexer.currentToken.position;
-            lexer.next();
-            node.left = left;
-            node.right = this.Involution2();
-            left = node;
-        }
-
-        return left;
-    }
-
-    @Override
-    public Node Involution2() throws ParsingException {
+    public Node Pow() throws ParsingException {
         Node left = this.Secondary();
 
         while (lexer.currentToken.kind == TokenKind.POW) {
@@ -984,7 +966,7 @@ public class Parser implements IParser {
             // null
             if (lexer.currentToken.kind == TokenKind.NULL) {
                 ConstantNode node = new ConstantNode();
-                node.value = new BtNull();
+                node.value = BulletRuntime.BTNULL;
                 node.position = lexer.currentToken.position;
                 lexer.next();
 
@@ -1063,9 +1045,6 @@ public class Parser implements IParser {
             case MOD:
             case ASSIGN_MOD:
                 return BinaryNode.Operator.MOD;
-
-            case INSTANCEOF:
-                return BinaryNode.Operator.INSTANCEOF;
             case EQUAL:
                 return BinaryNode.Operator.EQUAL;
             case NOT_EQUAL:

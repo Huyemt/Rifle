@@ -43,12 +43,10 @@ public class Lexer implements ILexer {
         registerToken(TokenKind.GREATER);
         registerToken(TokenKind.LESSER);
         registerToken(TokenKind.POINT);
-        registerToken(TokenKind.AT);
         registerToken(TokenKind.SHARP);
         registerToken(TokenKind.COLON);
         registerToken(TokenKind.MOD);
 
-        registerKeyword(TokenKind.INSTANCEOF);
         registerKeyword(TokenKind.TRUE);
         registerKeyword(TokenKind.FALSE);
         registerKeyword(TokenKind.VAR);
@@ -156,50 +154,66 @@ public class Lexer implements ILexer {
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.EQUAL);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.ASSIGN);
+
+                    position.next();
+                    break;
                 case '!':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.NOT_EQUAL);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.NOT);
+
+                    position.next();
+                    break;
                 case '>':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.GREATER_OR_EQUAL);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.GREATER);
+
+                    position.next();
+                    break;
                 case '<':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.LESSER_OR_EQUAL);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.LESSER);
+
+                    position.next();
+                    break;
                 case '&':
                     if (this.peekChar(1) == '&') {
                         position.next();
                         this.makeToken(TokenKind.AND);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.L_AND);
+
+                    position.next();
+                    break;
                 case '|':
                     if (this.peekChar(1) == '|') {
                         position.next();
                         this.makeToken(TokenKind.OR);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.L_OR);
+
+                    position.next();
+                    break;
                 case '+':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.ASSIGN_ADD);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.PLUS);
+
+                    position.next();
+                    break;
                 case '-':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.ASSIGN_SUB);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.MINUS);
+
+                    position.next();
+                    break;
                 case '*':
                     if (this.peekChar(1) == '*') {
                         position.next();
@@ -207,41 +221,46 @@ public class Lexer implements ILexer {
                         if (this.peekChar(1) == '=') {
                             position.next();
                             this.makeToken(TokenKind.ASSIGN_POW);
-                            break;
-                        }
+                        } else this.makeToken(TokenKind.POW);
 
-                        this.makeToken(TokenKind.POW);
-                        break;
-                    }
-                    if (this.peekChar(1) == '=') {
+                        position.next();
+                    } else if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.ASSIGN_MUL);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.STAR);
+
+                    position.next();
+                    break;
                 case '/':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.ASSIGN_DIV);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.SLASH);
+
+                    position.next();
+                    break;
                 case '%':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.ASSIGN_MOD);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.MOD);
+
+                    position.next();
+                    break;
                 case ':':
                     if (this.peekChar(1) == '=') {
                         position.next();
                         this.makeToken(TokenKind.C_ASSIGN);
-                        break;
-                    }
+                    } else this.makeToken(TokenKind.COLON);
+
+                    position.next();
+                    break;
                 default:
                     this.makeToken(tokens.get(position.currentChar.toString()));
+                    position.next();
                     break;
             }
 
-            position.next();
             return;
         }
 

@@ -1,14 +1,14 @@
-## [返回教程](README.md)
+# [返回教程](README.md)
 ***
-## 前言
+# 前言
 每一种编程语言都应该支持`函数`与`变量`，这些东西在高级语言中的地位与化学中的原子一样重要。编程语言结构的本质其实是许许多多的函数与变量拼凑而成。
 ***
-## 介绍
+# 介绍
 在`Bullet`语言中，我们将`func`作为函数声明的关键字，`var`作为变量声明的关键字。
 <br>
 而且我们拥有像`Golang`一样的变量推导式，使得程序编写的过程中可以更为简洁。
 ***
-## 变量
+# 变量
 _注意：Bullet规定程序员对所有不存在的变量进行操作时，都需要使用下面的方法进行声明_
 
 ```bullet
@@ -22,8 +22,8 @@ i := 10
 ```
 <br>
 
-### 变量声明演示
-#### 字符串
+## 变量声明演示
+### 字符串
 ```bullet
 aStr := "Hello, world"
 
@@ -32,7 +32,7 @@ println( isstr(aStr) )
 ```
 <br>
 
-#### 列表
+### 列表
 ```bullet
 var aList = [0, 1, 2, 3, 4]
 
@@ -41,7 +41,7 @@ println( islist(aList) )
 ```
 <br>
 
-#### 字典
+### 字典
 ```bullet
 aDict := {
     "a": 1,
@@ -58,7 +58,7 @@ aDict := {
 println( isdict(aDict) )
 ```
 ***
-## 函数
+# 函数
 `Bullet`内置了许多实用的函数，您可以[点击此处]()进行查询
 
 _注意：Bullet目前不支持嵌套函数的写法。_
@@ -78,8 +78,8 @@ func voidFunction {
 ```
 <br>
 
-### 函数的五种类型
-#### 无参数无返回值
+## 函数的五种类型
+### 无参数无返回值
 ```bullet
 func aFunc {
     println("Hello, world")
@@ -90,7 +90,7 @@ aFunc()
 ```
 <br>
 
-#### 有参数无返回值
+### 有参数无返回值
 ```bullet
 func aFunc( param ) {
     println(param)
@@ -101,7 +101,7 @@ aFunc("Hello, world")
 ```
 <br>
 
-#### 无参数有返回值
+### 无参数有返回值
 ```bullet
 aK := 1
 func aFunc {
@@ -114,7 +114,7 @@ println(aFunc())
 ```
 <br>
 
-#### 有参数有返回值
+### 有参数有返回值
 ```bullet
 func aFunc( list ) {
     list[] = len(list)
@@ -132,7 +132,7 @@ aFunc(a)
 // [0,1]
 println(a)
 ```
-#### 默认参数
+### 默认参数
 ```bullet
 func aFunc( msg="Hello, World" ) {
     println( msg )
@@ -145,7 +145,8 @@ aFunc()
 // Hi, Bullet
 aFunc("Hi, Bullet")
 ```
-### 高级用法
+## 高级用法
+### 参数名传参
 `Bullet`允许开发者在调用参数的时候，指定一个参数名称进行传参。
 <br>
 ```bullet
@@ -182,4 +183,16 @@ test(bullet, height=175+5)
 // 自动复位传参
 // Bullet	1	180
 test("Bullet", height=180, 1) // name, height, age
+```
+### 递归
+最常见的递归函数，当属`斐波那契数列`。
+```bullet
+func fibonacci( n ) {
+    if ( n <= 2 ) return 1
+    
+    return fibonacci( n - 1 ) + fibonacci( n - 2 )
+}
+
+// 55
+println( fibonacci(10) )
 ```

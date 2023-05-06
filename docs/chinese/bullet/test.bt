@@ -1,7 +1,5 @@
-i := 1 / 3
+data := "[{\"name\":\"Huyemt\",\"age\":{\"value\":17}}]"
 
-println(i)
+data = jsonD( data )
 
-println(i * 3)
-
-println(0)
+println( data[0]["name"] )

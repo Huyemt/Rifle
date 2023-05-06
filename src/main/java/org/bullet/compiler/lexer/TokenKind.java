@@ -29,7 +29,6 @@ public enum TokenKind {
     RETURN("return"),
     BREAK("break"),
     CONTINUE("continue"),
-    INSTANCEOF("instanceof"),
     NULL("null"),
 
     /*
@@ -74,7 +73,6 @@ public enum TokenKind {
     COMMA(","),
     POINT("."),
     SEMICOLON(";"),
-    AT("@"),
     SHARP("#"),
     COLON(":"),
 

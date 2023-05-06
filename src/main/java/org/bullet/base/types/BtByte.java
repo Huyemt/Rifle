@@ -29,4 +29,15 @@ public class BtByte extends BtType {
     public String toString() {
         return String.format("\\x%02X", value);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof BtByte) {
+            return getValue() == ((BtByte) o).getValue();
+        }
+
+        return false;
+    }
 }

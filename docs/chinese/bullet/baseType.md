@@ -1,6 +1,6 @@
-## [返回教程](README.md)
+# [返回教程](README.md)
 ***
-## 基本类型
+# 基本类型
 1. [x] [Number](#Number)
 2. [x] [String](#String)
 3. [x] [Boolean](#Boolean)
@@ -9,7 +9,7 @@
 6. [x] [Byte](#Byte)
 7. [x] [ByteString](#ByteString)
 ***
-### <a id="Number">Number</a>
+## <a id="Number">Number</a>
 `数字型`在`Bullet`语言中属于基本类型，它能够自动计算高精度。
 
 _注意：整形与浮点型一并列为数字型_
@@ -56,7 +56,7 @@ println( a )
 println( a * 3 )
 ```
 ***
-### <a id="String">String</a>
+## <a id="String">String</a>
 `字符串型`在`Bullet`语言中属于基本类型，使用者可以非常灵活地操作它。
 
 _注意1：复杂索引的两个值不能为负数_
@@ -89,7 +89,7 @@ println(aStr[len(aStr):])
 println(aStr[5:])
 ```
 ***
-### <a id="Boolean">Boolean</a>
+## <a id="Boolean">Boolean</a>
 `布尔型`在`Bullet`语言中属于基本类型，是控制`选择结构`与`循环结构`执行的决策者。
 
 _注意：在Bullet语言中，`&&`等价于`and`，`||`等价于`or`_
@@ -120,7 +120,7 @@ println(false || false)
 println(false or false)
 ```
 ***
-### <a id="List">List</a>
+## <a id="List">List</a>
 `列表`在`Bullet`语言中属于基本类型，它以数字为索引，可以容纳不同类型的值。
 
 _注意1：`列表`的索引使用规则与`字符串`相同_
@@ -167,7 +167,7 @@ aList[] = aList
 println(aList)
 ```
 ***
-### <a id="Dictionary">Dictionary</a>
+## <a id="Dictionary">Dictionary</a>
 `字典`在`Bullet`语言中属于基本类型，它以`key-value`的格式存储数据。
 
 _注意1：`字典`的键必须是`字符串型`，且访问也以`字符串型`为索引。_
@@ -210,8 +210,8 @@ aDict[][] = len(aDict[])
 println(aDict[])
 ```
 ***
-### <a id="Byte">Byte</a>
-### <a id="ByteString">ByteString</a>
+## <a id="Byte">Byte</a>
+## <a id="ByteString">ByteString</a>
 `Byte`与`ByteString`在`Bullet`语言中都属于基本类型，其中`ByteString`是`Byte`的集合体。
 
 _注意：`ByteString`也可以用数字索引访问值，但不可赋值。_

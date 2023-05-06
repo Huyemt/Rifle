@@ -13,4 +13,9 @@ public class BtNull extends BtType {
     public final String toString() {
         return "null";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof BtNull;
+    }
 }

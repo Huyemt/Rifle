@@ -113,4 +113,44 @@ public class BtDictionary extends BtType {
         dictionary.vector = (LinkedHashMap<String, Object>) vector.clone();
         return dictionary;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof BtDictionary) {
+            BtDictionary dictionary = (BtDictionary) o;
+
+            if (size() != dictionary.size()) return false;
+
+            String[] lkeys = keys().toArray(String[]::new);
+            String[] rkeys = dictionary.keys().toArray(String[]::new);
+
+            boolean flag = true;
+            String lkey;
+            String rkey;
+            Object lv;
+            Object rv;
+
+            for (int i = 0; i < lkeys.length; i++) {
+                if (!flag) break;
+
+                lkey = lkeys[i];
+                rkey = rkeys[i];
+
+                if (!lkey.equals(rkey)) return false;
+
+                lv = get(lkey);
+                rv = dictionary.get(rkey);
+
+                if (lv == rv) continue;
+
+                flag = lv.equals(rv);
+            }
+
+            return flag;
+        }
+
+        return false;
+    }
 }

@@ -7,6 +7,7 @@ import org.bullet.base.bulitIn.function.security.*;
 import org.bullet.base.bulitIn.function.net.*;
 import org.bullet.base.bulitIn.function.type.*;
 import org.bullet.base.components.*;
+import org.bullet.base.types.BtNull;
 import org.bullet.compiler.ast.nodes.BlockNode;
 import org.bullet.exceptions.common.UnderfineException;
 import org.rifle.console.logger.Logger;
@@ -29,6 +30,7 @@ public class BulletRuntime {
     public LoopStatus loopStatus;
     public int loopLevel;
     public Logger logger;
+    public static final BtNull BTNULL = new BtNull();
 
     public BulletRuntime() {
         functions = new HashMap<>();
