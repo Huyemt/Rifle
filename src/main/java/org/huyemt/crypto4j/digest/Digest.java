@@ -11,7 +11,7 @@ public class Digest {
     protected MessageDigest digest;
 
     public Digest(String algorithm) throws NoSuchAlgorithmException {
-        MessageDigest digest1 = MessageDigest.getInstance(algorithm);
+        digest = MessageDigest.getInstance(algorithm);
     }
 
     public MessageDigest getMessageDigest() {

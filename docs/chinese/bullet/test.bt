@@ -1,0 +1,1 @@
+println(md5( "a" ))
