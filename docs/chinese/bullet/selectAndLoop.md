@@ -62,12 +62,17 @@ if ( A > 10 ) {
 <br>
 <br>
 `until`循环体的工作是使`目的`达成。
+<br><br>
+`else`体被执行的前提是，循环头必须被执行过一次以上
 ### 有限循环
 ```bullet
 A := 0
 
 until ( A == 10 ) {
     A += 1
+} else {
+    // 10
+    println("done")
 }
 
 // 10
@@ -80,12 +85,15 @@ until ( false ) {
 }
 ```
 ## for
+`else`体被执行的前提是，循环头必须被执行过一次以上
 ### 有限循环
 ```bullet
 A := 5
 
 for ( i := 0; i < A; i += 1 ) {
     println( i )
+} else {
+    println("done")
 }
 
 // 0
@@ -93,6 +101,7 @@ for ( i := 0; i < A; i += 1 ) {
 // 2
 // 3
 // 4
+// done
 ```
 ### 无限循环
 ```bullet

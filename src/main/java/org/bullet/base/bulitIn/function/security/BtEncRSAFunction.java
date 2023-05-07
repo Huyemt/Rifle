@@ -2,6 +2,7 @@ package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.base.types.BtDictionary;
+import org.bullet.base.types.BtNull;
 import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
@@ -18,7 +19,7 @@ public class BtEncRSAFunction extends BtBulitInFunction {
     public BtEncRSAFunction(BulletRuntime runtime) {
         super("rsaE", runtime);
         args.put("content", null);
-        args.put("key", "");
+        args.put("key", BulletRuntime.BTNULL);
         args.put("padding", 1);
     }
 
@@ -32,28 +33,32 @@ public class BtEncRSAFunction extends BtBulitInFunction {
             throw new BulletException(String.format("Parameter type \"%s\" is not supported for RSA encryption", content.getClass().getSimpleName()));
         }
 
-        if (!(key instanceof String)) {
-            throw new BulletException("RSA publicKey must be a string");
+        if (!(key instanceof String) && !(key instanceof BtNull)) {
+            throw new BulletException("RSA publicKey must be a string or null");
         }
 
         if (!(padding instanceof BtNumber)) {
             throw new BulletException("Padding mode must be numeric");
         }
 
-        if (((String) key).length() == 0) {
-            RSA.Result result = Crypto4J.RSA.randomEncrypt(content.toString());
-            BtDictionary dictionary = new BtDictionary();
-            dictionary.add("result", result.result);
-            dictionary.add("publicKey", result.publicKey);
-            dictionary.add("privateKey", result.privateKey);
-            dictionary.add("padding", 1);
+        try {
+            if (key instanceof BtNull || ((String) key).length() == 0) {
+                RSA.Result result = Crypto4J.RSA.randomEncrypt(content.toString());
+                BtDictionary dictionary = new BtDictionary();
+                dictionary.add("result", result.result);
+                dictionary.add("publicKey", result.publicKey);
+                dictionary.add("privateKe", result.privateKey);
+                dictionary.add("padding", 1);
 
-            return dictionary;
-        } else {
-            RSA.EncryptConfig config = new RSA.EncryptConfig();
-            config.PADDING = getPadding(((BtNumber) padding).toInteger());
+                return dictionary;
+            } else {
+                RSA.EncryptConfig config = new RSA.EncryptConfig();
+                config.PADDING = getPadding(((BtNumber) padding).toInteger());
 
-            return Crypto4J.RSA.encrypt(content.toString(), key.toString(), config);
+                return Crypto4J.RSA.encrypt(content.toString(), key.toString(), config);
+            }
+        } catch (Exception e) {
+            throw new BulletException(e.getMessage());
         }
     }
 

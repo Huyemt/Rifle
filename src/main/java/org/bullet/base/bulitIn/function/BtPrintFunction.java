@@ -29,7 +29,7 @@ public class BtPrintFunction extends BtBulitInFunction {
         }
 
         if (runtime.logger == null)
-            System.out.println(builder);
+            System.out.print(builder);
         else
             runtime.logger.println(builder.toString());
 

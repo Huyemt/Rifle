@@ -24,7 +24,7 @@ public class BtSha512Function extends BtBulitInFunction {
         Object r = args.get("content");
 
         if (!(r instanceof String) && !(r instanceof BtList) && !(r instanceof BtNumber)) {
-            throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
+            throw new BulletException(String.format("Only strings, numbers and lists are supported for the function \"%s\"", funcName));
         }
 
         if (r instanceof BtList) {
@@ -39,7 +39,7 @@ public class BtSha512Function extends BtBulitInFunction {
 
         for (Object v : array.values()) {
             if (!(v instanceof String) && !(v instanceof BtList) && !(v instanceof BtNumber)) {
-                throw new BulletException(String.format("Only strings, numbers and arrays are supported for the function \"%s\"", funcName));
+                throw new BulletException(String.format("Only strings, numbers and lists are supported for the function \"%s\"", funcName));
             }
 
             if (v instanceof BtList) {

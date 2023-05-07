@@ -37,8 +37,16 @@ public class BtLenFunction extends BtBulitInFunction {
             return ((BtByteString) obj).size();
         }
 
-        if (obj instanceof BtByte) {
+        if (obj instanceof BtByte || obj instanceof Boolean) {
             return 1;
+        }
+
+        if (obj instanceof BtNull) {
+            return 0;
+        }
+
+        if (obj instanceof BtNumber) {
+            return obj;
         }
 
         throw new BulletException(String.format("Length of \"%s\" type is not supported", obj.getClass().getSimpleName()));

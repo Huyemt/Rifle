@@ -1,6 +1,7 @@
 package org.bullet.base.bulitIn.function.security;
 
 import org.bullet.base.components.BtBulitInFunction;
+import org.bullet.base.types.BtNull;
 import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
@@ -21,7 +22,7 @@ public class BtDecAESFunction extends BtBulitInFunction {
         args.put("key", null);
         args.put("mode", 1);
         args.put("padding", 1);
-        args.put("iv", "");
+        args.put("iv", BulletRuntime.BTNULL);
     }
 
     @Override
@@ -48,16 +49,17 @@ public class BtDecAESFunction extends BtBulitInFunction {
             throw new BulletException("Padding mode must be numeric");
         }
 
-        if (!(iv instanceof String)) {
-            throw new BulletException("Iv must be a string");
+        if (!(iv instanceof String) && !(iv instanceof BtNull)) {
+            throw new BulletException("Iv must be a string or null");
         }
 
-        String iiv = iv.toString();
-
-        if (iiv.length() == 0) {
-            return Crypto4J.AES.decrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()));
-        } else {
-            return Crypto4J.AES.decrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()), iiv);
+        try {
+            if (!(iv instanceof BtNull) && ((String) iv).length() > 0)
+                return Crypto4J.AES.decrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()), iv.toString());
+            else
+                return Crypto4J.AES.decrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()));
+        } catch (Exception e) {
+            throw new BulletException(e.getMessage());
         }
     }
 

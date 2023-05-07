@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 public class BtNumber extends BtType {
     public static final Pattern NUMBER_PARTTERN = Pattern.compile("^-?\\d+(\\.\\d+)?$");
+    public static final BtNumber ZERO = new BtNumber(0);
 
     private BigDecimal value;
     private BtNumber under;

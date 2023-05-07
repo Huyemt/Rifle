@@ -10,14 +10,8 @@ import java.security.NoSuchAlgorithmException;
 public class Digest {
     protected MessageDigest digest;
 
-    public Digest(String algorithm) {
-        MessageDigest digest1;
-        try {
-            digest1 = MessageDigest.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            digest1 = null;
-        }
-        digest = digest1;
+    public Digest(String algorithm) throws NoSuchAlgorithmException {
+        MessageDigest digest1 = MessageDigest.getInstance(algorithm);
     }
 
     public MessageDigest getMessageDigest() {

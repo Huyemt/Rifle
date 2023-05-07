@@ -960,6 +960,12 @@ public class Parser implements IParser {
                 node.value = new BtByteString(((VToken)lexer.currentToken).value, true);
                 lexer.next();
 
+                node.indexNode = this.Index();
+
+                if (node.indexNode != null && paramLevel > 0) {
+                    throw new ParsingException(node.position, "Syntax error");
+                }
+
                 return node;
             }
 

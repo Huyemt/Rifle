@@ -3,9 +3,8 @@ package org.bullet.base.bulitIn.function.security;
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
+import org.huyemt.crypto4j.Crypto4J;
 
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 
 /**
@@ -26,6 +25,6 @@ public class BtDecURLFunction extends BtBulitInFunction {
             throw new BulletException("Only support URL decoded string");
         }
 
-        return URLDecoder.decode(r.toString(), StandardCharsets.UTF_8);
+        return Crypto4J.URL.decode((String) r);
     }
 }

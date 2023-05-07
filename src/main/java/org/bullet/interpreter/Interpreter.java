@@ -93,6 +93,11 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goBinary(BinaryNode node) throws RuntimeException {
+        if (node.operator == BinaryNode.Operator.OR || node.operator == BinaryNode.Operator.AND) {
+            boolean l = translateBool(node.left);
+            return node.operator == BinaryNode.Operator.OR ? l || translateBool(node.right) : l && translateBool(node.right);
+        }
+
         Object right = node.right.accept(this);
         Object left = node.left.accept(this);
 
@@ -154,18 +159,7 @@ public class Interpreter extends Visitor {
         }
 
         if (left instanceof Boolean) {
-            if (right instanceof Boolean) {
-                switch (node.operator) {
-                    case OR:
-                        return ((Boolean) left) || ((Boolean) right);
-                    case AND:
-                        return ((Boolean) left) && ((Boolean) right);
-                    default:
-                        throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"and\" and \"or\"");
-                }
-            }
-
-            throw new RuntimeException(node.position, "Boolean values can only be operated with Boolean values");
+            throw new RuntimeException(node.position, "Boolean values cannot perform operations other than \"&&\" and \"||\"");
         }
 
         if (left instanceof String) {
@@ -235,7 +229,7 @@ public class Interpreter extends Visitor {
     @Override
     public Object goConstant(ConstantNode node) throws RuntimeException {
         if (node.value instanceof BtNumber || node.value instanceof Boolean || node.value instanceof String || node.value instanceof BtNull || node.value instanceof BtByteString || node.value instanceof BtByte) {
-            if (node.value instanceof String) {
+            if (node.value instanceof String || node.value instanceof BtByteString) {
                 return valueOfIndex(node.value, node.indexNode);
             }
 
@@ -277,17 +271,7 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goIf(IfNode node) throws RuntimeException {
-        Object condition = node.condition.accept(this);
-
-        boolean flag = false;
-
-        if (condition instanceof BtNumber) {
-            flag = ((BtNumber) condition).compare(new BtNumber()) != 0;
-        }
-
-        if (condition instanceof Boolean) {
-            flag = (Boolean) condition;
-        }
+        boolean flag = translateBool(node.condition);
 
         if (flag) {
             if (node.body != null) {
@@ -348,7 +332,7 @@ public class Interpreter extends Visitor {
             node.init.accept(this);
         }
 
-        boolean condition = (Boolean) node.condition.accept(this);
+        boolean condition = translateBool(node.condition);
         boolean flag = condition;
         Object result = null;
 
@@ -401,7 +385,7 @@ public class Interpreter extends Visitor {
     public Object goUntil(UntilNode node) throws RuntimeException {
         runtime.loopLevel++;
 
-        boolean purpose = (Boolean) node.purpose.accept(this);
+        boolean purpose = translateBool(node.purpose);
         boolean flag = purpose;
         Object result = null;
 
@@ -906,5 +890,20 @@ public class Interpreter extends Visitor {
         } catch (BulletException e) {
             throw new RuntimeException(node.position, e.getMessage());
         }
+    }
+
+    private boolean translateBool(Node node) throws RuntimeException {
+        Object v = node.accept(this);
+
+        if (v instanceof Boolean) return (boolean) v;
+        if (v instanceof String) return ((String) v).length() > 0;
+        if (v instanceof BtNumber) return ((BtNumber) v).compare(BtNumber.ZERO) != 0;
+        if (v instanceof BtDictionary) return ((BtDictionary) v).size() > 0;
+        if (v instanceof BtByte) return ((BtByte) v).getValue() != 0;
+        if (v instanceof BtByteString) return ((BtByteString) v).size() > 0;
+        if (v instanceof BtList) return ((BtList) v).size() > 0;
+        if (v instanceof BtNull) return false;
+
+        throw new RuntimeException(node.position, "Conversion of this type to Boolean is not supported");
     }
 }

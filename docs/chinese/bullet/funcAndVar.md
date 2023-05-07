@@ -59,7 +59,7 @@ println( isdict(aDict) )
 ```
 ***
 # 函数
-`Bullet`内置了许多实用的函数，您可以[点击此处]()进行查询
+`Bullet`内置了许多实用的函数，您可以[点击此处](builtFunc.md)进行查询
 
 _注意：Bullet目前不支持嵌套函数的写法。_
 

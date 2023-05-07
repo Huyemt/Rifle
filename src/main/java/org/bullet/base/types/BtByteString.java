@@ -2,6 +2,7 @@ package org.bullet.base.types;
 
 import org.bullet.exceptions.BulletException;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 /**
@@ -65,14 +66,14 @@ public class BtByteString extends BtType {
         return builder.toString();
     }
 
-    public final String translate() {
+    public final String translate(String encoding) throws UnsupportedEncodingException {
         byte[] r = new byte[bytes.size()];
 
         for (int i = 0; i < bytes.size(); i++) {
             r[i] = bytes.get(i).getValue();
         }
 
-        return new String(r);
+        return new String(r, encoding);
     }
 
     public byte[] toByteArray() {

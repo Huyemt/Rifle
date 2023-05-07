@@ -2,11 +2,17 @@ package org.huyemt.crypto4j.digest;
 
 import org.huyemt.crypto4j.Crypto4J;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * AES加密与解密
@@ -33,168 +39,163 @@ public class AES {
      * @param iv
      * @return String
      */
-    public String encrypt(byte[] content, Key key, Mode mode, Padding padding, Iv iv) {
-        try {
-            SecretKeySpec spec = new SecretKeySpec(key.getBytes(), "AES");
+    public String encrypt(byte[] content, Key key, Mode mode, Padding padding, Iv iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        SecretKeySpec spec = new SecretKeySpec(key.getBytes(), "AES");
 
-            if (mode == null) {
-                mode = Mode.ECB;
-            }
-
-            if (padding == null) {
-                padding = Padding.PKCS5_PADDING;
-            }
-
-            Cipher cipher = Cipher.getInstance("AES/" + mode + "/" + padding);
-
-            if (iv != null) {
-                cipher.init(Cipher.ENCRYPT_MODE, spec, new IvParameterSpec(iv.getBytes()));
-            } else {
-                cipher.init(Cipher.ENCRYPT_MODE, spec);
-            }
-
-            return Crypto4J.Base64.encrypt(cipher.doFinal(content));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        if (mode == null) {
+            mode = Mode.ECB;
         }
+
+        if (padding == null) {
+            padding = Padding.PKCS5_PADDING;
+        }
+
+        Cipher cipher = Cipher.getInstance("AES/" + mode + "/" + padding);
+
+        if (iv != null) {
+            cipher.init(Cipher.ENCRYPT_MODE, spec, new IvParameterSpec(iv.getBytes()));
+        } else {
+            cipher.init(Cipher.ENCRYPT_MODE, spec);
+        }
+
+        return Crypto4J.Base64.encrypt(cipher.doFinal(content));
     }
 
-    public String encrypt(byte[] content, Key key, Mode mode, Padding padding, byte[] iv) {
+    public String encrypt(byte[] content, Key key, Mode mode, Padding padding, byte[] iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, key, mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String encrypt(byte[] content, Key key, Mode mode, Padding padding, String iv) {
+    public String encrypt(byte[] content, Key key, Mode mode, Padding padding, String iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, key, mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String encrypt(byte[] content, Key key, Mode mode, Padding padding) {
+    public String encrypt(byte[] content, Key key, Mode mode, Padding padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, key, mode, padding, (Iv) null);
     }
 
-    public String encrypt(byte[] content, Key key, Mode mode) {
+    public String encrypt(byte[] content, Key key, Mode mode) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, key, mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(byte[] content, Key key) {
+    public String encrypt(byte[] content, Key key) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, key, Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(byte[] content, byte[] key, Mode mode, Padding padding, byte[] iv) {
+    public String encrypt(byte[] content, byte[] key, Mode mode, Padding padding, byte[] iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String encrypt(byte[] content, byte[] key, Mode mode, Padding padding, String iv) {
+    public String encrypt(byte[] content, byte[] key, Mode mode, Padding padding, String iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String encrypt(byte[] content, byte[] key, Mode mode, Padding padding) {
+    public String encrypt(byte[] content, byte[] key, Mode mode, Padding padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key), mode, padding, (Iv) null);
     }
 
-    public String encrypt(byte[] content, byte[] key, Mode mode) {
+    public String encrypt(byte[] content, byte[] key, Mode mode) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(byte[] content, byte[] key) {
+    public String encrypt(byte[] content, byte[] key) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
     ////////////////////////////////////////
 
-    public String encrypt(byte[] content, String key, Mode mode, Padding padding, Iv iv) {
+    public String encrypt(byte[] content, String key, Mode mode, Padding padding, Iv iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv);
     }
 
-    public String encrypt(byte[] content, String key, Mode mode, Padding padding, byte[] iv) {
+    public String encrypt(byte[] content, String key, Mode mode, Padding padding, byte[] iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String encrypt(byte[] content, String key, Mode mode, Padding padding, String iv) {
+    public String encrypt(byte[] content, String key, Mode mode, Padding padding, String iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String encrypt(byte[] content, String key, Mode mode, Padding padding) {
+    public String encrypt(byte[] content, String key, Mode mode, Padding padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, (Iv) null);
     }
 
-    public String encrypt(byte[] content, String key, Mode mode) {
+    public String encrypt(byte[] content, String key, Mode mode) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(byte[] content, String key) {
+    public String encrypt(byte[] content, String key) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
     /////////////////////////////////////////
 
-    public String encrypt(String content, Key key, Mode mode, Padding padding, Iv iv) {
+    public String encrypt(String content, Key key, Mode mode, Padding padding, Iv iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, iv);
     }
 
-    public String encrypt(String content, Key key, Mode mode, Padding padding, byte[] iv) {
+    public String encrypt(String content, Key key, Mode mode, Padding padding, byte[] iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String encrypt(String content, Key key, Mode mode, Padding padding, String iv) {
+    public String encrypt(String content, Key key, Mode mode, Padding padding, String iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String encrypt(String content, Key key, Mode mode, Padding padding) {
+    public String encrypt(String content, Key key, Mode mode, Padding padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, (Iv) null);
     }
 
-    public String encrypt(String content, Key key, Mode mode) {
+    public String encrypt(String content, Key key, Mode mode) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(String content, Key key) {
+    public String encrypt(String content, Key key) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), key, Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(String content, byte[] key, Mode mode, Padding padding, byte[] iv) {
+    public String encrypt(String content, byte[] key, Mode mode, Padding padding, byte[] iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String encrypt(String content, byte[] key, Mode mode, Padding padding, String iv) {
+    public String encrypt(String content, byte[] key, Mode mode, Padding padding, String iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String encrypt(String content, byte[] key, Mode mode, Padding padding) {
+    public String encrypt(String content, byte[] key, Mode mode, Padding padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, padding, (Iv) null);
     }
 
-    public String encrypt(String content, byte[] key, Mode mode) {
+    public String encrypt(String content, byte[] key, Mode mode) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(String content, byte[] key) {
+    public String encrypt(String content, byte[] key) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
     ////////////////////////////////////////
 
-    public String encrypt(String content, String key, Mode mode, Padding padding, Iv iv) {
+    public String encrypt(String content, String key, Mode mode, Padding padding, Iv iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv);
     }
 
-    public String encrypt(String content, String key, Mode mode, Padding padding, byte[] iv) {
+    public String encrypt(String content, String key, Mode mode, Padding padding, byte[] iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String encrypt(String content, String key, Mode mode, Padding padding, String iv) {
+    public String encrypt(String content, String key, Mode mode, Padding padding, String iv) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String encrypt(String content, String key, Mode mode, Padding padding) {
+    public String encrypt(String content, String key, Mode mode, Padding padding) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, (Iv) null);
     }
 
-    public String encrypt(String content, String key, Mode mode) {
+    public String encrypt(String content, String key, Mode mode) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String encrypt(String content, String key) {
+    public String encrypt(String content, String key) throws InvalidAlgorithmParameterException, NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
@@ -202,142 +203,137 @@ public class AES {
     ///////////////////////////////////////////////
     ///////////////////////////////////////////////
 
-    public String decrypt(byte[] content, Key key, Mode mode, Padding padding, Iv iv) {
-        try {
-            SecretKeySpec spec = new SecretKeySpec(key.getBytes(), "AES");
+    public String decrypt(byte[] content, Key key, Mode mode, Padding padding, Iv iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+        SecretKeySpec spec = new SecretKeySpec(key.getBytes(), "AES");
 
-            if (mode == null) {
-                mode = Mode.ECB;
-            }
-
-            if (padding == null) {
-                padding = Padding.PKCS5_PADDING;
-            }
-
-            Cipher cipher = Cipher.getInstance("AES/" + mode + "/" + padding);
-
-            if (iv != null) {
-                cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(iv.getBytes()));
-            } else {
-                cipher.init(Cipher.DECRYPT_MODE, spec);
-            }
-
-            return new String(cipher.doFinal(Crypto4J.Base64.decode(content)), StandardCharsets.UTF_8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        if (mode == null) {
+            mode = Mode.ECB;
         }
+
+        if (padding == null) {
+            padding = Padding.PKCS5_PADDING;
+        }
+
+        Cipher cipher = Cipher.getInstance("AES/" + mode + "/" + padding);
+
+        if (iv != null) {
+            cipher.init(Cipher.DECRYPT_MODE, spec, new IvParameterSpec(iv.getBytes()));
+        } else {
+            cipher.init(Cipher.DECRYPT_MODE, spec);
+        }
+
+        return new String(cipher.doFinal(Crypto4J.Base64.decode(content)), StandardCharsets.UTF_8);
     }
 
-    public String decrypt(byte[] content, Key key, Mode mode, Padding padding, byte[] iv) {
+    public String decrypt(byte[] content, Key key, Mode mode, Padding padding, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, key, mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String decrypt(byte[] content, Key key, Mode mode, Padding padding, String iv) {
+    public String decrypt(byte[] content, Key key, Mode mode, Padding padding, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, key, mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decrypt(byte[] content, Key key, Mode mode, Padding padding) {
+    public String decrypt(byte[] content, Key key, Mode mode, Padding padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, key, mode, padding, (Iv) null);
     }
 
-    public String decrypt(byte[] content, Key key, Mode mode) {
+    public String decrypt(byte[] content, Key key, Mode mode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, key, mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(byte[] content, Key key) {
+    public String decrypt(byte[] content, Key key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, key, Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(byte[] content, byte[] key, Mode mode, Padding padding, byte[] iv) {
+    public String decrypt(byte[] content, byte[] key, Mode mode, Padding padding, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String decrypt(byte[] content, byte[] key, Mode mode, Padding padding, String iv) {
+    public String decrypt(byte[] content, byte[] key, Mode mode, Padding padding, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decrypt(byte[] content, byte[] key, Mode mode, Padding padding) {
+    public String decrypt(byte[] content, byte[] key, Mode mode, Padding padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key), mode, padding, (Iv) null);
     }
 
-    public String decrypt(byte[] content, byte[] key, Mode mode) {
+    public String decrypt(byte[] content, byte[] key, Mode mode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(byte[] content, byte[] key) {
+    public String decrypt(byte[] content, byte[] key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
     ////////////////////////////////////////
 
-    public String decrypt(byte[] content, String key, Mode mode, Padding padding, Iv iv) {
+    public String decrypt(byte[] content, String key, Mode mode, Padding padding, Iv iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv);
     }
 
-    public String decrypt(byte[] content, String key, Mode mode, Padding padding, byte[] iv) {
+    public String decrypt(byte[] content, String key, Mode mode, Padding padding, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String decrypt(byte[] content, String key, Mode mode, Padding padding, String iv) {
+    public String decrypt(byte[] content, String key, Mode mode, Padding padding, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decrypt(byte[] content, String key, Mode mode, Padding padding) {
+    public String decrypt(byte[] content, String key, Mode mode, Padding padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, (Iv) null);
     }
 
-    public String decrypt(byte[] content, String key, Mode mode) {
+    public String decrypt(byte[] content, String key, Mode mode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(byte[] content, String key) {
+    public String decrypt(byte[] content, String key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content, new Key(key.getBytes(StandardCharsets.UTF_8)), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
     /////////////////////////////////////////
 
-    public String decrypt(String content, Key key, Mode mode, Padding padding, Iv iv) {
+    public String decrypt(String content, Key key, Mode mode, Padding padding, Iv iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, iv);
     }
 
-    public String decrypt(String content, Key key, Mode mode, Padding padding, byte[] iv) {
+    public String decrypt(String content, Key key, Mode mode, Padding padding, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String decrypt(String content, Key key, Mode mode, Padding padding, String iv) {
+    public String decrypt(String content, Key key, Mode mode, Padding padding, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decrypt(String content, Key key, Mode mode, Padding padding) {
+    public String decrypt(String content, Key key, Mode mode, Padding padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, padding, (Iv) null);
     }
 
-    public String decrypt(String content, Key key, Mode mode) {
+    public String decrypt(String content, Key key, Mode mode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), key, mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(String content, Key key) {
+    public String decrypt(String content, Key key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), key, Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(String content, byte[] key, Mode mode, Padding padding, byte[] iv) {
+    public String decrypt(String content, byte[] key, Mode mode, Padding padding, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String decrypt(String content, byte[] key, Mode mode, Padding padding, String iv) {
+    public String decrypt(String content, byte[] key, Mode mode, Padding padding, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decrypt(String content, byte[] key, Mode mode, Padding padding) {
+    public String decrypt(String content, byte[] key, Mode mode, Padding padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, padding, (Iv) null);
     }
 
-    public String decrypt(String content, byte[] key, Mode mode) {
+    public String decrypt(String content, byte[] key, Mode mode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(String content, byte[] key) {
+    public String decrypt(String content, byte[] key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 
@@ -355,27 +351,27 @@ public class AES {
      * @param iv
      * @return String
      */
-    public String decrypt(String content, String key, Mode mode, Padding padding, Iv iv) {
+    public String decrypt(String content, String key, Mode mode, Padding padding, Iv iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv);
     }
 
-    public String decrypt(String content, String key, Mode mode, Padding padding, byte[] iv) {
+    public String decrypt(String content, String key, Mode mode, Padding padding, byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv));
     }
 
-    public String decrypt(String content, String key, Mode mode, Padding padding, String iv) {
+    public String decrypt(String content, String key, Mode mode, Padding padding, String iv) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, iv == null ? null : new Iv(iv.getBytes(StandardCharsets.UTF_8)));
     }
 
-    public String decrypt(String content, String key, Mode mode, Padding padding) {
+    public String decrypt(String content, String key, Mode mode, Padding padding) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, padding, (Iv) null);
     }
 
-    public String decrypt(String content, String key, Mode mode) {
+    public String decrypt(String content, String key, Mode mode) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), mode, Padding.PKCS5_PADDING, (Iv) null);
     }
 
-    public String decrypt(String content, String key) {
+    public String decrypt(String content, String key) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), new Key(key.getBytes(StandardCharsets.UTF_8)), Mode.ECB, Padding.PKCS5_PADDING, (Iv) null);
     }
 

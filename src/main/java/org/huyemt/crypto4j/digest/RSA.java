@@ -36,15 +36,10 @@ public class RSA {
      * @param keysize
      * @return KeyPair
      */
-    public KeyPair initKey(int keysize) {
-        try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-            generator.initialize(keysize);
-            return generator.generateKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public KeyPair initKey(int keysize) throws NoSuchAlgorithmException {
+        KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+        generator.initialize(keysize);
+        return generator.generateKeyPair();
     }
 
     /**
@@ -55,32 +50,21 @@ public class RSA {
      * @param publicKey
      * @return PublicKey
      */
-    private PublicKey toPublicKey(byte[] publicKey) {
-        try {
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Crypto4J.Base64.decode(publicKey));
-            return KeyFactory.getInstance("RSA").generatePublic(keySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private PublicKey toPublicKey(byte[] publicKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Crypto4J.Base64.decode(publicKey));
+        return KeyFactory.getInstance("RSA").generatePublic(keySpec);
     }
 
     /**
      * 渲染密钥
-     *
-     * Render key
-     *
      * @param privateKey
-     * @return PrivateKey
+     * @return String
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeySpecException
      */
-    private PrivateKey toPrivateKey(byte[] privateKey) {
-        try {
-            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Crypto4J.Base64.decode(privateKey));
-            return KeyFactory.getInstance("RSA").generatePrivate(keySpec);
-        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
-        return null;
+    private PrivateKey toPrivateKey(byte[] privateKey) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Crypto4J.Base64.decode(privateKey));
+        return KeyFactory.getInstance("RSA").generatePrivate(keySpec);
     }
 
     /**
@@ -89,43 +73,44 @@ public class RSA {
      * @param publicKey
      * @param config
      * @return String
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws IOException
      */
-    public String encrypt(byte[] content, PublicKey publicKey, EncryptConfig config) {
-        try {
-            if (config == null) {
-                config = new EncryptConfig();
-            }
-
-            Cipher cipher = Cipher.getInstance("RSA/ECB/" + config.PADDING);
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-
-            int content_length = content.length;
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-            int offSet = 0;
-            int i = 0;
-            byte[] cache;
-
-            while (content_length - offSet > 0) {
-                if (content_length - offSet > config.MAX_ENCRYPT_BLOCK) {
-                    cache = cipher.doFinal(content, offSet, config.MAX_ENCRYPT_BLOCK);
-                } else {
-                    cache = cipher.doFinal(content, offSet, content_length - offSet);
-                }
-                stream.write(cache, 0, cache.length);
-                i++;
-                offSet = i * config.MAX_ENCRYPT_BLOCK;
-            }
-            stream.close();
-
-            return Crypto4J.Base64.encrypt(stream.toByteArray());
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | IOException e) {
-            e.printStackTrace();
+    public String encrypt(byte[] content, PublicKey publicKey, EncryptConfig config) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
+        if (config == null) {
+            config = new EncryptConfig();
         }
-        return null;
+
+        Cipher cipher = Cipher.getInstance("RSA/ECB/" + config.PADDING);
+        cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+
+        int content_length = content.length;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        int offSet = 0;
+        int i = 0;
+        byte[] cache;
+
+        while (content_length - offSet > 0) {
+            if (content_length - offSet > config.MAX_ENCRYPT_BLOCK) {
+                cache = cipher.doFinal(content, offSet, config.MAX_ENCRYPT_BLOCK);
+            } else {
+                cache = cipher.doFinal(content, offSet, content_length - offSet);
+            }
+            stream.write(cache, 0, cache.length);
+            i++;
+            offSet = i * config.MAX_ENCRYPT_BLOCK;
+        }
+        stream.close();
+
+        return Crypto4J.Base64.encrypt(stream.toByteArray());
     }
 
-    public String encrypt(byte[] content, PublicKey publicKey, Padding padding, int max_encrypt_block) {
+    public String encrypt(byte[] content, PublicKey publicKey, Padding padding, int max_encrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         EncryptConfig config = new EncryptConfig();
         config.PADDING = padding;
         config.MAX_ENCRYPT_BLOCK = max_encrypt_block;
@@ -133,35 +118,35 @@ public class RSA {
         return encrypt(content, publicKey, config);
     }
 
-    public String encrypt(byte[] content, PublicKey publicKey, Padding padding) {
+    public String encrypt(byte[] content, PublicKey publicKey, Padding padding) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         EncryptConfig config = new EncryptConfig();
         config.PADDING = padding;
 
         return encrypt(content, publicKey, config);
     }
 
-    public String encrypt(byte[] content, PublicKey publicKey, int max_encrypt_block) {
+    public String encrypt(byte[] content, PublicKey publicKey, int max_encrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         EncryptConfig config = new EncryptConfig();
         config.MAX_ENCRYPT_BLOCK = max_encrypt_block;
 
         return encrypt(content, publicKey, config);
     }
 
-    public String encrypt(byte[] content, PublicKey publicKey) {
+    public String encrypt(byte[] content, PublicKey publicKey) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return encrypt(content, publicKey, new EncryptConfig());
     }
 
-    public String encrypt(byte[] content, String publicKey) {
+    public String encrypt(byte[] content, String publicKey) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException, InvalidKeySpecException {
         return encrypt(content, toPublicKey(publicKey.getBytes(StandardCharsets.UTF_8)), new EncryptConfig());
     }
 
     ///////////////////////////////////
 
-    public String encrypt(String content, PublicKey publicKey, EncryptConfig config) {
+    public String encrypt(String content, PublicKey publicKey, EncryptConfig config) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), publicKey, config);
     }
 
-    public String encrypt(String content, PublicKey publicKey, Padding padding, int max_encrypt_block) {
+    public String encrypt(String content, PublicKey publicKey, Padding padding, int max_encrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         EncryptConfig config = new EncryptConfig();
         config.PADDING = padding;
         config.MAX_ENCRYPT_BLOCK = max_encrypt_block;
@@ -169,29 +154,29 @@ public class RSA {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), publicKey, config);
     }
 
-    public String encrypt(String content, PublicKey publicKey, Padding padding) {
+    public String encrypt(String content, PublicKey publicKey, Padding padding) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         EncryptConfig config = new EncryptConfig();
         config.PADDING = padding;
 
         return encrypt(content.getBytes(StandardCharsets.UTF_8), publicKey, config);
     }
 
-    public String encrypt(String content, PublicKey publicKey, int max_encrypt_block) {
+    public String encrypt(String content, PublicKey publicKey, int max_encrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         EncryptConfig config = new EncryptConfig();
         config.MAX_ENCRYPT_BLOCK = max_encrypt_block;
 
         return encrypt(content.getBytes(StandardCharsets.UTF_8), publicKey, config);
     }
 
-    public String encrypt(String content, PublicKey publicKey) {
+    public String encrypt(String content, PublicKey publicKey) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), publicKey, new EncryptConfig());
     }
 
-    public String encrypt(String content, String publicKey, EncryptConfig config) {
+    public String encrypt(String content, String publicKey, EncryptConfig config) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException, InvalidKeySpecException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), toPublicKey(publicKey.getBytes(StandardCharsets.UTF_8)), config);
     }
 
-    public String encrypt(String content, String publicKey) {
+    public String encrypt(String content, String publicKey) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException, InvalidKeySpecException {
         return encrypt(content.getBytes(StandardCharsets.UTF_8), toPublicKey(publicKey.getBytes(StandardCharsets.UTF_8)), new EncryptConfig());
     }
 
@@ -199,52 +184,50 @@ public class RSA {
 
     /**
      * RSA私钥解密
-     *
-     * RSA decrypts using the private key
-     *
      * @param content
      * @param privateKey
      * @param config
      * @return String
+     * @throws NoSuchPaddingException
+     * @throws NoSuchAlgorithmException
+     * @throws InvalidKeyException
+     * @throws IllegalBlockSizeException
+     * @throws BadPaddingException
+     * @throws IOException
      */
-    public String decrypt(byte[] content, PrivateKey privateKey, DecryptConfig config) {
-        try {
-            if (config == null) {
-                config = new DecryptConfig();
-            }
-
-            byte[] deBase64 = Crypto4J.Base64.decode(content);
-
-            Cipher cipher = Cipher.getInstance("RSA/ECB/" + config.PADDING);
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-
-            int deBase65_length = deBase64.length;
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-            int offSet = 0;
-            int i = 0;
-            byte[] cache;
-
-            while (deBase65_length - offSet > 0) {
-                if (deBase65_length - offSet > config.MAX_DECRYPT_BLOCK) {
-                    cache = cipher.doFinal(deBase64, offSet, config.MAX_DECRYPT_BLOCK);
-                } else {
-                    cache = cipher.doFinal(deBase64, offSet, deBase65_length - offSet);
-                }
-                stream.write(cache, 0, cache.length);
-                i++;
-                offSet = i * config.MAX_DECRYPT_BLOCK;
-            }
-            stream.close();
-
-            return Crypto4J.Utf8.toString(stream.toByteArray());
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException | IOException e) {
-            e.printStackTrace();
+    public String decrypt(byte[] content, PrivateKey privateKey, DecryptConfig config) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
+        if (config == null) {
+            config = new DecryptConfig();
         }
-        return null;
+
+        byte[] deBase64 = Crypto4J.Base64.decode(content);
+
+        Cipher cipher = Cipher.getInstance("RSA/ECB/" + config.PADDING);
+        cipher.init(Cipher.DECRYPT_MODE, privateKey);
+
+        int deBase65_length = deBase64.length;
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        int offSet = 0;
+        int i = 0;
+        byte[] cache;
+
+        while (deBase65_length - offSet > 0) {
+            if (deBase65_length - offSet > config.MAX_DECRYPT_BLOCK) {
+                cache = cipher.doFinal(deBase64, offSet, config.MAX_DECRYPT_BLOCK);
+            } else {
+                cache = cipher.doFinal(deBase64, offSet, deBase65_length - offSet);
+            }
+            stream.write(cache, 0, cache.length);
+            i++;
+            offSet = i * config.MAX_DECRYPT_BLOCK;
+        }
+        stream.close();
+
+        return Crypto4J.Utf8.toString(stream.toByteArray());
     }
 
-    public String decrypt(byte[] content, PrivateKey privateKey, Padding padding, int max_decrypt_block) {
+    public String decrypt(byte[] content, PrivateKey privateKey, Padding padding, int max_decrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         DecryptConfig config = new DecryptConfig();
         config.PADDING = padding;
         config.MAX_DECRYPT_BLOCK = max_decrypt_block;
@@ -252,35 +235,35 @@ public class RSA {
         return decrypt(content, privateKey, config);
     }
 
-    public String decrypt(byte[] content, PrivateKey privateKey, Padding padding) {
+    public String decrypt(byte[] content, PrivateKey privateKey, Padding padding) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         DecryptConfig config = new DecryptConfig();
         config.PADDING = padding;
 
         return decrypt(content, privateKey, config);
     }
 
-    public String decrypt(byte[] content, PrivateKey privateKey, int max_decrypt_block) {
+    public String decrypt(byte[] content, PrivateKey privateKey, int max_decrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         DecryptConfig config = new DecryptConfig();
         config.MAX_DECRYPT_BLOCK = max_decrypt_block;
 
         return decrypt(content, privateKey, config);
     }
 
-    public String decrypt(byte[] content, PrivateKey privateKey) {
+    public String decrypt(byte[] content, PrivateKey privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return decrypt(content, privateKey, new DecryptConfig());
     }
 
-    public String decrypt(byte[] content, String privateKey) {
+    public String decrypt(byte[] content, String privateKey) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
         return decrypt(content, toPrivateKey(privateKey.getBytes(StandardCharsets.UTF_8)), new DecryptConfig());
     }
 
     ///////////////////////////////////
 
-    public String decrypt(String content, PrivateKey privateKey, DecryptConfig config) {
+    public String decrypt(String content, PrivateKey privateKey, DecryptConfig config) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), privateKey, config);
     }
 
-    public String decrypt(String content, PrivateKey privateKey, Padding padding, int max_encrypt_block) {
+    public String decrypt(String content, PrivateKey privateKey, Padding padding, int max_encrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         DecryptConfig config = new DecryptConfig();
         config.PADDING = padding;
         config.MAX_DECRYPT_BLOCK = max_encrypt_block;
@@ -288,29 +271,29 @@ public class RSA {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), privateKey, config);
     }
 
-    public String decrypt(String content, PrivateKey privateKey, Padding padding) {
+    public String decrypt(String content, PrivateKey privateKey, Padding padding) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         DecryptConfig config = new DecryptConfig();
         config.PADDING = padding;
 
         return decrypt(content.getBytes(StandardCharsets.UTF_8), privateKey, config);
     }
 
-    public String decrypt(String content, PrivateKey privateKey, int max_decrypt_block) {
+    public String decrypt(String content, PrivateKey privateKey, int max_decrypt_block) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         DecryptConfig config = new DecryptConfig();
         config.MAX_DECRYPT_BLOCK = max_decrypt_block;
 
         return decrypt(content.getBytes(StandardCharsets.UTF_8), privateKey, config);
     }
 
-    public String decrypt(String content, PrivateKey privateKey) {
+    public String decrypt(String content, PrivateKey privateKey) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), privateKey, new DecryptConfig());
     }
 
-    public String decrypt(String content, String privateKey, DecryptConfig config) {
+    public String decrypt(String content, String privateKey, DecryptConfig config) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), toPrivateKey(privateKey.getBytes(StandardCharsets.UTF_8)), config);
     }
 
-    public String decrypt(String content, String privateKey) {
+    public String decrypt(String content, String privateKey) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
         return decrypt(content.getBytes(StandardCharsets.UTF_8), toPrivateKey(privateKey.getBytes(StandardCharsets.UTF_8)), new DecryptConfig());
     }
 
@@ -326,28 +309,28 @@ public class RSA {
      * @param config
      * @return Result
      */
-    public Result randomEncrypt(byte[] content, int keysize, EncryptConfig config) {
+    public Result randomEncrypt(byte[] content, int keysize, EncryptConfig config) throws NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, IOException, InvalidKeyException {
         KeyPair pair = initKey(keysize);
         return new Result(pair, encrypt(content, pair.getPublic(), config));
     }
 
-    public Result randomEncrypt(byte[] content, int keysize) {
+    public Result randomEncrypt(byte[] content, int keysize) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return randomEncrypt(content, keysize, new EncryptConfig());
     }
 
-    public Result randomEncrypt(byte[] content) {
+    public Result randomEncrypt(byte[] content) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return randomEncrypt(content, 2048, new EncryptConfig());
     }
 
-    public Result randomEncrypt(String content, int keysize, EncryptConfig config) {
+    public Result randomEncrypt(String content, int keysize, EncryptConfig config) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return randomEncrypt(content.getBytes(StandardCharsets.UTF_8), keysize, config);
     }
 
-    public Result randomEncrypt(String content, int keysize) {
+    public Result randomEncrypt(String content, int keysize) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return randomEncrypt(content.getBytes(StandardCharsets.UTF_8), keysize, new EncryptConfig());
     }
 
-    public Result randomEncrypt(String content) {
+    public Result randomEncrypt(String content) throws NoSuchPaddingException, IllegalBlockSizeException, NoSuchAlgorithmException, BadPaddingException, IOException, InvalidKeyException {
         return randomEncrypt(content.getBytes(StandardCharsets.UTF_8), 2048, new EncryptConfig());
     }
 

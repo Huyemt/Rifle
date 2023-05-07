@@ -27,7 +27,7 @@ public class BtDecRSAFunction extends BtBulitInFunction {
         Object key = args.get("key");
         Object padding = args.get("padding");
 
-        if ((!(content instanceof String || content instanceof BtNumber))) {
+        if ((!(content instanceof String))) {
             throw new BulletException(String.format("Parameter type \"%s\" is not supported for RSA decryption", content.getClass().getSimpleName()));
         }
 
@@ -39,10 +39,14 @@ public class BtDecRSAFunction extends BtBulitInFunction {
             throw new BulletException("Padding mode must be numeric");
         }
 
-        RSA.EncryptConfig config = new RSA.EncryptConfig();
+        RSA.DecryptConfig config = new RSA.DecryptConfig();
         config.PADDING = getPadding(((BtNumber) padding).toInteger());
 
-        return Crypto4J.RSA.encrypt(content.toString(), key.toString(), config);
+        try {
+            return Crypto4J.RSA.decrypt((String) content, (String) key, config);
+        } catch (Exception e) {
+            throw new BulletException(e.getMessage());
+        }
     }
 
     private RSA.Padding getPadding(int n) throws BulletException {

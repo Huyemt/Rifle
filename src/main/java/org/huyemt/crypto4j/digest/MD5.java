@@ -2,6 +2,7 @@ package org.huyemt.crypto4j.digest;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * MD5
@@ -10,7 +11,7 @@ import java.nio.charset.StandardCharsets;
  */
 
 public class MD5 extends Digest {
-    public MD5() {
+    public MD5() throws NoSuchAlgorithmException {
         super("MD5");
     }
 

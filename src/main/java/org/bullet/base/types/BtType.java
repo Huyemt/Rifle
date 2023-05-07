@@ -1,5 +1,7 @@
 package org.bullet.base.types;
 
+import org.bullet.interpreter.BulletRuntime;
+
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +12,7 @@ import java.util.Map;
 public class BtType {
     public static Object jTypeToBType(Object v) {
         if (v == null) {
-            return new BtNull();
+            return BulletRuntime.BTNULL;
         }
 
         if (v instanceof Number) {

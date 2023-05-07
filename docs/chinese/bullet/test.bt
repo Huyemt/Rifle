@@ -1,5 +1,0 @@
-data := "[{\"name\":\"Huyemt\",\"age\":{\"value\":17}}]"
-
-data = jsonD( data )
-
-println( data[0]["name"] )
