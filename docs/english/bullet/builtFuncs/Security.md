@@ -1,17 +1,17 @@
-# [返回教程](../README.md)
-# [返回内置函数目录](../builtFunc.md)
+# [Return to the tutorial](../README.md)
+# [Returns a list of built-in functions](../builtFunc.md)
 ***
 
 # md5
-## 介绍
-MD5加密
-## 参数
-| 参数      | 参数类型      | 描述             | 是否选填 |
-|:--------|:----------|:---------------|:-----|
-| content | 数字，列表，字符串 | 需要加密的`content` |      |
-## 返回值
-`字符串`或`列表`
-## 示例
+## Introduce
+MD5 encryption
+## Paramters
+| Name    | Type                 | Description                        | Optional |
+|:--------|:---------------------|:-----------------------------------|:---------|
+| content | Number, List, String | Content that needs to be encrypted |          |
+## Return value
+`String` or `List`
+## Example
 ```bullet
 // 0192023a7bbd73250516f069df18b500
 println( md5("admin123") )
@@ -30,15 +30,15 @@ println( md5( ["admin123", 10086, 10086.999, 139875734751985017895.1987298418209
 ```
 
 # sha1
-## 介绍
-SHA1加密
-## 参数
-| 参数      | 参数类型      | 描述             | 是否选填 |
-|:--------|:----------|:---------------|:-----|
-| content | 数字，列表，字符串 | 需要加密的`content` |      |
-## 返回值
-`字符串`或`列表`
-## 示例
+## Introduce
+SHA1 encryption
+## Paramters
+| Name    | Type                 | Description                        | Optional |
+|:--------|:---------------------|:-----------------------------------|:---------|
+| content | Number, List, String | Content that needs to be encrypted |          |
+## Return value
+`String` or `List`
+## Example
 ```bullet
 // f865b53623b121fd34ee5426c792e5c33af8c227
 println( sha1("admin123") )
@@ -57,15 +57,15 @@ println( sha1( ["admin123", 10086, 10086.999, 139875734751985017895.198729841820
 ```
 
 # sha256
-## 介绍
-SHA256加密
-## 参数
-| 参数      | 参数类型      | 描述             | 是否选填 |
-|:--------|:----------|:---------------|:-----|
-| content | 数字，列表，字符串 | 需要加密的`content` |      |
-## 返回值
-`字符串`或`列表`
-## 示例
+## Introduce
+SHA256 encryption
+## Paramters
+| Name    | Type                 | Description                        | Optional |
+|:--------|:---------------------|:-----------------------------------|:---------|
+| content | Number, List, String | Content that needs to be encrypted |          |
+## Return value
+`String` or `List`
+## Example
 ```bullet
 // 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
 println( sha256("admin123") )
@@ -84,15 +84,15 @@ println( sha256( ["admin123", 10086, 10086.999, 139875734751985017895.1987298418
 ```
 
 # sha512
-## 介绍
-SHA512加密
-## 参数
-| 参数      | 参数类型      | 描述             | 是否选填 |
-|:--------|:----------|:---------------|:-----|
-| content | 数字，列表，字符串 | 需要加密的`content` |      |
-## 返回值
-`字符串`或`列表`
-## 示例
+## Introduce
+SHA512 encryption
+## Paramters
+| Name    | Type                 | Description                        | Optional |
+|:--------|:---------------------|:-----------------------------------|:---------|
+| content | Number, List, String | Content that needs to be encrypted |          |
+## Return value
+`String` or `List`
+## Example
 ```bullet
 // 7fcf4ba391c48784edde599889d6e3f1e47a27db36ecc050cc92f259bfac38afad2c68a1ae804d77075e8fb722503f3eca2b2c1006ee6f6c7b7628cb45fffd1d
 println( sha512("admin123") )
@@ -111,37 +111,37 @@ println( sha512( ["admin123", 10086, 10086.999, 139875734751985017895.1987298418
 ```
 
 # aesE
-## 介绍
-AES加密
-## 参数
-| 参数      | 参数类型   | 描述      | 是否选填 |
-|:--------|:-------|:--------|:-----|
-| content | 字符串，数字 | 需要加密的内容 |      |
-| key     | 字符串    | 密钥      |      |
-| mode    | 数字     | 加密模式    | √    |
-| padding | 数字     | 填充模式    | √    |
-| iv      | 字符串    | 偏移量     | √    |
+## Introduce
+AES encryption
+## Paramters
+| Name    | Type           | Description                        | Optional |
+|:--------|:---------------|:-----------------------------------|:---------|
+| content | String, Number | Content that needs to be encrypted |          |
+| key     | String         | Key                                |          |
+| mode    | Number         | Encryption mode                    | √        |
+| padding | Number         | Padding mode                       | √        |
+| iv      | String         | Offset                             | √        |
 <br><br>
 `mode`
 
-| 值   | 意义  |
-|:----|:----|
-| 0   | CBC |
-| 1   | ECB |
-| 2   | CTR |
-| 3   | OFB |
-| 4   | CFB |
+| Value | Meaning |
+|:------|:--------|
+| 0     | CBC     |
+| 1     | ECB     |
+| 2     | CTR     |
+| 3     | OFB     |
+| 4     | CFB     |
 <br><br>
 `padding`
 
-| 值   | 意义         |
-|:----|:-----------|
-| 0   | NO_PADDING |
-| 1   | PKCS5      |
-| 2   | ISO10126   |
-## 返回值
-`字符串`
-## 示例
+| Value | Meaning    |
+|:------|:-----------|
+| 0     | NO_PADDING |
+| 1     | PKCS5      |
+| 2     | ISO10126   |
+## Return value
+`String`
+## Example
 ```bullet
 content := "Hello, World"
 key := "BestLangBullet77"
@@ -155,37 +155,37 @@ println( r )
 ```
 
 # aesD
-## 介绍
-AES解密
-## 参数
-| 参数      | 参数类型  | 描述      | 是否选填 |
-|:--------|:------|:--------|:-----|
-| content | 字符串   | 需要解密的内容 |      |
-| key     | 字符串   | 密钥      |      |
-| mode    | 数字    | 解密模式    | √    |
-| padding | 数字    | 填充模式    | √    |
-| iv      | 字符串   | 偏移量     | √    |
+## Introduce
+AES decryption
+## Paramters
+| Name    | Type   | Description             | Optional |
+|:--------|:-------|:------------------------|:---------|
+| content | String | Content to be decrypted |          |
+| key     | String | Private key             |          |
+| mode    | Number | Decryption mode         | √        |
+| padding | Number | Padding mode            | √        |
+| iv      | String | Offset                  | √        |
 <br><br>
 `mode`
 
-| 值   | 意义  |
-|:----|:----|
-| 0   | CBC |
-| 1   | ECB |
-| 2   | CTR |
-| 3   | OFB |
-| 4   | CFB |
+| Value | Meaning |
+|:------|:--------|
+| 0     | CBC     |
+| 1     | ECB     |
+| 2     | CTR     |
+| 3     | OFB     |
+| 4     | CFB     |
 <br><br>
 `padding`
 
-| 值   | 意义         |
-|:----|:-----------|
-| 0   | NO_PADDING |
-| 1   | PKCS5      |
-| 2   | ISO10126   |
-## 返回值
-`字符串`
-## 示例
+| Value | Meaning    |
+|:------|:-----------|
+| 0     | NO_PADDING |
+| 1     | PKCS5      |
+| 2     | ISO10126   |
+## Return value
+`String`
+## Example
 ```bullet
 content := "Lh85i/g7jKoiVNGco/zLeA=="
 key := "BestLangBullet77"
@@ -199,36 +199,36 @@ println( r )
 ```
 
 # rsaE
-## 介绍
-RSA加密
-## 参数
-| 参数      | 参数类型   | 描述      | 是否选填 |
-|:--------|:-------|:--------|:-----|
-| content | 字符串，数字 | 需要加密的内容 |      |
-| key     | 字符串    | 公钥      | √    |
-| padding | 数字     | 填充模式    | √    |
+## Introduce
+RSA encryption
+## Paramters
+| Name    | Type           | Description                        | Optional |
+|:--------|:---------------|:-----------------------------------|:---------|
+| content | String, Number | Content that needs to be encrypted |          |
+| key     | String         | Public key                         | √        |
+| padding | Number         | Padding mode                       | √        |
 <br><br>
 `padding`
 
-| 值   | 意义           |
-|:----|:-------------|
-| 0   | NO_PADDING   |
-| 1   | PKCS1        |
-| 2   | PKCS1_OAEP   |
-## 返回值
-`字符串`
+| Value | Meaning    |
+|:------|:-----------|
+| 0     | NO_PADDING |
+| 1     | PKCS1      |
+| 2     | PKCS1_OAEP |
+## Return value
+`String`
 <br>
-或
+or
 <br>
-`字典`
+`Dictionary`
 
-| 项名称        | 描述      | 值类型 |
-|:-----------|:--------|:----|
-| result     | 加密后的结果  | 字符串 |
-| publicKey  | 自动生成的公钥 | 字符串 |
-| privateKey | 自动生成的私钥 | 字符串 |
-| padding    | 填充模式    | 数字  |
-## 示例
+| Name       | Description  | Value类型 |
+|:-----------|:-------------|:--------|
+| result     | Result       | String  |
+| publicKey  | Public key   | String  |
+| privateKey | Private key  | String  |
+| padding    | Padding mode | Number  |
+## Example
 ```bullet
 content := "Hello, World"
 
@@ -249,25 +249,25 @@ println( rsaE( "Bullet", r['publicKey'] ) )
 ```
 
 # rsaD
-## 介绍
-RSA解密
-## 参数
-| 参数      | 参数类型 | 描述      | 是否选填 |
-|:--------|:-----|:--------|:-----|
-| content | 字符串  | 需要解密的内容 |      |
-| key     | 字符串  | 私钥      |      |
-| padding | 数字   | 填充模式    | √    |
+## Introduce
+RSA decryption
+## Paramters
+| Name    | Type   | Description             | Optional |
+|:--------|:-------|:------------------------|:---------|
+| content | String | Content to be decrypted |          |
+| key     | String | Private Key             |          |
+| padding | Number | Padding mode            | √        |
 <br><br>
 `padding`
 
-| 值   | 意义           |
-|:----|:-------------|
-| 0   | NO_PADDING   |
-| 1   | PKCS1        |
-| 2   | PKCS1_OAEP   |
-## 返回值
-`字符串`
-## 示例
+| Value | Meaning    |
+|:------|:-----------|
+| 0     | NO_PADDING |
+| 1     | PKCS1      |
+| 2     | PKCS1_OAEP |
+## Return value
+`String`
+## Example
 ```bullet
 privateKey := "MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCOspNsAo13vbJnKUP6OWikFMzXCGbaXpzX6ZESXVAR6x4O3AJZio4HEZYQ6+RgtqfYE0JV3Q5OgkyRWNIrJa4EP5x+RMtet3M1R37Kjgq9Tvb6G5eF4ZS7hMC4gKWmoyPEw6DFZoQi37c8gHKF5z6mK/4JmNgPhNFZrEz0beEISS5aCtxXVCnNqeR/+2UEjQnCYUJDYt2ls68l05pFlJXJ2J+j5TUX+ApW1oJc6R+gLebl1pyFZkKgaLVvCGai1lMkpyHedYuyUUr8v1v3ygGnLFmTFDcUJ2V6NjkVNI4exjQK0jcZHScwTSkUe6CFKvHKqFCLtRObVBpAit/4TQzNAgMBAAECggEAcXZQfhtxfPpatmg7YuTu7TiUv44wqgV81Lkk3uNPXVAD8HDDdYsT707ucbn/N19FCiwWHMvOKmK0mwVy51foi/xAZK4yvrdDZePZTxmuNGRrQOdbjdqWNpwR2SKBlIQ3VqbuWMdw3YHg4ryHUy1RxTNJpTvg4EYNaC32aoxL2BeYEVEfiHlKG5kRpUzThNcnp9WAZSd18cC2L/rOMCgctV7H/TWhT/Dq4yjFM18tFTA31exZl2dMdftbOkTrNyWxbWEGC7ir30Y+1WnQFOInt6jJqoPkYmJHpkaYyd5YFxNsbLct2x1wolt+wF9Ng2FNkRAk3Ne209OMIPw6G5z2yQKBgQDG4YahKQlkpRapU5KiDbH/fHn5b/nn92Ejfmej9WRE2vmBYDaWm9bQIwqSEvBzYhNFFNVK4VJA9XWXugBUSd9onJDzg3b1QwxwY5+w+oOwppkJWhOOYcAz73tSFumKtWcau2EJHmSvMMQOjOE5p12sMAHU4EMFEATk0CQt10f4twKBgQC3rjxdP1NBpD3Dk8eVCsm5sz6K3mU9hKFTXG38QLthUwisQDcy8EE0cbzJQIcAOmI29v+6xgpCqocwMMWB3/13grM7jBkgwadzcXmkLUzHT3h+USBDRKuMZ3m3MMy33gBBzMvOVnksyTXglxPsLHWxl8rlcd20hsIn7TOFGaA6mwKBgQCXmSmqh0FluoG/qLjJVm8sNJI1lSmFrIgbKiuOS2uXIOO3vsNdooToOw2/szgee8/8hJjhb0fnxDNS6LF/jqABefbz6G4xHl7I/OepXAwuB4/4FPV7Pv/nltEGDfkPhp+FPPgGn2hYMnAAN1snO3Cn5CBBSIFNxpw0XoR1fPibmQKBgQCEj+jc21D49NHmjobh19FShjxC+NJUHZ5YjUKLZSRWzxhZSFcOGjrU4KkBDeLglUJArO5PG5JYHr5GV0yTuNYzJE66URfpfhmdxW2mwVLCHWa2s1H3el3cjOlY/o0gvcWtt2H3Xo1Bd0288wvbzRJ7wzMZeJ4rJX6GVjhyfNYYtQKBgQCpy+0s7wTpR3qME6y4yiXyAB6hDTk6sxLj6ZrDaO4WGfQTbzwPfJ+tlx5BpQmXV7+Ccow+KP9BwvH96eXjT7TZJzb79WCFmpkQSKIhCjKwhHnm80POvLGaiY0Zuj9JpVZOzxCM5Iz+yFAaSCeBIGFXOZ13Mndta4aMAMxoy7u7Kw=="
 content1 := "LkJLtTv9IZ8R3Su6y3+N0cXUDjFUz8M9c5poskQuaEY2Ga6vblSMtV1QGeFTvwx3GOaVuSMGkg1nw/YrXHg0tlPMZa2UIMPv3PFlE/AAJLu/rtD122GmHxKWqXvpFBD9iPExf7VYFNwG+Z0zOvkvLEVFplPtKMD8+iIi2ubhKG6zL6tqExlItI1VlgcZ5LYJSvZrsQcDPumRcyC7A0KsEiqn/RGA1cD1Xf3IAWw+zzJb7aYnSWkVI0jIlVWI3hWTFn4d7LQkInSH50SelLIdZq88yKjrr9x5qJsZOXqLMw+OlyhVCeaI6/69Z35wfgTKwxPGpttnJIP3gxHcaiuFMg=="
