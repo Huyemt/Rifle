@@ -15,7 +15,7 @@ Your support for this project is the biggest financial support for Rifle develop
 * [Module Foundation](develop/Module.md)
 * [Custom Commands](develop/Command.md)
 * [Custom Tasks](develop/Task.md)
-* [Bullet Language]()
+* [Bullet Language](bullet/README.md)
 # Built-in Support Library
 * [JavaScript running](lib/JavaScript4J.md)
 * [Network request](https://github.com/Huyemt/Http4J/blob/main/docs/english/develop.md)
