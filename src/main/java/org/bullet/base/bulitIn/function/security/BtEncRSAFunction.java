@@ -47,7 +47,7 @@ public class BtEncRSAFunction extends BtBulitInFunction {
                 BtDictionary dictionary = new BtDictionary();
                 dictionary.add("result", result.result);
                 dictionary.add("publicKey", result.publicKey);
-                dictionary.add("privateKe", result.privateKey);
+                dictionary.add("privateKey", result.privateKey);
                 dictionary.add("padding", 1);
 
                 return dictionary;
