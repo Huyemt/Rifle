@@ -14,13 +14,28 @@ public class BtcProgram {
      * <br>
      * 每个 btc 文件都需要包含此信息头
      */
-    public BtcHeaders headers;
+    public final BtcHeaders headers;
 
-    public BtcProgram() {
+    /**
+     * 字节码
+     */
+    public int[] codes;
+
+    /**
+     * 函数集
+     */
+    public BtcFunction[] functions;
+
+    public BtcProgram(byte[] signature, byte[] version, byte[] birth) {
         headers = new BtcHeaders();
+
+        headers.SIGNATURE = signature;
+        headers.VERSION = version.length > 2 ? new byte[]{ version[0], version[1] } : version;
+        headers.BIRTH = birth;
+
     }
 
-    public void read(ByteBuffer buffer) {
+    public void parse(ByteBuffer buffer) {
 
     }
 }

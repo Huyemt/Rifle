@@ -18,7 +18,7 @@ public class BtcHeaders {
     /**
      * Bullet诞生时间
      */
-    public byte[] BIRTH_YEAR;
+    public byte[] BIRTH;
 
     public BtcHeaders() {
 
