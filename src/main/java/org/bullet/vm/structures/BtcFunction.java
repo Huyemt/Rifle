@@ -1,5 +1,8 @@
 package org.bullet.vm.structures;
 
+import org.bullet.exceptions.vm.VMException;
+import org.bullet.vm.utils.BtcReader;
+
 /**
  * @author Huyemt
  */
@@ -22,16 +25,19 @@ public class BtcFunction {
     public byte parameterCount;
 
     /**
-     * 字节码
+     * 通用结构
+     * <br>
+     * 包含：字节码，常量池，子函数集
      */
-    public int[] codes;
+    public BtcCommon common = new BtcCommon();
 
-    /**
-     * 函数集
-     */
-    public BtcFunction[] functions;
+    public BtcFunction(BtcReader reader) throws VMException {
+        startLine = reader.readInt();
+        endLine = reader.readInt();
+        parameterCount = reader.buffer.get();
 
-    public BtcFunction() {
-
+        // common.codes = reader.readCodes();
+        common.constants = reader.readConstants();
+        // common.functions = reader.readFunctions();
     }
 }

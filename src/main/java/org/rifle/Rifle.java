@@ -1,8 +1,5 @@
 package org.rifle;
 
-import org.bullet.Reporter;
-import org.bullet.exceptions.BulletException;
-import org.bullet.exceptions.common.ParsingException;
 import org.rifle.command.builtIn.*;
 import org.rifle.manager.CommandManager;
 import org.rifle.console.Console;
@@ -139,7 +136,7 @@ public class Rifle {
     }
 
     public final String getVersion() {
-        return "1.0.5";
+        return "1.0.6";
     }
 
     public final String getGithub() {

@@ -1,60 +1,101 @@
 package org.bullet.vm.utils;
 
+import org.bullet.HexUtil;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.vm.VMBtcCorruptedException;
 import org.bullet.exceptions.vm.VMException;
-import org.bullet.exceptions.vm.VMInCompatibleException;
-import org.bullet.vm.BtcVM;
-import org.bullet.vm.structures.BtcProgram;
+import org.bullet.vm.structures.BtcFunction;
+import org.bullet.vm.structures.BtcType;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
 /**
  * @author Huyemt
  */
 
 public class BtcReader {
-    public static BtcProgram loadBtc(File btcF) throws IOException, VMException {
-        try (FileInputStream inputStream = new FileInputStream(btcF)) {
-            ByteBuffer buffer = ByteBuffer.wrap(inputStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
-            inputStream.close();
 
-            byte[] signature = readBytes(buffer, 6);
-            byte[] version = readBytes(buffer, 2);
-            byte[] birth = readBytes(buffer, 4);
+    public final File file;
+    public final ByteBuffer buffer;
 
-            ReaderCode code = checkHeaders(signature, version, birth);
+    public BtcReader(File file) throws IOException {
+        this.file = file;
 
-            if (code == ReaderCode.SUCCESS) {
-                BtcProgram program = new BtcProgram(signature, version, birth);
-                program.parse(buffer);
-                return program;
-            }
-
-            if (code == ReaderCode.VERSION) {
-                throw new VMInCompatibleException(btcF, version);
-            }
-
-            throw new VMBtcCorruptedException(btcF);
+        try (FileInputStream inputStream = new FileInputStream(file)) {
+            buffer = ByteBuffer.wrap(inputStream.readAllBytes()).order(ByteOrder.LITTLE_ENDIAN);
         }
+
     }
 
-    public static ReaderCode checkHeaders(byte[] signature, byte[] version, byte[] birth) {
-        if (!Arrays.equals(signature, BtcVM.SIGNATURE) || !Arrays.equals(birth, BtcVM.BIRTH)) return ReaderCode.FAIL;
-        if (BtcVM.VERSION[0] < version[0] || BtcVM.VERSION[1] < version[1]) return ReaderCode.VERSION;
-
-        return ReaderCode.SUCCESS;
+    public int readCode() {
+        return readInt();
     }
 
-    private static byte[] readBytes(ByteBuffer buffer, int count) {
+    public int[] readCodes() {
+        int[] codes = new int[buffer.getInt()];
+
+        for (int i = 0; i < codes.length; i++) codes[i] = readInt();
+
+        return codes;
+    }
+
+    public Object readConstant() throws VMException {
+        switch (buffer.get()) {
+            case BtcType.NULL:
+                return null;
+            case BtcType.BOOLEAN:
+                return buffer.get() != 0;
+            case BtcType.NUMBER:
+                return new BtNumber(readShortString());
+            case BtcType.SHORT_STRING:
+            case BtcType.LONG_STRING:
+                return readShortString();
+        }
+
+        throw new VMBtcCorruptedException(file);
+    }
+
+    public Object[] readConstants() throws VMException {
+        Object[] r = new Object[readInt()];
+
+        for (int i = 0; i < r.length; i++) r[i] = readConstant();
+
+        return r;
+    }
+
+    public BtcFunction[] readFunctions() throws VMException {
+        BtcFunction[] btcFunctions = new BtcFunction[readInt()];
+
+        for (int i = 0; i < btcFunctions.length; i++) btcFunctions[i] = new BtcFunction(this);
+
+        return btcFunctions;
+    }
+
+    public String readShortString() {
+        return new String(readBytes(readInt()));
+    }
+
+    public String readLongString() {
+        return new String(readBytes((int) readLong()));
+    }
+
+    public byte[] readBytes(int count) {
         byte[] r = new byte[count];
 
         buffer.get(r);
 
         return r;
+    }
+
+    public int readInt() {
+        return HexUtil.toInt(readBytes(4));
+    }
+
+    public long readLong() {
+        return HexUtil.toLong(readBytes(8));
     }
 }
