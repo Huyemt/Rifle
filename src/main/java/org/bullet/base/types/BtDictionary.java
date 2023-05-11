@@ -1,5 +1,7 @@
 package org.bullet.base.types;
 
+import org.bullet.exceptions.BulletException;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.Set;
  */
 
 public class BtDictionary extends BtType {
-    public static BtDictionary parse(Map<?, ?> map) {
+    public static BtDictionary parse(Map<?, ?> map) throws BulletException {
         BtDictionary dictionary = new BtDictionary();
 
         for (Object key : map.keySet()) {
@@ -61,7 +63,7 @@ public class BtDictionary extends BtType {
         return builder.toString();
     }
 
-    public Object add(String key, Object value) {
+    public Object add(String key, Object value) throws BulletException {
         vector.put(key, value = jTypeToBType(value));
         return value;
     }

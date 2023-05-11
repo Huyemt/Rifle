@@ -120,39 +120,45 @@ public class Interpreter extends Visitor {
         }
 
         if (left instanceof BtNumber) {
-            switch (node.operator) {
-                case ADD:
-                    if (right instanceof BtNumber) return ((BtNumber) left).add((BtNumber) right);
+            try {
+                switch (node.operator) {
+                    case ADD:
+                        if (right instanceof BtNumber) return ((BtNumber) left).add((BtNumber) right);
 
-                    throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case SUB:
-                    if (right instanceof BtNumber) return ((BtNumber) left).subtract((BtNumber) right);
+                        throw new RuntimeException(node.position, String.format("Addition of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case SUB:
+                        if (right instanceof BtNumber) return ((BtNumber) left).subtract((BtNumber) right);
 
-                    throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case MUL:
-                    if (right instanceof BtNumber) return ((BtNumber) left).multiply((BtNumber) right);
+                        throw new RuntimeException(node.position, String.format("Subtraction of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case MUL:
+                        if (right instanceof BtNumber) return ((BtNumber) left).multiply((BtNumber) right);
 
-                    throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case DIV:
-                    if (right instanceof BtNumber) {
-                        if (((BtNumber) right).toInteger() == 0) throw new RuntimeException(node.position, "Cannot divide by zero");
+                        throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case DIV:
+                        if (right instanceof BtNumber) {
+                            if (((BtNumber) right).toInteger() == 0)
+                                throw new RuntimeException(node.position, "Cannot divide by zero");
 
-                        return ((BtNumber) left).divide((BtNumber) right);
-                    }
+                            return ((BtNumber) left).divide((BtNumber) right);
+                        }
 
-                    throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case MOD:
-                    if (right instanceof BtNumber) {
-                        if (((BtNumber) right).toInteger() == 0) throw new RuntimeException(node.position, "Cannot divide by zero");
+                        throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case MOD:
+                        if (right instanceof BtNumber) {
+                            if (((BtNumber) right).toInteger() == 0)
+                                throw new RuntimeException(node.position, "Cannot divide by zero");
 
-                        return ((BtNumber) left).mod((BtNumber) right);
-                    }
+                            return ((BtNumber) left).mod((BtNumber) right);
+                        }
 
-                    throw new RuntimeException(node.position, String.format("Remainder of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
-                case POW:
-                    if (right instanceof BtNumber) return ((BtNumber) left).pow(((BtNumber) right).toInteger());
+                        throw new RuntimeException(node.position, String.format("Remainder of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                    case POW:
+                        if (right instanceof BtNumber) return ((BtNumber) left).pow(((BtNumber) right).toInteger());
 
-                    throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                        throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
+                }
+            } catch (BulletException e) {
+                throw new RuntimeException(node.position, e.getMessage());
             }
 
             throw new RuntimeException(node.position, "Unsupported binary operator");
@@ -211,7 +217,11 @@ public class Interpreter extends Visitor {
                 case PLUS:
                     return left;
                 case MINUS:
-                    return ((BtNumber) left).negate();
+                    try {
+                        return ((BtNumber) left).negate();
+                    } catch (BulletException e) {
+                        throw new RuntimeException(node.position, e.getMessage());
+                    }
                 default:
                     throw new RuntimeException(node.position, "Unsupported unary operator");
             }
@@ -522,36 +532,44 @@ public class Interpreter extends Visitor {
 
     @Override
     public Object goList(ListNode node) throws RuntimeException {
-        BtList list = new BtList();
+        try {
+            BtList list = new BtList();
 
-        for (int i = 0; i < node.values.size(); i++) {
-            list.add(node.values.get(i).accept(this));
+            for (int i = 0; i < node.values.size(); i++) {
+                list.add(node.values.get(i).accept(this));
+            }
+
+            return valueOfIndex(list, node.indexNode);
+        } catch (Exception e) {
+            throw new RuntimeException(node.position, e.getMessage());
         }
-
-        return valueOfIndex(list, node.indexNode);
     }
 
     @Override
     public Object goDictionary(DictionaryNode node) throws RuntimeException {
-        BtDictionary dictionary = new BtDictionary();
+        try {
+            BtDictionary dictionary = new BtDictionary();
 
-        if (node.vector.size() > 0) {
-            Object key;
-            Object value;
+            if (node.vector.size() > 0) {
+                Object key;
+                Object value;
 
-            for (Map.Entry<Node, Node> entry : node.vector.entrySet()) {
-                key = entry.getKey().accept(this);
-                value = entry.getValue().accept(this);
+                for (Map.Entry<Node, Node> entry : node.vector.entrySet()) {
+                    key = entry.getKey().accept(this);
+                    value = entry.getValue().accept(this);
 
-                if (key instanceof String) {
-                    dictionary.add(key.toString(), value);
-                } else {
-                    throw new RuntimeException(entry.getValue().position, "It is not a string");
+                    if (key instanceof String) {
+                        dictionary.add(key.toString(), value);
+                    } else {
+                        throw new RuntimeException(entry.getValue().position, "It is not a string");
+                    }
                 }
             }
-        }
 
-        return valueOfIndex(dictionary, node.indexNode);
+            return valueOfIndex(dictionary, node.indexNode);
+        } catch (Exception e) {
+            throw new RuntimeException(node.position, e.getMessage());
+        }
     }
 
     private Object valueOfIndex(Object v, IndexNode node) throws RuntimeException {
@@ -659,15 +677,21 @@ public class Interpreter extends Visitor {
                         }
                     }
 
-                    BtList btList = new BtList();
+                    try {
 
-                    for (int n = start; n < end; n++) {
-                        btList.add(btList1.get(n));
+                        BtList btList = new BtList();
+
+                        for (int n = start; n < end; n++) {
+                            btList.add(btList1.get(n));
+                        }
+
+
+                        if (flag)
+                            btList.reverse();
+                        v = btList;
+                    } catch (BulletException e) {
+                        throw new RuntimeException(node.position, e.getMessage());
                     }
-
-                    if (flag)
-                        btList.reverse();
-                    v = btList;
                 }
             } else {
                 if (!(v instanceof BtList || v instanceof String || v instanceof BtDictionary || v instanceof BtByteString)) {

@@ -4,8 +4,10 @@ import org.bullet.HexUtil;
 import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.vm.VMBtcCorruptedException;
 import org.bullet.exceptions.vm.VMException;
-import org.bullet.vm.structures.BtcFunction;
-import org.bullet.vm.structures.BtcType;
+import org.bullet.interpreter.BulletRuntime;
+import org.bullet.vm.structure.components.BtcFunction;
+import org.bullet.vm.structure.BtcType;
+import org.bullet.vm.structure.components.BtcVariable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,16 +46,22 @@ public class BtcReader {
     }
 
     public Object readConstant() throws VMException {
-        switch (buffer.get()) {
-            case BtcType.NULL:
-                return null;
-            case BtcType.BOOLEAN:
-                return buffer.get() != 0;
-            case BtcType.NUMBER:
-                return new BtNumber(readShortString());
-            case BtcType.SHORT_STRING:
-            case BtcType.LONG_STRING:
-                return readShortString();
+        byte type = buffer.get();
+
+        try {
+            switch (type) {
+                case BtcType.NULL:
+                    return BulletRuntime.BTNULL;
+                case BtcType.BOOLEAN:
+                    return buffer.get() != 0;
+                case BtcType.NUMBER:
+                    return new BtNumber(readString(BtcType.SHORT_STRING));
+                case BtcType.SHORT_STRING:
+                case BtcType.LONG_STRING:
+                    return readString(type);
+            }
+        } catch (Exception e) {
+            throw new VMException(e.getMessage());
         }
 
         throw new VMBtcCorruptedException(file);
@@ -67,6 +75,14 @@ public class BtcReader {
         return r;
     }
 
+    public BtcVariable[] readVariables() throws VMException {
+        BtcVariable[] r = new BtcVariable[readInt()];
+
+        for (int i = 0; i < r.length; i++) r[i] = new BtcVariable(this);
+
+        return r;
+    }
+
     public BtcFunction[] readFunctions() throws VMException {
         BtcFunction[] btcFunctions = new BtcFunction[readInt()];
 
@@ -75,12 +91,19 @@ public class BtcReader {
         return btcFunctions;
     }
 
-    public String readShortString() {
-        return new String(readBytes(readInt()));
-    }
+    public String readString(int type) throws VMException {
+        int size;
 
-    public String readLongString() {
-        return new String(readBytes((int) readLong()));
+        if (type == BtcType.LONG_STRING)
+            size = (int) readLong();
+        else if (type == BtcType.SHORT_STRING)
+            size = readInt();
+        else
+            throw new VMBtcCorruptedException(file);
+
+        if (size == 0) return "";
+
+        return new String(readBytes(size));
     }
 
     public byte[] readBytes(int count) {

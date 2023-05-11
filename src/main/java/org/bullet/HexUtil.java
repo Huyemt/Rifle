@@ -40,7 +40,7 @@ public class HexUtil {
         return result;
     }
 
-    public byte[] toBytes(long num) {
+    public static byte[] toBytes(long num) {
         byte[] b = new byte[8];
 
         for (int i = 0; i < 8; i++) b[i] = (byte) (num >>> (56 - i * 8));

@@ -1,5 +1,7 @@
 package org.bullet.base.types;
 
+import org.bullet.exceptions.BulletException;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,7 +11,7 @@ import java.util.Collections;
  */
 
 public class BtList extends BtType {
-    public static BtList parse(Object[] obj) {
+    public static BtList parse(Object[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (Object v : obj) {
@@ -19,7 +21,7 @@ public class BtList extends BtType {
         return list;
     }
 
-    public static BtList parse(int[] obj) {
+    public static BtList parse(int[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (int v : obj) {
@@ -29,7 +31,7 @@ public class BtList extends BtType {
         return list;
     }
 
-    public static BtList parse(float[] obj) {
+    public static BtList parse(float[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (float v : obj) {
@@ -39,7 +41,7 @@ public class BtList extends BtType {
         return list;
     }
 
-    public static BtList parse(double[] obj) {
+    public static BtList parse(double[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (double v : obj) {
@@ -49,7 +51,7 @@ public class BtList extends BtType {
         return list;
     }
 
-    public static BtList parse(byte[] obj) {
+    public static BtList parse(byte[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (byte v : obj) {
@@ -59,7 +61,7 @@ public class BtList extends BtType {
         return list;
     }
 
-    public static BtList parse(short[] obj) {
+    public static BtList parse(short[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (short v : obj) {
@@ -69,7 +71,7 @@ public class BtList extends BtType {
         return list;
     }
 
-    public static BtList parse(char[] obj) {
+    public static BtList parse(char[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (char v : obj) {
@@ -79,7 +81,7 @@ public class BtList extends BtType {
         return list;
     }
 
-    public static BtList parse(boolean[] obj) {
+    public static BtList parse(boolean[] obj) throws BulletException {
         BtList list = new BtList();
 
         for (boolean v : obj) {
@@ -126,12 +128,12 @@ public class BtList extends BtType {
         return builder.toString();
     }
 
-    public Object add(Object value) {
+    public Object add(Object value) throws BulletException {
         vector.add(value = jTypeToBType(value));
         return value;
     }
 
-    public Object set(int index, Object value) {
+    public Object set(int index, Object value) throws BulletException {
         return vector.set(index, jTypeToBType(value));
     }
 

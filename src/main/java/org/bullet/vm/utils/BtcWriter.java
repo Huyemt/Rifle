@@ -1,56 +1,114 @@
 package org.bullet.vm.utils;
 
 import org.bullet.HexUtil;
+import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.vm.VMException;
 import org.bullet.vm.BtcVM;
-import org.bullet.vm.structures.BtcProgram;
-import org.bullet.vm.structures.BtcType;
+import org.bullet.vm.structure.BtcType;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 /**
  * @author Huyemt
  */
 
 public class BtcWriter {
-    public static File generateFile(File file, BtcProgram program) throws IOException, VMException {
+    private final File file;
+    private int constantCount;
+    private final ArrayList<Byte> constants;
+
+    public BtcWriter(File file) throws IOException, VMException {
         if (!file.getName().matches("^.+\\.btc$")) throw new VMException(String.format("The file with path \"%s\" is not a Bullet bytecode file", file.getAbsolutePath()));
 
         if (file.exists() && file.isDirectory()) throw new VMException(String.format("The path \"%s\" is a folder", file.getAbsolutePath()));
         if (!file.exists()) file.delete();
         file.createNewFile();
 
-        FileOutputStream outputStream = new FileOutputStream(file);
+        this.file = file;
+        constantCount = 0;
+        constants = new ArrayList<>();
+    }
 
+    public void save(short[] version) throws IOException {
+        FileOutputStream outputStream = new FileOutputStream(file);
         outputStream.write(BtcVM.signature);
-        outputStream.write(HexUtil.toBytes(program.version));
+        outputStream.write(HexUtil.toBytes(version));
         outputStream.write(BtcVM.birth);
 
         // codes
         outputStream.write(HexUtil.toBytes(0));
 
         // constants
-        outputStream.write(HexUtil.toBytes(2));
+        outputStream.write(HexUtil.toBytes(constantCount));
 
-        outputStream.write(BtcType.NUMBER);
-        String n = "114514.11111";
-        outputStream.write(HexUtil.toBytes(n.length()));
-        outputStream.write(n.getBytes(StandardCharsets.UTF_8));
+        if (constantCount > 0) {
+            for (byte b : constants) outputStream.write(b);
+        }
 
-        outputStream.write(BtcType.SHORT_STRING);
-        n = "Hello, world";
-        outputStream.write(HexUtil.toBytes(n.length()));
-        outputStream.write(n.getBytes(StandardCharsets.UTF_8));
+        // variables
+        outputStream.write(HexUtil.toBytes(0));
 
         // functions
         outputStream.write(HexUtil.toBytes(0));
 
         outputStream.flush();
         outputStream.close();
+    }
 
-        return file;
+    public <T> BtcWriter putConstant(T obj) throws VMException {
+        if (obj == null) {
+            constants.add((byte) BtcType.NULL);
+            constantCount++;
+        } else if (!(obj instanceof String || obj instanceof BtNumber))
+            throw new VMException("Unsupport type");
+
+        if (obj instanceof String) putString((String) obj);
+        if (obj instanceof BtNumber) putNumber((BtNumber) obj);
+
+        return this;
+    }
+
+    private BtcWriter putString(String str) {
+
+        if (str == null)
+            constants.add((byte) BtcType.NULL);
+        else {
+            byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+            int type = bytes.length == 0 || str.length() <= 65535 ? BtcType.SHORT_STRING : BtcType.LONG_STRING;
+
+            constants.add((byte) type);
+            intoList(type == BtcType.LONG_STRING ? HexUtil.toBytes((long) bytes.length) : HexUtil.toBytes(bytes.length));
+            intoList(bytes);
+        }
+
+        constantCount++;
+
+        return this;
+    }
+
+    private BtcWriter putNumber(BtNumber number) {
+
+        if (number == null)
+            constants.add((byte) BtcType.NULL);
+        else {
+            String str = number.toString();
+            byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
+
+            constants.add((byte) BtcType.NUMBER);
+            intoList(HexUtil.toBytes(bytes.length));
+            intoList(bytes);
+        }
+
+        constantCount++;
+
+        return this;
+    }
+
+    private void intoList(byte[] bytes) {
+        for (byte b : bytes) constants.add(b);
     }
 }

@@ -1,5 +1,7 @@
 package org.bullet.base.types;
 
+import org.bullet.exceptions.BulletException;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.regex.Pattern;
@@ -25,33 +27,33 @@ public class BtNumber extends BtType {
         value = new BigDecimal(v);
     }
 
-    public BtNumber(BigDecimal molecule) {
+    public BtNumber(BigDecimal molecule) throws BulletException {
         this(molecule.toPlainString());
     }
 
-    public BtNumber(String factor) {
-        if (NUMBER_PARTTERN.matcher(factor).matches())
-            value = new BigDecimal(format(factor));
-        else value = null;
+    public BtNumber(String factor) throws BulletException {
+        if (!NUMBER_PARTTERN.matcher(factor).matches())
+            throw new BulletException(String.format("Illegal number \"%s\"", factor));
 
+        value = new BigDecimal(format(factor));
         under = null;
     }
 
-    public BtNumber add(BtNumber number) {
+    public BtNumber add(BtNumber number) throws BulletException {
         if (value == null) return number;
         if (number == null) return this;
 
         return new BtNumber(exact().add(number.exact()));
     }
 
-    public BtNumber subtract(BtNumber number) {
+    public BtNumber subtract(BtNumber number) throws BulletException {
         if (value == null) return number.negate();
         if (number == null) return this;
 
         return new BtNumber(exact().subtract(number.exact()));
     }
 
-    public BtNumber multiply(BtNumber number) {
+    public BtNumber multiply(BtNumber number) throws BulletException {
         if (value == null || number == null) return new BtNumber(0);
 
         String a = toString();
@@ -86,15 +88,15 @@ public class BtNumber extends BtType {
         return number1;
     }
 
-    public BtNumber mod(BtNumber number) {
+    public BtNumber mod(BtNumber number) throws BulletException {
         return new BtNumber(exact().remainder(number.exact()));
     }
 
-    public BtNumber pow(int n) {
+    public BtNumber pow(int n) throws BulletException {
         return new BtNumber(exact().pow(n));
     }
 
-    public BtNumber negate() {
+    public BtNumber negate() throws BulletException {
         return new BtNumber(exact().negate());
     }
 

@@ -1,6 +1,8 @@
-package org.bullet.vm.structures;
+package org.bullet.vm.structure.components;
 
 import org.bullet.exceptions.vm.VMException;
+import org.bullet.vm.structure.BtcCommon;
+import org.bullet.vm.structure.BtcType;
 import org.bullet.vm.utils.BtcReader;
 
 /**
@@ -8,6 +10,8 @@ import org.bullet.vm.utils.BtcReader;
  */
 
 public class BtcFunction {
+
+    public String name;
 
     /**
      * 起始行
@@ -32,12 +36,14 @@ public class BtcFunction {
     public BtcCommon common = new BtcCommon();
 
     public BtcFunction(BtcReader reader) throws VMException {
+        name = reader.readString(BtcType.SHORT_STRING);
         startLine = reader.readInt();
         endLine = reader.readInt();
         parameterCount = reader.buffer.get();
 
-        // common.codes = reader.readCodes();
+        common.codes = reader.readCodes();
         common.constants = reader.readConstants();
-        // common.functions = reader.readFunctions();
+        common.variables = reader.readVariables();
+        common.functions = reader.readFunctions();
     }
 }

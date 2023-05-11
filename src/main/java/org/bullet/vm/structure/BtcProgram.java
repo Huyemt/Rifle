@@ -1,4 +1,4 @@
-package org.bullet.vm.structures;
+package org.bullet.vm.structure;
 
 import org.bullet.HexUtil;
 import org.bullet.exceptions.vm.VMBtcCorruptedException;
@@ -28,6 +28,7 @@ public class BtcProgram {
             BtcProgram program = new BtcProgram(version);
             program.common.codes = reader.readCodes();
             program.common.constants = reader.readConstants();
+            program.common.variables = reader.readVariables();
             program.common.functions = reader.readFunctions();
             return program;
         }
@@ -55,5 +56,10 @@ public class BtcProgram {
 
     public BtcProgram(short[] version) {
         this.version = version.length > 2 ? new short[]{ version[0], version[1] } : version;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 }

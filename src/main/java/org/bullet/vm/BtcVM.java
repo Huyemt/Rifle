@@ -1,10 +1,8 @@
 package org.bullet.vm;
 
-import org.bullet.HexUtil;
 import org.bullet.base.types.BtNumber;
-import org.bullet.exceptions.vm.VMException;
-import org.bullet.vm.structures.BtcProgram;
-import org.bullet.vm.structures.BtcType;
+import org.bullet.exceptions.BulletException;
+import org.bullet.vm.structure.BtcProgram;
 import org.bullet.vm.utils.BtcWriter;
 import org.bullet.vm.utils.ReaderCode;
 
@@ -50,10 +48,29 @@ public class BtcVM {
 
     }
 
-    public static void main(String[] args) throws IOException, VMException {
+    public static void main(String[] args) throws IOException, BulletException {
         File file = new File("E:\\AMyCode\\Projects\\Java\\Rifle\\Rifle\\a.btc");
         BtcProgram program;
-        program = BtcProgram.load(BtcWriter.generateFile(file, new BtcProgram(version)));
-        System.out.println(((BtNumber) program.common.constants[0]).add(new BtNumber("114514")));
+        BtcWriter writer = new BtcWriter(file);
+
+        writer.putConstant("你好");
+        writer.putConstant(new BtNumber("2023.512"));
+        writer.putConstant(null);
+        writer.save(new short[]{ 0, 1 });
+
+        program = BtcProgram.load(file);
+
+        System.out.println("Bytecode:\n");
+
+        System.out.println("\nConstant table:");
+        Object object;
+        for (int i = 0; i < program.common.constants.length; i++) {
+            object = program.common.constants[i];
+            System.out.printf("\t[%d] %s -> %s%n", i, object.getClass().getSimpleName(), object);
+        }
+
+        System.out.println("\nVariable table:\n");
+
+        System.out.println("\nFunctions:\n");
     }
 }
