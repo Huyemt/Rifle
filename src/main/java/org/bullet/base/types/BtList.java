@@ -129,12 +129,12 @@ public class BtList extends BtType {
     }
 
     public Object add(Object value) throws BulletException {
-        vector.add(value = jTypeToBType(value));
+        vector.add(value = toBType(value));
         return value;
     }
 
     public Object set(int index, Object value) throws BulletException {
-        return vector.set(index, jTypeToBType(value));
+        return vector.set(index, toBType(value));
     }
 
     public void addAll(BtList list) {
@@ -169,7 +169,7 @@ public class BtList extends BtType {
         ArrayList<Object> list = new ArrayList<>();
 
         for (Object v : array.vector) {
-            list.add(bTypeToJType(v));
+            list.add(toJType(v));
         }
 
         return list.toArray(Object[]::new);

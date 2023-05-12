@@ -3,6 +3,7 @@ package org.bullet.base.bulitIn.function.type;
 import org.bullet.base.components.BtBulitInFunction;
 import org.bullet.exceptions.BulletException;
 import org.bullet.interpreter.BulletRuntime;
+import org.bullet.vm.structure.BtcType;
 
 import java.util.LinkedHashMap;
 
@@ -18,6 +19,6 @@ public class BtTypeofFunction extends BtBulitInFunction {
 
     @Override
     public Object eval(LinkedHashMap<String, Object> args) throws BulletException {
-        return args.get("obj").getClass().getSimpleName();
+        return BtcType.typeOf(args.get("obj"));
     }
 }

@@ -64,7 +64,7 @@ public class BtDictionary extends BtType {
     }
 
     public Object add(String key, Object value) throws BulletException {
-        vector.put(key, value = jTypeToBType(value));
+        vector.put(key, value = toBType(value));
         return value;
     }
 
@@ -104,7 +104,7 @@ public class BtDictionary extends BtType {
         LinkedHashMap<String, Object> map = new LinkedHashMap<>();
 
         for (Map.Entry<String, Object> entry : dictionary.vector.entrySet()) {
-            map.put(entry.getKey(), bTypeToJType(entry.getValue()));
+            map.put(entry.getKey(), toJType(entry.getValue()));
         }
 
         return map;

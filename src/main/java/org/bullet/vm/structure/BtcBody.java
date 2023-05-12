@@ -7,7 +7,7 @@ import org.bullet.vm.structure.components.BtcVariable;
  * @author Huyemt
  */
 
-public class BtcCommon {
+public class BtcBody {
     /**
      * 字节码
      */

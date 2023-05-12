@@ -4,7 +4,7 @@ import org.bullet.HexUtil;
 import org.bullet.base.types.BtNumber;
 import org.bullet.exceptions.vm.VMException;
 import org.bullet.vm.BtcVM;
-import org.bullet.vm.structure.BtcType;
+import org.bullet.vm.structure.BtcProgram;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -61,7 +61,7 @@ public class BtcWriter {
 
     public <T> BtcWriter putConstant(T obj) throws VMException {
         if (obj == null) {
-            constants.add((byte) BtcType.NULL);
+            constants.add((byte) BtcProgram.NULL);
             constantCount++;
         } else if (!(obj instanceof String || obj instanceof BtNumber))
             throw new VMException("Unsupport type");
@@ -75,13 +75,13 @@ public class BtcWriter {
     private BtcWriter putString(String str) {
 
         if (str == null)
-            constants.add((byte) BtcType.NULL);
+            constants.add((byte) BtcProgram.NULL);
         else {
             byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
-            int type = bytes.length == 0 || str.length() <= 65535 ? BtcType.SHORT_STRING : BtcType.LONG_STRING;
+            int type = bytes.length == 0 || str.length() <= 65535 ? BtcProgram.SHORT_STRING : BtcProgram.LONG_STRING;
 
             constants.add((byte) type);
-            intoList(type == BtcType.LONG_STRING ? HexUtil.toBytes((long) bytes.length) : HexUtil.toBytes(bytes.length));
+            intoList(type == BtcProgram.LONG_STRING ? HexUtil.toBytes((long) bytes.length) : HexUtil.toBytes(bytes.length));
             intoList(bytes);
         }
 
@@ -93,12 +93,12 @@ public class BtcWriter {
     private BtcWriter putNumber(BtNumber number) {
 
         if (number == null)
-            constants.add((byte) BtcType.NULL);
+            constants.add((byte) BtcProgram.NULL);
         else {
             String str = number.toString();
             byte[] bytes = str.getBytes(StandardCharsets.UTF_8);
 
-            constants.add((byte) BtcType.NUMBER);
+            constants.add((byte) BtcProgram.NUMBER);
             intoList(HexUtil.toBytes(bytes.length));
             intoList(bytes);
         }

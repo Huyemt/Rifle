@@ -29,10 +29,10 @@ public class BtDecJsonFunction extends BtBulitInFunction {
 
             if (m.startsWith("[")) {
                 LinkedList<Object> r = Json4J.parse(objS, LinkedList.class);
-                return BtType.jTypeToBType(r);
+                return BtType.toBType(r);
             } else if (m.startsWith("{")) {
                 LinkedHashMap<String, Object> r = Json4J.parse(objS, LinkedHashMap.class);
-                return BtType.jTypeToBType(r);
+                return BtType.toBType(r);
             }
 
             throw new BulletException("Abnormal json structure in string");

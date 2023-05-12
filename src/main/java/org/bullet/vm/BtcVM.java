@@ -37,13 +37,6 @@ public class BtcVM {
      */
     public static final byte[] birth = { '2', '0', '2', '3' };
 
-    public static ReaderCode checkHeaders(byte[] signature, short[] version, byte[] birth) {
-        if (!Arrays.equals(signature, BtcVM.signature) || !Arrays.equals(birth, BtcVM.birth)) return ReaderCode.FAIL;
-        if (BtcVM.version[0] < version[0] || BtcVM.version[1] < version[1]) return ReaderCode.VERSION;
-
-        return ReaderCode.SUCCESS;
-    }
-
     public BtcVM() {
 
     }
@@ -64,8 +57,8 @@ public class BtcVM {
 
         System.out.println("\nConstant table:");
         Object object;
-        for (int i = 0; i < program.common.constants.length; i++) {
-            object = program.common.constants[i];
+        for (int i = 0; i < program.body.constants.length; i++) {
+            object = program.body.constants[i];
             System.out.printf("\t[%d] %s -> %s%n", i, object.getClass().getSimpleName(), object);
         }
 

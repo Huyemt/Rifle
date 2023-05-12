@@ -52,7 +52,7 @@ public class BtCustomFunction extends BtFunction {
 
         int i = 0;
         for (String name : node.params.keySet()) {
-            environment.params.put(name, BtType.jTypeToBType(args[i]));
+            environment.params.put(name, BtType.toBType(args[i]));
             i++;
         }
 

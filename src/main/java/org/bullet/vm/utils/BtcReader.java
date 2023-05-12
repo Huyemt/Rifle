@@ -2,11 +2,11 @@ package org.bullet.vm.utils;
 
 import org.bullet.HexUtil;
 import org.bullet.base.types.BtNumber;
-import org.bullet.exceptions.vm.VMBtcCorruptedException;
+import org.bullet.exceptions.vm.BtcCorruptedException;
 import org.bullet.exceptions.vm.VMException;
 import org.bullet.interpreter.BulletRuntime;
+import org.bullet.vm.structure.BtcProgram;
 import org.bullet.vm.structure.components.BtcFunction;
-import org.bullet.vm.structure.BtcType;
 import org.bullet.vm.structure.components.BtcVariable;
 
 import java.io.File;
@@ -50,21 +50,21 @@ public class BtcReader {
 
         try {
             switch (type) {
-                case BtcType.NULL:
+                case BtcProgram.NULL:
                     return BulletRuntime.BTNULL;
-                case BtcType.BOOLEAN:
+                case BtcProgram.BOOLEAN:
                     return buffer.get() != 0;
-                case BtcType.NUMBER:
-                    return new BtNumber(readString(BtcType.SHORT_STRING));
-                case BtcType.SHORT_STRING:
-                case BtcType.LONG_STRING:
+                case BtcProgram.NUMBER:
+                    return new BtNumber(readString(BtcProgram.SHORT_STRING));
+                case BtcProgram.SHORT_STRING:
+                case BtcProgram.LONG_STRING:
                     return readString(type);
             }
         } catch (Exception e) {
             throw new VMException(e.getMessage());
         }
 
-        throw new VMBtcCorruptedException(file);
+        throw new BtcCorruptedException(file);
     }
 
     public Object[] readConstants() throws VMException {
@@ -94,12 +94,12 @@ public class BtcReader {
     public String readString(int type) throws VMException {
         int size;
 
-        if (type == BtcType.LONG_STRING)
+        if (type == BtcProgram.LONG_STRING)
             size = (int) readLong();
-        else if (type == BtcType.SHORT_STRING)
+        else if (type == BtcProgram.SHORT_STRING)
             size = readInt();
         else
-            throw new VMBtcCorruptedException(file);
+            throw new BtcCorruptedException(file);
 
         if (size == 0) return "";
 

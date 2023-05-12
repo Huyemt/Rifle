@@ -11,7 +11,8 @@ import java.util.Map;
  */
 
 public class BtType {
-    public static Object jTypeToBType(Object v) throws BulletException {
+
+    public static Object toBType(Object v) throws BulletException {
         if (v == null) {
             return BulletRuntime.BTNULL;
         }
@@ -63,7 +64,7 @@ public class BtType {
         return v;
     }
 
-    public static Object bTypeToJType(Object v) {
+    public static Object toJType(Object v) {
         if (v instanceof BtList) {
             return ((BtList) v).toArray();
         }

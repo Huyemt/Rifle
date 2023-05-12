@@ -24,7 +24,7 @@ public class BtBulitInFunction extends BtFunction {
         if (isVarParam) {
             ArrayList<Object> list = new ArrayList<>();
             for (Object arg : args) {
-                list.add(BtType.jTypeToBType(arg));
+                list.add(BtType.toBType(arg));
             }
 
             return eval(list.toArray());
@@ -36,7 +36,7 @@ public class BtBulitInFunction extends BtFunction {
             String[] params = this.args.keySet().toArray(String[]::new);
 
             for (int i = 0; i < args.length; i++) {
-                g.put(params[i], BtType.jTypeToBType(args[i]));
+                g.put(params[i], BtType.toBType(args[i]));
             }
 
             for (int i = args.length; i < this.args.size(); i++) {
@@ -50,7 +50,7 @@ public class BtBulitInFunction extends BtFunction {
         } else if (args.length == this.args.size()) {
             int i = 0;
             for (String name : this.args.keySet()) {
-                g.put(name, BtType.jTypeToBType(args[i]));
+                g.put(name, BtType.toBType(args[i]));
                 i++;
             }
         } else {
