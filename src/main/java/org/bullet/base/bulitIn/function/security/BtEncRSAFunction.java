@@ -53,7 +53,7 @@ public class BtEncRSAFunction extends BtBulitInFunction {
                 return dictionary;
             } else {
                 RSA.EncryptConfig config = new RSA.EncryptConfig();
-                config.PADDING = getPadding(((BtNumber) padding).toInteger());
+                config.PADDING = getPadding((int) ((BtNumber) padding).toLong());
 
                 return Crypto4J.RSA.encrypt(content.toString(), key.toString(), config);
             }

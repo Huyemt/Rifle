@@ -40,7 +40,7 @@ public class BtDecRSAFunction extends BtBulitInFunction {
         }
 
         RSA.DecryptConfig config = new RSA.DecryptConfig();
-        config.PADDING = getPadding(((BtNumber) padding).toInteger());
+        config.PADDING = getPadding((int) ((BtNumber) padding).toLong());
 
         try {
             return Crypto4J.RSA.decrypt((String) content, (String) key, config);

@@ -27,6 +27,11 @@ public class BtNumber extends BtType {
         value = new BigDecimal(v);
     }
 
+    public BtNumber(long v) {
+        under = null;
+        value = new BigDecimal(String.valueOf(v));
+    }
+
     public BtNumber(BigDecimal molecule) throws BulletException {
         this(molecule.toPlainString());
     }
@@ -104,12 +109,12 @@ public class BtNumber extends BtType {
         return exact().compareTo(number.exact());
     }
 
-    public int toInteger() {
-        return exact().intValue();
+    public long toLong() {
+        return exact().longValue();
     }
 
-    public int toIntegerE() {
-        return exact().intValueExact();
+    public double toDouble() {
+        return exact().doubleValue();
     }
 
     public BtNumber clone() {

@@ -56,9 +56,9 @@ public class BtEncAESFunction extends BtBulitInFunction {
 
         try {
             if (!(iv instanceof BtNull) && ((String) iv).length() > 0)
-                return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()), iv.toString());
+                return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode((int) ((BtNumber) mode).toLong()), getPadding((int) ((BtNumber) padding).toLong()), iv.toString());
             else
-                return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode(((BtNumber) mode).toInteger()), getPadding(((BtNumber) padding).toInteger()));
+                return Crypto4J.AES.encrypt(content.toString(), key.toString(), getMode((int) ((BtNumber) mode).toLong()), getPadding((int) ((BtNumber) padding).toLong()));
         } catch (Exception e) {
             throw new BulletException(e.getMessage());
         }

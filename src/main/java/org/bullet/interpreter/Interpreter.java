@@ -136,7 +136,7 @@ public class Interpreter extends Visitor {
                         throw new RuntimeException(node.position, String.format("Multiplication of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                     case DIV:
                         if (right instanceof BtNumber) {
-                            if (((BtNumber) right).toInteger() == 0)
+                            if (((BtNumber) right).toLong() == 0)
                                 throw new RuntimeException(node.position, "Cannot divide by zero");
 
                             return ((BtNumber) left).divide((BtNumber) right);
@@ -145,7 +145,7 @@ public class Interpreter extends Visitor {
                         throw new RuntimeException(node.position, String.format("Division of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                     case MOD:
                         if (right instanceof BtNumber) {
-                            if (((BtNumber) right).toInteger() == 0)
+                            if (((BtNumber) right).toLong() == 0)
                                 throw new RuntimeException(node.position, "Cannot divide by zero");
 
                             return ((BtNumber) left).mod((BtNumber) right);
@@ -153,7 +153,7 @@ public class Interpreter extends Visitor {
 
                         throw new RuntimeException(node.position, String.format("Remainder of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                     case POW:
-                        if (right instanceof BtNumber) return ((BtNumber) left).pow(((BtNumber) right).toInteger());
+                        if (right instanceof BtNumber) return ((BtNumber) left).pow((int) ((BtNumber) right).toLong());
 
                         throw new RuntimeException(node.position, String.format("Exponentiation  of type \"%s\" is not supported for numeric types", right.getClass().getSimpleName()));
                 }
@@ -177,7 +177,7 @@ public class Interpreter extends Visitor {
                 }
 
                 if (node.operator == BinaryNode.Operator.MUL) {
-                    if (right instanceof BtNumber) return ((String) left).repeat(((BtNumber) right).toInteger());
+                    if (right instanceof BtNumber) return ((String) left).repeat((int) ((BtNumber) right).toLong());
 
                     throw new RuntimeException(node.position, "A string can only be multiplied to a number");
                 }
@@ -600,7 +600,7 @@ public class Interpreter extends Visitor {
                         throw new RuntimeException(indexNode.start.position, "Complex index values must be numbers");
                     }
 
-                    start = ((BtNumber) i).toInteger();
+                    start = (int) ((BtNumber) i).toLong();
 
                     if (start < 0) {
                         throw new RuntimeException(indexNode.start.position, "Index value less than 0 is not allowed");
@@ -620,7 +620,7 @@ public class Interpreter extends Visitor {
                         throw new RuntimeException(indexNode.end.position, "Complex index values must be numbers");
                     }
 
-                    end = ((BtNumber) i).toInteger();
+                    end = (int) ((BtNumber) i).toLong();
 
                     if (end < 0) {
                         throw new RuntimeException(indexNode.end.position, "Index value less than 0 is not allowed");
@@ -729,7 +729,7 @@ public class Interpreter extends Visitor {
 
                     if (v instanceof BtList) {
                         BtList btList = (BtList) v;
-                        len = i == null ? btList.size() - 1 : ((BtNumber) i).toInteger();
+                        len = i == null ? btList.size() - 1 : (int) ((BtNumber) i).toLong();
                         if (len >= btList.size() || len < 0) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("List index %d is out of range %d", len, btList.size()));
                         }
@@ -737,7 +737,7 @@ public class Interpreter extends Visitor {
                         v = btList.get(len);
                     } else if (v instanceof String) {
                         String str = (String) v;
-                        len = i == null ? str.length() - 1 : ((BtNumber) i).toInteger();
+                        len = i == null ? str.length() - 1 : (int) ((BtNumber) i).toLong();
                         if (len >= str.length()) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("String index %d is out of range %d", len, str.length()));
                         }
@@ -745,7 +745,7 @@ public class Interpreter extends Visitor {
                         v = String.valueOf(str.charAt(len));
                     } else {
                         BtByteString str = (BtByteString) v;
-                        len = i == null ? str.size() - 1 : ((BtNumber) i).toInteger();
+                        len = i == null ? str.size() - 1 : (int) ((BtNumber) i).toLong();
                         if (len >= str.size()) {
                             throw new RuntimeException(indexNode.start != null ? indexNode.start.position : indexNode.position, String.format("ByteString index %d is out of range %d", len, str.size()));
                         }
@@ -802,7 +802,7 @@ public class Interpreter extends Visitor {
                         if (index == null) {
                             list.add(result);
                         } else {
-                            int n = ((BtNumber) index).toInteger();
+                            int n = (int) ((BtNumber) index).toLong();
 
                             if (n > list.size()) {
                                 throw new RuntimeException(node.position, String.format("List index %d is out of range %d", n, list.size()));
@@ -884,7 +884,7 @@ public class Interpreter extends Visitor {
                         if (index == null) {
                             list.add(result);
                         } else {
-                            int n = ((BtNumber) index).toInteger();
+                            int n = (int) ((BtNumber) index).toLong();
 
                             if (n > list.size()) {
                                 throw new RuntimeException(address.start.position, String.format("List index %d is out of range %d", n, list.size()));

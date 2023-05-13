@@ -1,1 +1,0 @@
-println( typeof( "你好" ) )

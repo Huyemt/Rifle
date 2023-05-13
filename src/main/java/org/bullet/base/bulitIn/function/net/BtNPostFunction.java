@@ -80,7 +80,7 @@ public class BtNPostFunction extends BtBulitInFunction {
         HttpConfig config = new HttpConfig();
 
         config.allowsRedirect((boolean) allowRediectV);
-        config.timeout(((BtNumber) timeoutV).toInteger());
+        config.timeout((int) ((BtNumber) timeoutV).toLong());
 
         params.setAll(((BtDictionary) paramsV).toMap());
 

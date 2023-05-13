@@ -64,6 +64,10 @@ public class HexUtil {
         return v;
     }
 
+    public static short toShort(byte b) {
+        return (short) (b & 0xFF);
+    }
+
     public static short toShort(byte[] b) {
         return (short) (b[1] & 0xFF | (b[0] & 0xFF) << 8);
     }
